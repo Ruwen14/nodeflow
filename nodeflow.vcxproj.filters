@@ -38,10 +38,13 @@
     <ClInclude Include="src\core\NFSettings.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\NFTypeInfo.h">
+    <ClInclude Include="src\core\NFTypeInfoChaiscript.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\core\NFPin.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\NFTypeInfo.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

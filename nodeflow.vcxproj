@@ -151,7 +151,8 @@
     <ClInclude Include="src\core\NFAbstractNodeModel.h" />
     <ClInclude Include="src\core\NFPin.h" />
     <ClInclude Include="src\core\NFSettings.h" />
-    <ClInclude Include="src\core\NFTypeInfo.h">
+    <ClInclude Include="src\core\NFTypeInfo.h" />
+    <ClInclude Include="src\core\NFTypeInfoChaiscript.h">
       <SubType>
       </SubType>
     </ClInclude>
