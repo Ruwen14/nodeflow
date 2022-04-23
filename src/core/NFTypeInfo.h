@@ -171,37 +171,21 @@ namespace nodeflow
 
 	} // namespace detail
 
-	/// \brief Creates a Type_Info object representing the type passed in
-	/// \tparam T Type of object to get a Type_Info for, derived from the passed in parameter
-	/// \return Type_Info for T
-	///
-	/// \b Example:
-	/// \code
-	/// int i;
-	/// chaiscript::Type_Info ti = chaiscript::user_type(i);
-	/// \endcode
+	
 	template<typename T>
 	constexpr Type_Info user_type(const T& /*t*/) noexcept {
 		return detail::Get_Type_Info<T>::get();
 	}
 
-	/// \brief Creates a Type_Info object representing the templated type
-	/// \tparam T Type of object to get a Type_Info for
-	/// \return Type_Info for T
-	///
-	/// \b Example:
-	/// \code
-	/// chaiscript::Type_Info ti = chaiscript::user_type<int>();
-	/// \endcode
+
 	template<typename T>
 	constexpr Type_Info user_type() noexcept {
 		return detail::Get_Type_Info<T>::get();
 	}
 
-} // namespace chaiscript
+} 
 
 
 
 
 
-}
