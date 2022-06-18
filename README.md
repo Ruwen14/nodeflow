@@ -11,11 +11,6 @@ Still in _very_ early development.
 - [x] Dynamic Input and Output Pins
 - [x] Easy Implementation of custom nodes 
 
-- c++ version of retejs: https://github.dev/retejs/cpp-engine
-- https://github.com/skypjack/entt/issues/658
-- Look into https://skypjack.github.io/entt/md_docs_md_core.html
-- Look into https://github.com/foonathan/string_id
-
 ## How to implement Execution
 - Every Node stores a vector<Signal> output and vector<const Signal*> input, so the input of a node is just the view on the ouput of the connected node
 - getInput -> returns const Template* that can be nullptr if not connected.
@@ -25,6 +20,12 @@ Still in _very_ early development.
 
 # UUID
 - See Chernos video for uin64_t uuid (enough)
+
+## Look Into
+- c++ version of retejs: https://github.dev/retejs/cpp-engine
+- https://github.com/skypjack/entt/issues/658
+- Look into https://skypjack.github.io/entt/md_docs_md_core.html
+- Look into https://github.com/foonathan/string_id
 
 
 <!--
