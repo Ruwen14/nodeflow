@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "utility/entt.h"
 
 template<typename T>
 inline void pprint_internal(const T& t)
@@ -21,7 +22,13 @@ namespace nodeflow
 		{
 			pprint_internal(arg);
 			std::cout << ", ";
-			pprint(args...); // pass the args further
+			print(args...); // pass the args further
 		}
+	}
+
+
+	void printIntId()
+	{
+		print(entt::type_id<std::string>().index());
 	}
 }
