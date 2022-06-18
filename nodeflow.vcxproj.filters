@@ -26,25 +26,58 @@
     <ClInclude Include="src\utility\ppmagic.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\NFAbstractNodeModel.h">
+    <ClInclude Include="src\core\NFAbstractNodeModel.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\Header.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\NFUserNode.h">
+    <ClInclude Include="src\core\NFUserNode.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\NFSettings.h">
+    <ClInclude Include="src\core\NFSettings.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\NFTypeInfoChaiscript.h">
+    <ClInclude Include="src\core\NFTypeInfo.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\NFPin.h">
+    <ClInclude Include="src\utility\timer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\NFTypeInfo.h">
+    <ClInclude Include="src\utility\entt.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utility\any.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\NumericConversion.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\TypeConversion.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utility\nfutils.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\StaticNodeModel.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\TypeTricks.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\NodeStyle.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\NFPainter.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utility\tmp.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\ValueWrapper.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\IOPort.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

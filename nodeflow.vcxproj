@@ -88,6 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -133,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -148,21 +149,44 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\core\NFAbstractNodeModel.h" />
-    <ClInclude Include="src\core\NFPin.h" />
-    <ClInclude Include="src\core\NFSettings.h" />
-    <ClInclude Include="src\core\NFTypeInfo.h" />
-    <ClInclude Include="src\core\NFTypeInfoChaiscript.h">
+    <ClInclude Include="src\core\IOPort.h">
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="src\core\NFUserNode.h">
+    <ClInclude Include="src\core\NFPainter.hpp" />
+    <ClInclude Include="src\core\NodeStyle.hpp" />
+    <ClInclude Include="src\core\TypeTricks.hpp" />
+    <ClInclude Include="src\core\NFAbstractNodeModel.hpp" />
+    <ClInclude Include="src\core\NFSettings.hpp" />
+    <ClInclude Include="src\core\NFTypeInfo.hpp" />
+    <ClInclude Include="src\core\NFUserNode.hpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="src\core\NumericConversion.hpp" />
+    <ClInclude Include="src\core\StaticNodeModel.hpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="src\core\TypeConversion.hpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="src\core\ValueWrapper.h">
       <SubType>
       </SubType>
     </ClInclude>
     <ClInclude Include="src\Header.h" />
+    <ClInclude Include="src\utility\any.h" />
+    <ClInclude Include="src\utility\entt.h" />
+    <ClInclude Include="src\utility\nfutils.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="src\utility\ppmagic.h" />
     <ClInclude Include="src\utility\print.h" />
+    <ClInclude Include="src\utility\timer.h" />
+    <ClInclude Include="src\utility\tmp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
