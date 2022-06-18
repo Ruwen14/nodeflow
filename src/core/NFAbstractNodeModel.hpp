@@ -82,6 +82,7 @@ namespace nodeflow
 		virtual ~NFAbstractNodeModel() = default;
 
 	public:
+
 		std::string name() const noexcept;
 
 		void setName(const std::string& name) noexcept;
@@ -125,7 +126,10 @@ namespace nodeflow
 
 	protected:
 		/* Possible Interface for dynamic Node
-		void addPin(const detail::NFTypeInfo& type, const std::string); */
+		bool addPort(const detail::NFTypeInfo& type, const std::string); */
+
+		/* Possible Interface for dynamic Node
+		bool removePort(const detail::NFTypeInfo& type, const std::string); */
 
 		/* Possible Interface for dynamic Node Dat
 		bool setPinData(int pin, PinFlag f, const PinType& t_data,
