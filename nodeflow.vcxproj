@@ -149,6 +149,11 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Downloads\sol.hpp" />
+    <ClInclude Include="src\core\CodeGen.hpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="src\core\IOPort.h">
       <SubType>
       </SubType>
@@ -176,7 +181,6 @@
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="src\Header.h" />
     <ClInclude Include="src\utility\any.h" />
     <ClInclude Include="src\utility\entt.h" />
     <ClInclude Include="src\utility\nfutils.h">
