@@ -26,13 +26,13 @@ namespace cpputils
 
 	template<typename T, typename = typename
 		std::enable_if<std::is_fundamental<T>::value>::type>
-		inline void pprint_internal(const T t)
+	inline void pprint_internal(const T t)
 	{
 		std::cout << t;
 	}
 	template<typename T, typename = typename
-		std::enable_if<!std::is_fundamental<T>::value>::type>
-		inline void pprint_internal(const T& t)
+	std::enable_if<!std::is_fundamental<T>::value>::type>
+	inline void pprint_internal(const T& t)
 	{
 		std::cout << stringify(t);
 	}
