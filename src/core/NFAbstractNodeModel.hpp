@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-// #include "core/NFTypeInfo.h"
+
 
 #include <string>
 #include <vector>
