@@ -32,9 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "3rdparty/entt/src/entt/entt.hpp"
 #include <type_traits>
 #include <iostream>
+#include <functional>
+
 
 namespace nodeflow
 {
@@ -55,6 +56,9 @@ namespace nodeflow
 			return index_in_tuple_fn<I + 1, T, Tuple_t>();
 		}
 	}
+
+
+
 
 	template<typename T, typename Tuple_t>
 	struct index_in_tuple {
@@ -92,5 +96,16 @@ namespace nodeflow
 	static constexpr auto has_ostream_operator_v = is_streamable<std::ostream, T>::value;
 
 
+	template<typename Ret, class... Params>
+	struct FuncSignature
+	{
+	};
+
+	template<typename Ret, class... Params>
+	struct FuncSignature<std::function<Ret(Params...)>>
+	{
+		using ReturnType_t = Ret;
+		using ParamTypes_t = std::tuple<Params...>;
+	};
 
 }
