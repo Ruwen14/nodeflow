@@ -34,13 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "TypeTricks.hpp"
-#include "3rdparty/entt/single_include/entt/entt.hpp"
+#include "../3rdparty/entt/single_include/entt/entt.hpp"
 
-namespace nodeflow
+namespace nf
 {
 
 	template< typename T >
-	struct type_names;
+	struct type_names {};
 
 	template< typename... Ts >
 	struct type_names< std::tuple< Ts... > >
@@ -52,8 +52,8 @@ namespace nodeflow
 	template<auto Func>
 	struct FunctionCodeContext
 	{
-		using ReturnType = typename nodeflow::FuncSignature<decltype(std::function{ Func }) > ::ReturnType_t;
-		using ArgumentTypes = typename nodeflow::FuncSignature<decltype(std::function{ Func }) > ::ParamTypes_t;
+		using ReturnType = typename nf::FuncSignature<decltype(std::function{ Func }) > ::ReturnType_t;
+		using ArgumentTypes = typename nf::FuncSignature<decltype(std::function{ Func }) > ::ParamTypes_t;
 
 		static constexpr auto FunctionName() noexcept
 		{
