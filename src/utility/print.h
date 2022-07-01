@@ -8,7 +8,7 @@ inline void pprint_internal(const T& t)
 	std::cout << t;
 }
 
-namespace nodeflow
+namespace nf
 {
 	template <typename Arg, typename...Args>
 	inline constexpr void print(const Arg& arg, const Args&... args) noexcept
@@ -32,3 +32,4 @@ namespace nodeflow
 		print(entt::type_id<std::string>().index());
 	}
 }
+
