@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "3rdparty/entt/single_include/entt/entt.hpp"
 
-namespace nodeflow::detail
+namespace nf::detail
 {
 	template<class ITs = std::tuple<void>, class OTs = std::tuple<void>>
 	struct StaticNodeArgs_
@@ -57,7 +57,7 @@ namespace nodeflow::detail
 	};
 }
 
-namespace nodeflow::detail
+namespace nf::detail
 {
 	template<
 		class FixedITs,
@@ -90,8 +90,8 @@ namespace nodeflow::detail
 
 }
 
-using StaticNodeArgs = nodeflow::detail::StaticNodeArgs_<>;
-using DynamicNodeArgs = nodeflow::detail::DynamicNodeArgs_<std::tuple<void>, std::tuple<void>, std::tuple<void>, std::tuple<void>, 0, 0>;
+using StaticNodeArgs = nf::detail::StaticNodeArgs_<>;
+using DynamicNodeArgs = nf::detail::DynamicNodeArgs_<std::tuple<void>, std::tuple<void>, std::tuple<void>, std::tuple<void>, 0, 0>;
 
 using Args = StaticNodeArgs::SetupInput<int>;
 
@@ -138,7 +138,7 @@ struct TypeHashArray<std::tuple<Ts...>>
 
 
 
-namespace nodeflow
+namespace nf
 {
 	template<class... Types>
 	struct PinTypes

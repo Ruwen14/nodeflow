@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 
 
-namespace nodeflow
+namespace nf
 {
 	template <class T, class... Types>
 	inline constexpr bool is_any_of_v = std::disjunction<std::is_same<T, Types>...>{};
@@ -106,6 +106,15 @@ namespace nodeflow
 	{
 		using ReturnType_t = Ret;
 		using ParamTypes_t = std::tuple<Params...>;
+	};
+
+// 
+	template<typename Ret, typename Cls, class... Params >
+	struct FuncSignature<std::function<Ret (Cls::*)(Params...)>>
+	{
+		using ReturnType_t = Ret;
+		using ParamTypes_t = std::tuple<Params...>;
+		using ClassType_t = Cls;
 	};
 
 }

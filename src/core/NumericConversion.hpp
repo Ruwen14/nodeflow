@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TypeTricks.h"
 
 
-namespace nodeflow
+namespace nf
 {
 	enum class NumericConversionState
 	{

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 #include <string>
 
-namespace nodeflow
+namespace nf
 {
 	template<int Count, class... Types>
 	struct InputPins
