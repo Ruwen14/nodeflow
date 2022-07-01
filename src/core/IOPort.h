@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ValueWrapper.h"
 
-namespace nodeflow
+namespace nf
 {
 	class PortView;
 
@@ -54,10 +54,16 @@ namespace nodeflow
 		int portIndex = -1;
 	};
 
+
+
+
+
 	template<typename T>
 	class OutputPort : public ValueWrapper<T>
 	{
 		friend class PortView;
+	public:
+		static constexpr bool valid = true;
 	public:
 		OutputPort() = default;
 		OutputPort(const T& defaultVal)
@@ -67,6 +73,23 @@ namespace nodeflow
 	private:
 		int portIndex = -1;
 	};
+
+	template<>
+	class OutputPort<void> : public ValueWrapper<void>
+	{
+		friend class PortView;
+	public:
+		static constexpr bool valid = false;
+	public:
+		OutputPort() = default;
+
+	private:
+		int portIndex = -1;
+	};
+
+
+
+
 
 	template<typename T, size_t minPorts = 1, size_t maxPorts = 255, unsigned int defaultPorts = minPorts>
 	class InputPortGroup
