@@ -32,43 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "3rdparty/entt/single_include/entt/entt.hpp"
-#include "TypeTricks.hpp"
 
 
-namespace nf
-{
-
-	template<typename T>
-	class ValueWrapper
-	{
-	public:
-		using type_t = T;
-	public:
-		static constexpr auto typeID = entt::type_hash<T>::value();
-		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
-
-	public:
-		ValueWrapper() = default;
-		ValueWrapper(const T& instance)
-			: value(instance)
-		{
-		}
-
-	public:
-		T value;
-	};
-
-	template<>
-	class ValueWrapper<void>
-	{
-	public:
-		using type_t = void;
-		static constexpr auto typeID = entt::type_hash<type_t>::value();
-		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
-
-		ValueWrapper() = default;
-
-	};
-
-}
+// LOOK INTO std::mem_fn
+// https://en.cppreference.com/w/cpp/utility/functional/mem_fn

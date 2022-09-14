@@ -27,7 +27,10 @@ Still in _very_ early development.
 - Look into https://skypjack.github.io/entt/md_docs_md_core.html
 - Look into https://github.com/foonathan/string_id
 
+FKismetCompilerContext::Compile https://docs.unrealengine.com/4.26/en-US/API/Editor/KismetCompiler/FKismetCompilerContext/Compile/
+struct FFuncInfo
 
+https://s1t2.com/blog/brief-intro-k2nodes
 <!--
 - Look into ChaiScript Types
   -  any.hpp https://github.com/ChaiScript/ChaiScript/blob/3aa1fa8278efaa369487f5a7203f3b483a6ae09c/include/chaiscript/dispatchkit/any.hpp

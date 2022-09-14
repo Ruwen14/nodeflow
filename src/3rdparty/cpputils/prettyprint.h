@@ -37,6 +37,17 @@ namespace cpputils
 		std::cout << stringify(t);
 	}
 
+
+	template<typename T>
+	inline void pprint_internal(T* ptr)
+	{
+		if (ptr)
+			std::cout << ptr;
+		else
+			std::cout << "nullptr";
+	}
+
+
 	inline void pprint_internal(const bool b)
 	{
 		std::cout << (b ? "true" : "false");
@@ -56,6 +67,8 @@ namespace cpputils
 	{
 		std::cout << s;
 	}
+
+
 
 	template <typename Arg, typename...Args>
 	inline constexpr void pprint(const Arg& arg, const Args&... args) noexcept

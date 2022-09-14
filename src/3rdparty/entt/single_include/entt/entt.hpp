@@ -50,7 +50,7 @@
 
 #ifndef ENTT_ID_TYPE
 #    include <cstdint>
-#    define ENTT_ID_TYPE std::uint32_t
+#    define ENTT_ID_TYPE std::uint64_t
 #endif
 
 #ifndef ENTT_SPARSE_PAGE

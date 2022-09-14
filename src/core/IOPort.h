@@ -35,12 +35,89 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "3rdparty/entt/single_include/entt/entt.hpp"
-
 #include "ValueWrapper.hpp"
+
+#include <optional>
+#include <functional>
 
 namespace nf
 {
-	class PortView;
+	class Node;
+	struct ExecutionPinOut
+	{
+		// ToDo: Maybe name = "branch1 | branch2" [if branchable]
+
+		enum BranchFlag : std::uint8_t {
+			Unbranchable = 0,
+			FirstBranch = 1,
+			SecondBranch = 2,
+			StopExecution = 3
+		};
+
+		inline void MakeBranchable() noexcept
+		{
+			flag = FirstBranch;
+		}
+
+		inline bool Branchable() const noexcept
+		{
+			return flag != Unbranchable;
+		}
+		inline void BranchFirst() noexcept
+		{
+			if (flag != Unbranchable)
+				flag = FirstBranch;
+		}
+		inline void BranchSecond() noexcept
+		{
+			if (flag != Unbranchable)
+				flag = SecondBranch;
+		}
+		inline void ToggleBranch() noexcept
+		{
+			if (flag == FirstBranch)
+				flag = SecondBranch;
+			else if (flag == SecondBranch)
+				flag = FirstBranch;
+			else
+				return;
+		}
+
+		inline void ForceStopExecution() noexcept
+		{
+			flag = StopExecution;
+		}
+
+		inline Node* GetLinkedNodeToBeExecuted() const noexcept
+		{
+			if (flag == StopExecution)
+				return nullptr;
+
+			if (flag == SecondBranch)
+				return linkedNodeSecondBranch;
+			return linkedNodeFirstBranch; // Case for Unbranchable and FirstBranch
+		}
+
+		inline bool IsConnected() const noexcept
+		{
+			return linkedNodeFirstBranch || linkedNodeSecondBranch;
+		}
+
+	private:
+		Node* linkedNodeFirstBranch = nullptr;
+		Node* linkedNodeSecondBranch = nullptr;
+	public:
+		BranchFlag flag = Unbranchable; // Either 0 or 1
+	};
+
+
+
+
+
+
+
+
+	class OutputPinHandle;
 
 	template<typename T>
 	class InputPort
@@ -61,7 +138,7 @@ namespace nf
 	template<typename T>
 	class OutputPort : public ValueWrapper<T>
 	{
-		friend class PortView;
+		friend class OutputPinHandle;
 	public:
 		static constexpr bool valid = true;
 	public:
@@ -70,14 +147,16 @@ namespace nf
 			: ValueWrapper<T>(defaultVal)
 		{}
 
-	private:
+		// Serialization operator <<
+
+	public:
 		int portIndex = -1;
 	};
 
 	template<>
 	class OutputPort<void> : public ValueWrapper<void>
 	{
-		friend class PortView;
+		friend class OutputPinHandle;
 	public:
 		static constexpr bool valid = false;
 	public:
@@ -116,44 +195,63 @@ namespace nf
 		unsigned int portCount_ = defaultPorts;
 	};
 
-
-	class PortView
+	// IDK maybe call id NfOutDataHandle like MDataHandle
+	class OutputPinHandle
 	{
 	public:
 		template<typename T>
-		PortView(const OutputPort<T>& port)
-			: typeID(port.typeID), view(&port.value)
+		OutputPinHandle(OutputPort<T>& port)
+			: typeID_(port.typeID), view(&port.value)
 		{
 		}
 
-		template<typename T>
-		const T* peek() const
+		template<typename Type>
+		const Type* valuePtr() const noexcept
 		{
-			static constexpr auto T_typeID = entt::type_hash<T>::value();
-			if (typeID != T_typeID)
+			return valueRef<Type>();
+		}
+
+		template<typename Type>
+		Type* valueRef() const noexcept
+		{
+			static constexpr auto Type_typeID = entt::type_hash<Type>::value();
+			if (typeID_ != Type_typeID)
 				return nullptr;
-			return static_cast<const T*>(view);
+			return static_cast<Type*>(view);
 		}
 
-		const void* data() const
+		const void* data() const noexcept
 		{
 			return view;
 		}
 
-		bool empty() const
+		bool empty() const noexcept
 		{
 			return view == nullptr;
 		}
 
 		void reset()
 		{
-			typeID = 0;
+			typeID_ = entt::type_hash<void>::value();
 			view = nullptr;
 		}
 
+		template<typename Type>
+		bool isType()
+		{
+			static constexpr auto Type_typeID = entt::type_hash<Type>::value();
+			return typeID_ == Type_typeID;
+		}
+
+
+		inline uint64_t typeID() const noexcept
+		{
+			return typeID_;
+		}
+
 	private:
-		uint32_t typeID;
-		const void* view = nullptr;
+		uint64_t typeID_ = entt::type_hash<void>::value();
+		void* view = nullptr;
 	};
 
 

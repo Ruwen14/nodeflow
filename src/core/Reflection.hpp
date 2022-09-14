@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <tuple>
 #include <string_view>
 #include <type_traits>
+#include <format>
+
 
 
 namespace nf
@@ -167,5 +169,19 @@ namespace nf
 		using Type = internal::TypeReflection<Type_>;
 	};
 
+
+	template<auto Func>
+	std::string constructFunctionCall()
+	{
+		using ReflectedFunction = nf::Reflection::Function<Func>;
+
+		auto named_args = nf::Reflection::Function<Func>::ArgumentTypeNames();
+
+		return std::format("{} __LocalVar__{} = {}({})",
+			ReflectedFunction::ReturnTypeName(),
+			__COUNTER__, ReflectedFunction::FunctionName(), cpputils::str_join(named_args.begin(), named_args.end(), ", "));
+
+
+	}
 
 }
