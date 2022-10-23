@@ -578,7 +578,7 @@
     <ClInclude Include="3rdparty\sol\sol.hpp" />
     <ClInclude Include="src\core\CodeGen.hpp" />
     <ClInclude Include="src\core\FreeFunctionNode.hpp" />
-    <ClInclude Include="src\core\FuncReflection.hpp" />
+    <ClInclude Include="src\reflection\FuncReflection.hpp" />
     <ClInclude Include="src\core\Header.h" />
     <ClInclude Include="src\core\IOPort.h" />
     <ClInclude Include="src\core\MemberFunctionNode.hpp">
@@ -596,7 +596,7 @@
     <ClInclude Include="src\core\StaticNodeModel.hpp" />
     <ClInclude Include="src\core\TypeConversion.hpp" />
     <ClInclude Include="src\core\TypeTricks.hpp" />
-    <ClInclude Include="src\core\TypeReflection.hpp" />
+    <ClInclude Include="src\reflection\TypeReflection.hpp" />
     <ClInclude Include="src\core\ValueWrapper.hpp" />
     <ClInclude Include="src\lua\include\lauxlib.h" />
     <ClInclude Include="src\lua\include\lua.h" />
