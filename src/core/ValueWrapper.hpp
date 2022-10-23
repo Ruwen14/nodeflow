@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include "3rdparty/entt/single_include/entt/entt.hpp"
 #include "TypeTricks.hpp"
+#include "TypeReflection.hpp"
 
 
 namespace nf
@@ -45,8 +46,9 @@ namespace nf
 	public:
 		using type_t = T;
 	public:
-		static constexpr auto typeID = entt::type_hash<T>::value();
+		static constexpr auto typeID = nf::refltype<T>::id();
 		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
+		static constexpr auto typeID2 = nf::refltype<T>::id();
 
 	public:
 		ValueWrapper() = default;
@@ -64,7 +66,7 @@ namespace nf
 	{
 	public:
 		using type_t = void;
-		static constexpr auto typeID = entt::type_hash<type_t>::value();
+		static constexpr auto typeID = nf::refltype<type_t>::id();
 		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
 
 		ValueWrapper() = default;
