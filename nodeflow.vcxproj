@@ -117,10 +117,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\src\3rdparty\boost_preprocessor\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\src\3rdparty\boost_preprocessor\include;C:\Users\ruwen\OneDrive\Desktop\nodeflow\3rdparty</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -571,13 +571,14 @@
     <ClInclude Include="src\3rdparty\boost_preprocessor\include\boost\preprocessor\variadic\to_tuple.hpp" />
     <ClInclude Include="src\3rdparty\boost_preprocessor\include\boost\preprocessor\while.hpp" />
     <ClInclude Include="src\3rdparty\boost_preprocessor\include\boost\preprocessor\wstringize.hpp" />
-    <ClInclude Include="src\3rdparty\entt\single_include\entt\entt.hpp" />
-    <ClInclude Include="src\3rdparty\nameof\include\nameof.hpp" />
-    <ClInclude Include="src\3rdparty\sol\config.hpp" />
-    <ClInclude Include="src\3rdparty\sol\forward.hpp" />
-    <ClInclude Include="src\3rdparty\sol\sol.hpp" />
+    <ClInclude Include="3rdparty\entt\single_include\entt\entt.hpp" />
+    <ClInclude Include="3rdparty\nameof\include\nameof.hpp" />
+    <ClInclude Include="3rdparty\sol\config.hpp" />
+    <ClInclude Include="3rdparty\sol\forward.hpp" />
+    <ClInclude Include="3rdparty\sol\sol.hpp" />
     <ClInclude Include="src\core\CodeGen.hpp" />
     <ClInclude Include="src\core\FreeFunctionNode.hpp" />
+    <ClInclude Include="src\core\FuncReflection.hpp" />
     <ClInclude Include="src\core\Header.h" />
     <ClInclude Include="src\core\IOPort.h" />
     <ClInclude Include="src\core\MemberFunctionNode.hpp">
@@ -595,6 +596,7 @@
     <ClInclude Include="src\core\StaticNodeModel.hpp" />
     <ClInclude Include="src\core\TypeConversion.hpp" />
     <ClInclude Include="src\core\TypeTricks.hpp" />
+    <ClInclude Include="src\core\TypeReflection.hpp" />
     <ClInclude Include="src\core\ValueWrapper.hpp" />
     <ClInclude Include="src\lua\include\lauxlib.h" />
     <ClInclude Include="src\lua\include\lua.h" />
