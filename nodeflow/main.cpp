@@ -1,18 +1,22 @@
 #include "core/NFAbstractNodeModel.hpp"
 
-#include "3rdparty/entt/single_include/entt/entt.hpp"
-
-#include "3rdparty/cpputils/prettyprint.h"
-
 #include "core/TypeTricks.hpp"
+
+#include <entt/single_include/entt/entt.hpp>
+
+#include <cpputils/prettyprint.h>
+
 
 
 using namespace cpputils;
 
 
+
+
 // #ifdef _WIN32
 // #pragma comment(lib, "liblua54.a")
 // #endif
+
 
 
 
@@ -202,17 +206,6 @@ template<> struct NfFunction<Func> \
 // void dostuff(); 
 // NF_FUNCTION(dostuff, DisplayName("HEY"));
 
-#include <boost/preprocessor.hpp>
-
-#define NF_TUPLE(a, b) (a, b)
-
-
-
-#define MACRO(r, data, elem) \
-BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(2, 0, elem), 0), node.setDisplayName(BOOST_PP_TUPLE_ELEM(2,1, elem))) \
-
-
-#define SEQ ((0, "Hey"))((1, "Ja"))
 
 
 
@@ -671,16 +664,6 @@ struct NFColor
 };
 
 
-struct GlobalNodeStyle
-{
-	template<typename T>
-	void AddTypeColor(const NFColor& color)
-	{
-		typeColors[entt::type_hash<T>::value()] = color;
-	}
-
-	std::map<uint64_t, NFColor> typeColors;
-};
 
 void testRValue(int&& rval)
 {
@@ -714,56 +697,73 @@ constexpr int f(int a, int b, int c)
 	return a + b + c;
 }
 
-
-template<typename T>
-struct wrapper
-{
-public:
-	T val{};
-};
-
-template<typename T>
-constexpr T wrapper_get(const wrapper<T>& w)
-{
-	return w.val;
-}
-
-
 namespace nf
 {
-	// Implementation taken from std::apply MSVC
-	// Compare to https://en.cppreference.com/w/cpp/utility/apply - Implementation
-
-	template <class Func, class Tuple, size_t... seq>
-	constexpr decltype(auto) ApplyPinsOnCallable_Impl(Func&& callable, Tuple&& tupl, std::index_sequence<seq...>)
+	template<typename T>
+	struct wrapper
 	{
-		return std::invoke(std::forward<Func>(callable),
-			wrapper_get(std::get<seq>(std::forward<Tuple>(tupl)))...);
+	public:
+		T val{};
+	};
+
+	template<typename T>
+	constexpr T wrapper_get(const wrapper<T>& w)
+	{
+		return w.val;
 	}
 
-	template <class Func, class Tuple>
-	constexpr decltype(auto) ApplyPinsOnCallable(Func&& callable, Tuple&& tpl)
-	{
-		return ApplyPinsOnCallable_Impl(std::forward<Func>(callable), std::forward<Tuple>(tpl),
-			std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<Tuple>>>{});
-	}
+}
+
+void lan(int a, float b)
+{
+
+}
+
+void la2n(const int& a, float* b)
+{
 
 }
 
 
 #include "utility/timer.h"
+#include "nameof/include/nameof.hpp"
+#include "reflection/TypeReflection.hpp"
+#include "reflection/FuncReflection.hpp"
+
+struct GlobalNodeStyle
+{
+	template<typename T>
+	void setTypeColor(const NFColor& color)
+	{
+		typeColors[nf::refltype<T>::id()] = color;
+	}
+
+	template<typename T>
+	NFColor getTypeColor() const
+	{
+		return typeColors.at(nf::refltype<T>::id());
+	}
+
+	std::map<nf::typeid_t, NFColor> typeColors;
+};
+
+
+
+
 
 int main()
 {
-	
-	
+	nf::ValueWrapper<int> e{ 3 };
+	pprint(e.typeID);
 
-
-
+// 	3143511548502526014
+// 	3143511548502526014
+// 	3143511548502526014
 	return 0;
 	GlobalNodeStyle style;
-	style.AddTypeColor<int>({ 123,123,123 });
-	pprint((int)style.typeColors[entt::type_hash<int>::value()].b);
+	style.setTypeColor<int>({ 123,123,123 });
+	int a = style.getTypeColor<int>().b;
+	pprint(a);
 
 
 	// 	std::cout << ad<nf::InputPort<int>>();

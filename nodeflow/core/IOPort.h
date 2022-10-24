@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 
-#include "3rdparty/entt/single_include/entt/entt.hpp"
+#include "entt/single_include/entt/entt.hpp"
 #include "ValueWrapper.hpp"
 
 #include <optional>
