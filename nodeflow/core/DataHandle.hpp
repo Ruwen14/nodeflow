@@ -32,54 +32,87 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-
-#include "TypeReflection.hpp"
-#include "core/TypeTricks.hpp"
+#include "reflection/type_reflection.hpp"
 
 
-namespace  nf
+namespace nf::detail
 {
-	template<auto Func>
-	struct reflfunc
+	class DataHandle
 	{
-		
-		using signature_t = typename nf::FuncSignature<decltype(std::function{ Func }) > ;
-		using return_t = signature_t::ReturnType_t;
-		using argument_ts = signature_t::ParamTypes_t;
+	public:
+		DataHandle() = default;
 
-
-		static constexpr bool ismethod() noexcept
+		template<typename T>
+		DataHandle(T& data, typeid_t typeID)
+			: m_typeid(typeID), m_dataptr(static_cast<void*>(&data))
 		{
-			return std::is_member_function_pointer_v<decltype(Func)>();
 		}
 
-		static constexpr typeid_t id() noexcept
+		template<typename Type>
+		Type* getMutable()
 		{
-			return 123;
+			static constexpr typeid_t targetID = nf::type_id<Type>();
+			if (m_typeid != targetID)
+			{
+				return nullptr;
+			}
+			return static_cast<Type*>(m_dataptr);
 		}
 
-
-		static constexpr auto name() noexcept
+		template<typename Type>
+		const Type* get() const
 		{
-			return "";
+			static constexpr typeid_t targetID = nf::type_id<Type>();
+			if (m_typeid != targetID)
+			{
+				return nullptr;
+			}
+			return static_cast<const Type*>(m_dataptr);
 		}
 
-		static constexpr auto returnTypeName() noexcept
+		template<typename T> void assign(T& data, typeid_t typeID)
 		{
-			return nf::typeName<return_t>();
+			m_typeid = typeID;
+			m_dataptr = static_cast<void*>(&data);
 		}
 
-		static constexpr auto argTypeNames() noexcept
+		const void* data() const noexcept
 		{
-			return nf::refltypes<argument_ts>::names();
+			return m_dataptr;
 		}
 
-		static constexpr auto argCount() noexcept
+		inline bool valid() const noexcept
 		{
-			return std::tuple_size_v<argument_ts>;
+			return m_dataptr != nullptr && m_typeid != 0;
 		}
 
+		operator bool() const noexcept
+		{
+			return valid();
+		}
 
+		void reset()
+		{
+			m_typeid = 0;
+			m_dataptr = nullptr;
+		}
+
+		template<typename Type>
+		bool isType() const
+		{
+			return (valid() && m_typeid == nf::type_id<Type>());
+		}
+
+		inline typeid_t typeID() const noexcept
+		{
+			return m_typeid;
+		}
+
+	public:
+		typeid_t m_typeid = 0;
+		void* m_dataptr = nullptr;
 	};
 }
+
+
 

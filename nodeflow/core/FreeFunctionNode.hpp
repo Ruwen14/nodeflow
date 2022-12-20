@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "IOPort.h"
-#include "TypeTricks.hpp"
+#include "type_tricks.hpp"
 #include <tuple>
 #include <type_traits>
 
@@ -46,13 +46,13 @@ namespace nf
 	template<class... Ts>
 	struct MakeInputPorts
 	{
-		using value = std::tuple<nf::InputPort<Ts>...>;
+		using value = std::tuple<nf::InputPin<Ts>...>;
 	};
 
 	template<class... Ts>
 	struct MakeInputPorts < std::tuple<Ts...>>
 	{
-		using value = std::tuple<nf::InputPort<Ts>...>;
+		using value = std::tuple<nf::InputPin<Ts>...>;
 	};
 
 	template<auto Func>
@@ -81,7 +81,7 @@ namespace nf
 
 	public:
 		InputPorts_t iports;
-		nf::OutputPort<ReturnType_t> oport;
+		nf::OutputPin<ReturnType_t> oport;
 
 	};
 

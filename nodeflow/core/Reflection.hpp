@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "../3rdparty/entt/single_include/entt/entt.hpp"
-#include "TypeTricks.hpp"
+#include "type_tricks.hpp"
+#include "../3rdparty/cpputils/stringutils.h"
 
 #include <tuple>
 #include <string_view>
@@ -55,10 +56,6 @@ namespace nf
 		{
 			static constexpr std::array<std::string_view, sizeof...(Ts)> value = { {entt::type_name<Ts>::value()...} };
 		};
-
-
-
-
 
 		template<auto Func>
 		struct FreeFunctionReflection

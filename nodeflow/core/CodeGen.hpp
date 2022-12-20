@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "TypeTricks.hpp"
+#include "type_tricks.hpp"
 #include "../3rdparty/entt/single_include/entt/entt.hpp"
 
 namespace nf
@@ -47,7 +47,6 @@ namespace nf
 	{
 		static constexpr std::array<std::string_view, sizeof...(Ts)> value = { {entt::type_name<Ts>::value()...} };
 	};
-
 
 	template<auto Func>
 	struct FunctionCodeContext

@@ -32,45 +32,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "../3rdparty/entt/single_include/entt/entt.hpp"
-#include "type_tricks.hpp"
-#include "reflection/type_reflection.hpp"
+#include <cstdint>
+#include <optional>
+#include <iostream>
 
+#include "typedefs.hpp"
 
 namespace nf
 {
-
-	template<typename T>
-	class ValueWrapper
+	class NFObject
 	{
 	public:
-		using type_t = T;
-	public:
-		static constexpr auto typeID = nf::refltype<T>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
-		static constexpr auto typeID2 = nf::refltype<T>::id();
-
-	public:
-		ValueWrapper() = default;
-		ValueWrapper(const T& instance)
-			: value(instance)
+		NFObject() = default;
+		virtual ~NFObject() = default;
+	
+		std::optional<typeid_t> typeID() const noexcept
 		{
+			if (m_typeID != 0)
+				return m_typeID;
+			return std::nullopt;
 		}
 
-	public:
-		T value;
+
+		std::optional<std::uint64_t> UUID() const noexcept
+		{
+			if (m_UUID != 0)
+				return m_UUID;
+			return std::nullopt;
+		}
+
+		void assignTypeID(typeid_t id) noexcept
+		{
+			m_typeID = id;
+		}
+
+		void assignUUID(std::uint64_t uuid) noexcept
+		{
+			m_UUID = uuid;
+
+		}
+		/*Event Parsing*/
+	
+	private:
+		typeid_t m_typeID = 0;
+		std::uint64_t m_UUID = 0;
 	};
-
-	template<>
-	class ValueWrapper<void>
-	{
-	public:
-		using type_t = void;
-		static constexpr auto typeID = nf::refltype<type_t>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
-
-		ValueWrapper() = default;
-
-	};
-
 }

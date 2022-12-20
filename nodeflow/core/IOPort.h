@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 
-#include "entt/single_include/entt/entt.hpp"
+#include "../3rdparty/entt/single_include/entt/entt.hpp"
 #include "ValueWrapper.hpp"
 
 #include <optional>
@@ -117,10 +117,10 @@ namespace nf
 
 
 
-	class OutputPinHandle;
+	class PinDataHandle;
 
 	template<typename T>
-	class InputPort
+	class InputPin
 	{
 	public:
 		using type_t = T;
@@ -136,14 +136,14 @@ namespace nf
 
 
 	template<typename T>
-	class OutputPort : public ValueWrapper<T>
+	class OutputPin : public ValueWrapper<T>
 	{
-		friend class OutputPinHandle;
+		friend class PinDataHandle;
 	public:
 		static constexpr bool valid = true;
 	public:
-		OutputPort() = default;
-		OutputPort(const T& defaultVal)
+		OutputPin() = default;
+		OutputPin(const T& defaultVal)
 			: ValueWrapper<T>(defaultVal)
 		{}
 
@@ -154,13 +154,13 @@ namespace nf
 	};
 
 	template<>
-	class OutputPort<void> : public ValueWrapper<void>
+	class OutputPin<void> : public ValueWrapper<void>
 	{
-		friend class OutputPinHandle;
+		friend class PinDataHandle;
 	public:
 		static constexpr bool valid = false;
 	public:
-		OutputPort() = default;
+		OutputPin() = default;
 
 	private:
 		int portIndex = -1;
@@ -195,12 +195,12 @@ namespace nf
 		unsigned int portCount_ = defaultPorts;
 	};
 
-	// IDK maybe call id NfOutDataHandle like MDataHandle
-	class OutputPinHandle
+	// IDK maybe call it NfOutDataHandle like MDataHandle
+	class PinDataHandle
 	{
 	public:
 		template<typename T>
-		OutputPinHandle(OutputPort<T>& port)
+		PinDataHandle(OutputPin<T>& port)
 			: typeID_(port.typeID), view(&port.value)
 		{
 		}

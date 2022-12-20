@@ -1,3 +1,4 @@
+
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -32,45 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "../3rdparty/entt/single_include/entt/entt.hpp"
-#include "type_tricks.hpp"
-#include "reflection/type_reflection.hpp"
+#include <string>
 
+namespace nf {
 
-namespace nf
-{
-
-	template<typename T>
-	class ValueWrapper
+	class FlowModule
 	{
 	public:
-		using type_t = T;
-	public:
-		static constexpr auto typeID = nf::refltype<T>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
-		static constexpr auto typeID2 = nf::refltype<T>::id();
-
-	public:
-		ValueWrapper() = default;
-		ValueWrapper(const T& instance)
-			: value(instance)
+		template<typename T>
+		bool include(const std::string& name)
 		{
+			return true;
 		}
 
-	public:
-		T value;
+	protected:
+	private:
 	};
-
-	template<>
-	class ValueWrapper<void>
-	{
-	public:
-		using type_t = void;
-		static constexpr auto typeID = nf::refltype<type_t>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
-
-		ValueWrapper() = default;
-
-	};
-
 }

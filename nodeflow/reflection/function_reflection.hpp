@@ -32,45 +32,54 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "../3rdparty/entt/single_include/entt/entt.hpp"
-#include "type_tricks.hpp"
-#include "reflection/type_reflection.hpp"
+
+#include "type_reflection.hpp"
+#include "../core/type_tricks.hpp"
 
 
-namespace nf
+namespace  nf
 {
-
-	template<typename T>
-	class ValueWrapper
+	template<auto Func>
+	struct reflfunc
 	{
-	public:
-		using type_t = T;
-	public:
-		static constexpr auto typeID = nf::refltype<T>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
-		static constexpr auto typeID2 = nf::refltype<T>::id();
+		
+		using signature_t = typename nf::FuncSignature<decltype(std::function{ Func }) > ;
+		using return_t = signature_t::ReturnType_t;
+		using argument_ts = signature_t::ParamTypes_t;
 
-	public:
-		ValueWrapper() = default;
-		ValueWrapper(const T& instance)
-			: value(instance)
+
+		static constexpr bool ismethod() noexcept
 		{
+			return std::is_member_function_pointer_v<decltype(Func)>();
 		}
 
-	public:
-		T value;
+		static constexpr typeid_t id() noexcept
+		{
+			return 123;
+		}
+
+
+		static constexpr auto name() noexcept
+		{
+			return "";
+		}
+
+		static constexpr auto returnTypeName() noexcept
+		{
+			return nf::type_name<return_t>();
+		}
+
+		static constexpr auto argTypeNames() noexcept
+		{
+			return nf::refltypes<argument_ts>::names();
+		}
+
+		static constexpr auto argCount() noexcept
+		{
+			return std::tuple_size_v<argument_ts>;
+		}
+
+
 	};
-
-	template<>
-	class ValueWrapper<void>
-	{
-	public:
-		using type_t = void;
-		static constexpr auto typeID = nf::refltype<type_t>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
-
-		ValueWrapper() = default;
-
-	};
-
 }
+

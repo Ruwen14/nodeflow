@@ -32,45 +32,55 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "../3rdparty/entt/single_include/entt/entt.hpp"
-#include "type_tricks.hpp"
+
 #include "reflection/type_reflection.hpp"
 
 
+#define NF_REGISTER_EVENT(EventType)						\
+public:														\
+	static constexpr auto type = nf::type_id<EventType>();	\
+	nf::typeid_t eventType() const override					\
+	{														\
+		return type;										\
+	}														\
+
+// Redo for Events
 namespace nf
 {
-
-	template<typename T>
-	class ValueWrapper
+	class FlowEvent
 	{
+		// add static EventID
 	public:
-		using type_t = T;
-	public:
-		static constexpr auto typeID = nf::refltype<T>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
-		static constexpr auto typeID2 = nf::refltype<T>::id();
+		FlowEvent() = default;
+		virtual ~FlowEvent() = default;
 
 	public:
-		ValueWrapper() = default;
-		ValueWrapper(const T& instance)
-			: value(instance)
+		template<typename T>
+		bool isEvent() const
 		{
+			return eventType() == T::type;
 		}
 
-	public:
-		T value;
+		virtual typeid_t eventType() const = 0;
 	};
 
-	template<>
-	class ValueWrapper<void>
+	template<typename To>
+	To* flowevent_cast(nf::FlowEvent* from)
 	{
-	public:
-		using type_t = void;
-		static constexpr auto typeID = nf::refltype<type_t>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
+		if (from->eventType() == nf::type_id<To>())
+		{
+			return static_cast<To*>(from);
+		}
+		return nullptr;
+	}
 
-		ValueWrapper() = default;
-
-	};
+	template<> nf::FlowEvent* flowevent_cast<nf::FlowEvent>(nf::FlowEvent* from)
+	{
+		return from;
+	}
 
 }
+
+
+
+

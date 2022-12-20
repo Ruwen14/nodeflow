@@ -45367,7 +45367,7 @@ struct meta_prop {
      * @brief Returns the stored value by copy.
      * @return A wrapper containing the value stored with the property.
      */
-    [[nodiscard]] meta_any value() const {
+    [[nodiscard]] meta_any() const {
         return node->value;
     }
 

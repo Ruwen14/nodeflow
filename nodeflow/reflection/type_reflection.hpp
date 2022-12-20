@@ -33,16 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <cstdint>
 #include <string_view>
-
-#define NF_FUNC_SIGNATURE __FUNCSIG__
-#define NF_FUNC_SIGNATURE_PREFIX '<'
-#define NF_FUNC_SIGNATURE_SUFFIX '>'
-
-#ifndef NF_TYPE_ID
-	#define NF_TYPE_ID std::uint64_t
-#endif // !NF_TYPE_ID
+#include "typedefs.hpp"
 
 
 namespace nf
@@ -85,10 +77,9 @@ namespace nf
 		};
 	}
 
-	using typeid_t = NF_TYPE_ID;
 
 	template<typename Type>
-	constexpr auto typeName() noexcept
+	constexpr auto type_name() noexcept
 	{
 		constexpr std::string_view pretty_function{ NF_FUNC_SIGNATURE };
 		constexpr auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(NF_FUNC_SIGNATURE_PREFIX) + 1);
@@ -98,9 +89,9 @@ namespace nf
 
 
 	template<typename Type>
-	constexpr nf::typeid_t typeID() noexcept
+	constexpr nf::typeid_t type_id() noexcept
 	{
-		constexpr auto tName = typeName<Type>();
+		constexpr auto tName = type_name<Type>();
 		return detail::Fnv1aHasher<nf::typeid_t>::hash(tName.data(), tName.size());
 	}
 
@@ -111,12 +102,12 @@ namespace nf
 
 		static constexpr std::string_view name() noexcept
 		{
-			return typeName<Type>();
+			return type_name<Type>();
 		}
 
 		static constexpr typeid_t id() noexcept
 		{
-			return typeID<Type>();
+			return type_id<Type>();
 		}
 	};
 
@@ -127,12 +118,12 @@ namespace nf
 
 		static constexpr auto names() noexcept
 		{
-			return std::array<std::string_view, sizeof...(Types)>{ {nf::typeName<Types>()...} };
+			return std::array<std::string_view, sizeof...(Types)>{ {nf::type_name<Types>()...} };
 		}
 
 		static constexpr auto ids() noexcept
 		{
-			return std::array<typeid_t, sizeof...(Types)>{ {nf::typeID<Types>()...}};
+			return std::array<typeid_t, sizeof...(Types)>{ {nf::type_id<Types>()...}};
 		}
 
 	};
@@ -145,12 +136,12 @@ namespace nf
 
 		static constexpr auto names() noexcept
 		{
-			return std::array<std::string_view, sizeof...(Types)>{ {nf::typeName<Types>()...} };
+			return std::array<std::string_view, sizeof...(Types)>{ {nf::type_name<Types>()...} };
 		}
 
 		static constexpr auto ids() noexcept
 		{
-			return std::array<typeid_t, sizeof...(Types)>{ {nf::typeID<Types>()...}};
+			return std::array<typeid_t, sizeof...(Types)>{ {nf::type_id<Types>()...}};
 		}
 	};
 

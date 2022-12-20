@@ -1,3 +1,4 @@
+
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -32,45 +33,56 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "../3rdparty/entt/single_include/entt/entt.hpp"
-#include "type_tricks.hpp"
-#include "reflection/type_reflection.hpp"
 
+#include <vector>
+#include <unordered_map>
 
 namespace nf
-{
+{	
+	class Node;
 
-	template<typename T>
-	class ValueWrapper
+
+
+	class ExecutionStack
+	{
+	private:
+	};
+
+	
+	class FlowStateMachine
+	{
+		using InstrPtr = Node*;
+
+		using ExecutionFrame = std::vector<Node*>;
+
+		const ExecutionFrame& nextExecutionFrame() const noexcept;
+		
+
+	private:
+
+		std::unordered_map<InstrPtr, ExecutionFrame> executionStack;
+	};
+
+
+
+
+
+	class FlowScript
 	{
 	public:
-		using type_t = T;
-	public:
-		static constexpr auto typeID = nf::refltype<T>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
-		static constexpr auto typeID2 = nf::refltype<T>::id();
-
-	public:
-		ValueWrapper() = default;
-		ValueWrapper(const T& instance)
-			: value(instance)
+		Node* variables() const;
+		
+		void precomputeExecutionOrder()
 		{
+
 		}
+		
+		bool build();
 
-	public:
-		T value;
+		void run();
+
+
+	private:
+// 		std::vector<BuildError> errorList
 	};
-
-	template<>
-	class ValueWrapper<void>
-	{
-	public:
-		using type_t = void;
-		static constexpr auto typeID = nf::refltype<type_t>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
-
-		ValueWrapper() = default;
-
-	};
-
 }

@@ -32,45 +32,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include "../3rdparty/entt/single_include/entt/entt.hpp"
-#include "type_tricks.hpp"
-#include "reflection/type_reflection.hpp"
+
+#include <cstdint>
+
+
+#define NF_FUNC_SIGNATURE __FUNCSIG__
+#define NF_FUNC_SIGNATURE_PREFIX '<'
+#define NF_FUNC_SIGNATURE_SUFFIX '>'
+
+#ifndef NF_TYPE_ID
+#define NF_TYPE_ID std::uint64_t
+#endif // !NF_TYPE_ID
+
+
+
+
+#ifdef NDEBUG
+#define NF_ASSERT(condition, msg) (void(0))
+#else
+#include <cassert>
+#define NF_ASSERT(condition, msg) assert((msg ,condition))
+#endif
 
 
 namespace nf
 {
-
-	template<typename T>
-	class ValueWrapper
-	{
-	public:
-		using type_t = T;
-	public:
-		static constexpr auto typeID = nf::refltype<T>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<T>;
-		static constexpr auto typeID2 = nf::refltype<T>::id();
-
-	public:
-		ValueWrapper() = default;
-		ValueWrapper(const T& instance)
-			: value(instance)
-		{
-		}
-
-	public:
-		T value;
-	};
-
-	template<>
-	class ValueWrapper<void>
-	{
-	public:
-		using type_t = void;
-		static constexpr auto typeID = nf::refltype<type_t>::id();
-		static constexpr auto streamable = nf::has_ostream_operator_v<type_t>;
-
-		ValueWrapper() = default;
-
-	};
-
+	using typeid_t = NF_TYPE_ID;
+	using PortIndex = int;
 }

@@ -39,10 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace nf
 {
-	enum class PinFlag
+	enum class PinDirection
 	{
-		In,
-		Out
+		Input,
+		Output
 	};
 
 	class NFAbstractNodeModel
@@ -60,7 +60,6 @@ namespace nf
 	public:
 // 		using PinType = NFTypeInfo;
 		using PinType = int;
-
 
 		explicit NFAbstractNodeModel(
 			const std::string& caption,
@@ -87,13 +86,13 @@ namespace nf
 
 		void setName(const std::string& name) noexcept;
 
-		std::string pinName(int pin, PinFlag f) const;
+		std::string pinName(int pin, PinDirection f) const;
 
-		void setPinName(int pin, PinFlag f, const std::string& name) noexcept;
+		void setPinName(int pin, PinDirection f, const std::string& name) noexcept;
 
-		int pinCount(PinFlag f) const noexcept;
+		int pinCount(PinDirection f) const noexcept;
 
-		const PinType& pinType(int pin, PinFlag f) const;
+		const PinType& pinType(int pin, PinDirection f) const;
 
 		/* INteraface for PinPolicy with {DisplayName, InputToMany or One}
 		PinPolicy pinPolicy(int pint, PinFlag f) const noexcept;
@@ -104,7 +103,7 @@ namespace nf
 
 		virtual bool hasOutputPins() const noexcept;
 
-		virtual bool hasDynamicPorts(PinFlag f) const { return false; }
+		virtual bool hasDynamicPorts(PinDirection f) const { return false; }
 
 	public:
 		// Calls propagate

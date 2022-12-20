@@ -117,10 +117,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\Users\ruwen\OneDrive\Desktop\nodeflow\3rdparty</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\Users\ruwen\OneDrive\Desktop\nodeflow;C:\Users\ruwen\OneDrive\Desktop\nodeflow\nodeflow</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,7 +138,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\src\lua\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\src\lua\include;C:\Users\ruwen\OneDrive\Desktop\nodeflow\nodeflow</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,33 +149,43 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="nodeflow\core\CodeGen.hpp" />
+    <ClInclude Include="nodeflow\core\DataHandle.hpp" />
+    <ClInclude Include="nodeflow\core\FlowModule.hpp" />
+    <ClInclude Include="nodeflow\core\FlowScript.hpp" />
     <ClInclude Include="nodeflow\core\FreeFunctionNode.hpp" />
-    <ClInclude Include="nodeflow\core\Header.h" />
     <ClInclude Include="nodeflow\core\IOPort.h" />
     <ClInclude Include="nodeflow\core\MemberFunctionNode.hpp" />
     <ClInclude Include="nodeflow\core\NFAbstractNodeModel.hpp" />
+    <ClInclude Include="nodeflow\core\NFNode.hpp" />
+    <ClInclude Include="nodeflow\core\NFObject.hpp" />
     <ClInclude Include="nodeflow\core\NFPainter.hpp" />
     <ClInclude Include="nodeflow\core\NFSettings.hpp" />
     <ClInclude Include="nodeflow\core\NFTypeInfo.hpp" />
     <ClInclude Include="nodeflow\core\NFUserNode.hpp" />
     <ClInclude Include="nodeflow\core\NodeStyle.hpp" />
     <ClInclude Include="nodeflow\core\NumericConversion.hpp" />
+    <ClInclude Include="nodeflow\core\NodePort.hpp" />
     <ClInclude Include="nodeflow\core\Reflection.hpp" />
     <ClInclude Include="nodeflow\core\StaticNodeModel.hpp" />
     <ClInclude Include="nodeflow\core\TypeConversion.hpp" />
-    <ClInclude Include="nodeflow\core\TypeTricks.hpp" />
+    <ClInclude Include="nodeflow\typedefs.hpp" />
+    <ClInclude Include="nodeflow\core\type_tricks.hpp" />
     <ClInclude Include="nodeflow\core\ValueWrapper.hpp" />
+    <ClInclude Include="nodeflow\core\FlowEvent.hpp" />
     <ClInclude Include="nodeflow\lua\include\lauxlib.h" />
     <ClInclude Include="nodeflow\lua\include\lua.h" />
     <ClInclude Include="nodeflow\lua\include\lua.hpp" />
     <ClInclude Include="nodeflow\lua\include\luaconf.h" />
     <ClInclude Include="nodeflow\lua\include\lualib.h" />
-    <ClInclude Include="nodeflow\reflection\FuncReflection.hpp" />
-    <ClInclude Include="nodeflow\reflection\TypeReflection.hpp" />
+    <ClInclude Include="nodeflow\reflection\function_reflection.hpp" />
+    <ClInclude Include="nodeflow\reflection\type_reflection.hpp" />
     <ClInclude Include="nodeflow\utility\any.h" />
     <ClInclude Include="nodeflow\utility\nfutils.h" />
     <ClInclude Include="nodeflow\utility\ppmagic.h" />
     <ClInclude Include="nodeflow\utility\print.h" />
+    <ClInclude Include="nodeflow\utility\Singleton.hpp" />
+    <ClInclude Include="nodeflow\utility\Singleton2.hpp" />
+    <ClInclude Include="nodeflow\utility\Singleton3.hpp" />
     <ClInclude Include="nodeflow\utility\timer.h" />
     <ClInclude Include="nodeflow\utility\tmp.h" />
     <ClInclude Include="3rdparty\entt\single_include\entt\entt.hpp" />
@@ -185,13 +195,15 @@
     <ClInclude Include="3rdparty\sol\sol.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="nodeflow\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <Library Include="nodeflow\lua\liblua54.a" />
   </ItemGroup>
   <ItemGroup>
     <None Include="nodeflow\lua\lua54.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nodeflow\core\NFNode.cpp" />
+    <ClCompile Include="nodeflow\core\NodePort.cpp" />
+    <ClCompile Include="nodeflow\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
