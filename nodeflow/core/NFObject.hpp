@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "typedefs.hpp"
+#include "core/FlowEvent.hpp"
 
 namespace nf
 {
@@ -69,9 +70,9 @@ namespace nf
 		void assignUUID(std::uint64_t uuid) noexcept
 		{
 			m_UUID = uuid;
-
 		}
-		/*Event Parsing*/
+
+		virtual void onEvent(FlowEvent* event) {}
 	
 	private:
 		typeid_t m_typeID = 0;
