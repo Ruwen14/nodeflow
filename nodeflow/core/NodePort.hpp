@@ -152,25 +152,24 @@ namespace nf
 
 	namespace detail
 	{
-		class PortLink
+		struct PortLink
 		{
-		public:
 			PortLink() = default;
 			PortLink(PortIndex targetIndex_, NFNode* targetNode_)
 				: targetIndex(targetIndex_), targetNode(targetNode_)
 			{}
-		public:
 
 			inline bool valid() const noexcept { return targetNode != nullptr && targetIndex != -1;}
 			
 			void breakLink() noexcept;
 		
 			void setTarget(PortIndex targetIndex_, NFNode* targetNode_) noexcept;
+
+			bool operator==(const PortLink& rhs) const;
 			
 			PortIndex targetIndex = -1;
 			NFNode* targetNode = nullptr;
 		};
-
 
 		class InputPortContext
 		{
@@ -212,7 +211,7 @@ namespace nf
 				: m_name(caption), m_dataHandle(data, typeID)
 			{}
 
-			bool makeLink(PortIndex targetIndex, NFNode* targetNode);
+			bool createLink(PortIndex targetIndex, NFNode* targetNode);
 
 			size_t linkCount() const noexcept;
 
