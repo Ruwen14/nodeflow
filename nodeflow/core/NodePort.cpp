@@ -16,6 +16,12 @@ namespace nf::detail
 		targetNode = targetNode_;
 	}
 
+	bool PortLink::operator==(const PortLink& rhs) const
+	{
+		return ((targetIndex == rhs.targetIndex) && (targetNode == rhs.targetNode));
+	}
+
+
 #pragma endregion PortLink
 
 #pragma region InputPortContext
@@ -42,7 +48,7 @@ namespace nf::detail
 
 #pragma region OutputPortContext
 
-	bool OutputPortContext::makeLink(PortIndex targetIndex, NFNode* targetNode)
+	bool OutputPortContext::createLink(PortIndex targetIndex, NFNode* targetNode)
 	{
 		PortLink link(targetIndex, targetNode);
 		if (link.valid())
