@@ -41,20 +41,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "core/NFObject.hpp"
 #include "core/NodePort.hpp"
 
-
 namespace nf
 {
-	struct MakeLinkResult
+	struct LinkageResult
 	{
-		enum LinkFlag
+		enum LinkageFlag
 		{
 			Success,
-			PortAlreadyLinked,
-			PortIndexInvalid,
-			NodeInvalid
+			ERROR_PortAlreadyLinked,
+			ERROR_PortIndexInvalid,
+			ERROR_NodeInvalid,
+			ERROR_UnequalPortTypes
 		};
 
-		MakeLinkResult(LinkFlag flag)
+		LinkageResult(LinkageFlag flag)
 			: m_linkflag(flag)
 		{}
 
@@ -65,13 +65,13 @@ namespace nf
 			return false;
 		}
 
-		LinkFlag result() const noexcept
+		LinkageFlag result() const noexcept
 		{
 			return m_linkflag;
 		}
 
 	private:
-		LinkFlag m_linkflag;
+		LinkageFlag m_linkflag;
 	};
 
 
@@ -83,7 +83,7 @@ namespace nf
 		virtual ~NFNode() = default;
 
 	public: // Or better private and friend FlowScript
-		virtual std::string nodeName() const noexcept { return "NFNode"; }
+		virtual std::string nodeName() const { return "NFNode"; }
 
 		virtual bool serialize(std::ostringstream& serializer, 
 			PortDirection dir, PortIndex index) const;
@@ -109,11 +109,11 @@ namespace nf
 
 		const detail::OutputPortContext* findOutputPort(std::string_view name) const;
 
-		void printLinkTree(std::ostringstream& stream) const;
+		void formatLinkageTree(std::ostringstream& stream) const;
 
 
+		LinkageResult makeLink(PortIndex fromOutIndex, NFNode* toNode, PortIndex toInIndex);
 	protected:
-		MakeLinkResult makeLink(PortIndex fromOutIndex, NFNode* toNode, PortIndex toInIndex);
 
 		void clearLinks(PortDirection dir);
 

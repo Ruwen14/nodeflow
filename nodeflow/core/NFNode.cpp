@@ -70,32 +70,82 @@ namespace nf
 		return nullptr;
 	}
 
-	MakeLinkResult NFNode::makeLink(PortIndex fromOutIndex, NFNode* toNode, PortIndex toInIndex)
+	void NFNode::formatLinkageTree(std::ostringstream& stream) const
 	{
-// 		if (fromOutIndex == -1 || toInIndex == -1)
-// 			return {MakeLinkResult::PortIndexInvalid};
-// 
-// 		if (fromOutIndex < m_outputPorts.size() || toInIndex < toNode->m_inputPorts.size())
-// 			return { MakeLinkResult::PortIndexInvalid };
-// 
-// 		if (toNode == nullptr)
-// 			return { MakeLinkResult::NodeInvalid };
-// 
-// 		if (toNode->m_inputPorts[toInIndex].hasValidLink())
-// 			return { MakeLinkResult::PortAlreadyLinked };
-// 
-// 		for (const auto& link : m_outputPorts[fromOutIndex].links())
-// 		{
-// 			if (link.valid())
-// 			{
-// 				if (link.targetNode == toNode && link.targetIndex == toInIndex)
-// 				{
-// 					return { MakeLinkResult::PortAlreadyLinked; }
-// 				}
-// 			}
-// 		}
+	    stream << "LinkageTree for [Node:" << nodeName() << " @" << this <<"]\n";
+		stream << "{\n";
+		stream << "    [Output Ports]:\n";
+		for (const auto& oPort : m_outputPorts)
+		{
+			stream << "\t>[Port:" << oPort.name() << "] Link Count: " << oPort.linkCount() <<"\n";
+			for (const auto& link : oPort.links())
+			{
+				stream << "\t\t\t---<Link>--> ";
+
+				if (!link.valid())
+					stream << " Invalid";
+				stream << "To [Port:" << link.targetNode->getInputPortList()[link.targetIndex].name() 
+					<< "][" << link.targetIndex <<
+					"] of [Node:" << link.targetNode->nodeName() << " @" << link.targetNode << "]\n";
+					
+			}
+
+		}
+		stream << "\n    [Input Ports]:\n";
+		for (const auto& iPort : m_inputPorts)
+		{
+			stream << "\t>[Port:" << iPort.name() << "] ---<Link>--> ";
+			auto link = iPort.link();
+			if (!link.valid())
+				stream << "NOT ASSIGNED\n";
+			else {
+				stream << "To [Port:" << link.targetNode->getOutputPortList()[link.targetIndex].name() 
+					<< "][" << link.targetIndex << "] of [Node:" <<
+					link.targetNode->nodeName() << " @" << link.targetNode << "]\n";
+			}
+
+		}
+		stream << "}\n";
+
 
 	}
+
+	LinkageResult NFNode::makeLink(PortIndex fromOutIndex, NFNode* toNode, PortIndex toInIndex)
+	{
+		// Check if Link between Ports can be made ------------------
+		if (toNode == nullptr)
+			return { LinkageResult::ERROR_NodeInvalid };
+
+		if (fromOutIndex == -1 || toInIndex == -1 
+			|| !(fromOutIndex < m_outputPorts.size()) || !(toInIndex < toNode->m_inputPorts.size()))
+			return {LinkageResult::ERROR_PortIndexInvalid};
+
+		if (toNode->m_inputPorts[toInIndex].hasValidLink())
+			return { LinkageResult::ERROR_PortAlreadyLinked };
+
+		auto fromPortType = m_outputPorts[fromOutIndex].typeID();
+		auto toPortType = toNode->m_inputPorts[toInIndex].typeID();
+
+		if (m_outputPorts[fromOutIndex].typeID() != toNode->m_inputPorts[toInIndex].typeID())
+			return { LinkageResult::ERROR_UnequalPortTypes };
+		// ----------------------------------------------------------
+		
+		auto futurePortLink = nf::detail::PortLink(toInIndex, toNode);
+		auto& port = m_outputPorts[fromOutIndex];
+		const auto& portLinks = port.links();
+
+		if (std::find(portLinks.begin(), portLinks.end(), futurePortLink) != portLinks.end())
+			return { LinkageResult::ERROR_PortAlreadyLinked };
+
+		port.createLink(toInIndex, toNode);
+
+		// Add this Link to the output of the target node
+		auto& targetPort = toNode->m_inputPorts[toInIndex];
+		targetPort.makeLink(fromOutIndex, this);
+
+		return { LinkageResult::Success };
+	}
+
 
 
 }
