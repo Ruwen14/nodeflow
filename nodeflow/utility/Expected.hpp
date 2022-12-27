@@ -2162,6 +2162,9 @@ namespace nf {
 		}
 	};
 
+	template <class T, class E>
+	using ExpectedRef = nf::Expected<std::reference_wrapper<T>, E>;
+
 	namespace detail {
 		template <class Exp> using exp_t = typename detail::decay_t<Exp>::value_type;
 		template <class Exp> using err_t = typename detail::decay_t<Exp>::error_type;
