@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace nf
 {
 	template <typename T>
@@ -21,7 +20,6 @@ namespace nf
 	protected:
 		Singleton() = default;                          // default constructor
 		~Singleton() = default;                       // default destructor
-		struct Token {};
 	}; // end template class T
 } // end namespace std
 
