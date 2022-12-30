@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <type_traits>
 #include <sstream>
+#include <ostream>
 
 
 #include "typedefs.hpp"
@@ -43,17 +44,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../reflection/type_reflection.hpp"
 #include "core/DataHandle.hpp"
 
-
 namespace nf
 {
-	class NFNode;
+	class Node;
 
 
 	enum class PortDirection
 	{
 		Input,
 		Output,
-		None
+		Both
 	};
 
 	enum class PortType
@@ -73,13 +73,12 @@ namespace nf
 	template<typename T>
 	class Port
 	{
-		friend NFNode;
+		friend Node;
 		static_assert(!std::is_reference_v<T>, "Node can't have ports of reference type");
 	public:
 		using type_t = T;
 		static constexpr auto typeID = type_id<T>();
 		static constexpr auto streamable = has_ostream_operator_v<T>;
-		static constexpr auto PORT_DEBUG_NAME = type_name<T>();
 
 		inline operator PortIndex() const { return m_portIndex; }
 
@@ -100,7 +99,7 @@ namespace nf
 			m_portIndex = index;
 		}
 
-	private:
+	public:
 		PortIndex m_portIndex = -1;
 	};
 
@@ -108,7 +107,7 @@ namespace nf
 	template<typename T>
 	class InputPort : public Port<T>
 	{
-		friend NFNode;
+		friend Node;
 		static_assert(std::is_same_v<T, void> != true, "Node can't have input of type <void>");
 	};
 
@@ -116,32 +115,32 @@ namespace nf
 	template<typename T>
 	class OutputPort : public Port<T>
 	{
-		friend NFNode;
+		friend Node;
 	public:
 		OutputPort() = default;
 		explicit OutputPort(const T& defaultValue)
-			: m_value(defaultValue)
+			: value(defaultValue)
 		{}
 
 
 		template<typename T>
 		void setValue(T&& val)
 		{
-			pprint(nf::type_name<decltype(val)>());
-			m_value = std::forward<T>(val);
+// 			pprint(nf::type_name<decltype(val)>());
+			value = std::forward<T>(val);
 		}
 
-		bool serialize(std::ostringstream& stream) const {
+		bool serialize(std::ostringstream& archive) const {
 			if constexpr (this->streamable)
 			{
-				stream << m_value;
+				archive << value;
 				return true;
 			}
 			return false;
 		}
 
 	public:
-		T m_value{};
+		T value{};
 	};
 
 	template<>
@@ -150,96 +149,128 @@ namespace nf
 
 	};
 
-	namespace detail
+	struct PortLink
 	{
-		struct PortLink
-		{
-			PortLink() = default;
-			PortLink(PortIndex targetIndex_, NFNode* targetNode_)
-				: targetIndex(targetIndex_), targetNode(targetNode_)
-			{}
+		PortLink() = default;
+		PortLink(PortIndex targetIndex_, Node* targetNode_)
+			: targetIndex(targetIndex_), targetNode(targetNode_)
+		{}
 
-			inline bool valid() const noexcept { return targetNode != nullptr && targetIndex != -1;}
+		inline bool valid() const noexcept { return targetNode != nullptr && targetIndex != -1;}
 			
-			void breakLink() noexcept;
+		void breakLink() noexcept;
 		
-			void setTarget(PortIndex targetIndex_, NFNode* targetNode_) noexcept;
+		void setTarget(PortIndex targetIndex_, Node* targetNode_) noexcept;
 
-			bool operator==(const PortLink& rhs) const;
+		bool operator==(const PortLink& rhs) const;
 			
-			PortIndex targetIndex = -1;
-			NFNode* targetNode = nullptr;
-		};
-
-		class InputPortContext
+		friend std::ostream& operator<< (std::ostream& stream, const PortLink& link)
 		{
-			friend NFNode;
-		public:
-			InputPortContext() = default;
-			InputPortContext( typeid_t typeID, const std::string& caption = "")
-				: m_name(caption), m_link(-1, nullptr), m_dataTypeID(typeID)
-			{}
+			stream << "{port=" << link.targetIndex << ", node=" << link.targetNode << "}";
+			return stream;
+		}
 
-			bool makeLink(PortIndex targetIndex, NFNode* targetNode);
+		PortIndex targetIndex = -1;
+		Node* targetNode = nullptr;
+	};
 
-			bool hasValidLink() const noexcept;
+	struct FlowLink
+	{
+		FlowLink() = default;
+		FlowLink(Node* targetNode_)
+			: targetNode(targetNode_)
+		{}
 
-			void breakLink() noexcept;
+		inline bool valid() const noexcept { return targetNode != nullptr; }
 
-			std::string name() const noexcept { return m_name; }
+		void breakLink() noexcept;
 
-			void setName(const std::string& name) { m_name = name; }
+		void setTarget(Node* targetNode_) noexcept;
 
-			PortLink link() const noexcept { return m_link; }
+		bool operator==(const FlowLink& rhs) const;
+
+		friend std::ostream& operator<< (std::ostream& stream, const FlowLink& link)
+		{
+			stream << "FlowLink{targetNode=" << link.targetNode << "}";
+			return stream;
+		}
+
+		Node* targetNode = nullptr;
+	};
+
+
+	class InputPortHandle
+	{
+		friend Node;
+	public:
+		InputPortHandle() = default;
+		InputPortHandle( typeid_t typeID, const std::string& caption = "")
+			: m_name(caption), m_link(-1, nullptr), m_dataTypeID(typeID)
+		{}
+
+		bool makeLink(PortIndex targetIndex, Node* targetNode);
+
+		bool hasValidLink() const noexcept;
+
+		void breakLink() noexcept;
+
+		std::string name() const noexcept { return m_name; }
+
+		void setName(const std::string& name) { m_name = name; }
+
+		PortLink link() const noexcept { return m_link; }
 		
-			inline typeid_t typeID() const noexcept { return m_dataTypeID; }
+		inline typeid_t typeID() const noexcept { return m_dataTypeID; }
 
-		private:
-			std::string m_name;
-			PortLink m_link;
-			typeid_t m_dataTypeID;
-		};
+	private:
+		std::string m_name;
+		PortLink m_link;
+		typeid_t m_dataTypeID;
+	};
 
-		class OutputPortContext
+	class OutputPortHandle
+	{
+		friend Node;
+	public:
+		OutputPortHandle() = default;
+
+		template<typename T>
+		OutputPortHandle(T& data, typeid_t typeID, const std::string& caption = "")
+			: m_name(caption), m_dataHandle(data, typeID)
+		{}
+
+		bool createLink(PortIndex targetIndex, Node* targetNode);
+
+		bool removeLink(PortLink link);
+
+		bool hasLink(PortLink link) const;
+
+		size_t linkCount() const noexcept;
+
+		void breakAllLinks();
+
+		std::string name() const noexcept { return m_name; }
+
+		void setName(const std::string& name) { m_name = name; }
+
+		const std::vector<PortLink>& links() const noexcept { return m_links; }
+
+		template<typename T>
+		void setDataHandle(T& data, typeid_t typeID)
 		{
-			friend NFNode;
-		public:
-			OutputPortContext() = default;
+			m_dataHandle.reset();
+			m_dataHandle.assign(data, typeID);
+		}
 
-			template<typename T>
-			OutputPortContext(T& data, typeid_t typeID, const std::string& caption = "")
-				: m_name(caption), m_dataHandle(data, typeID)
-			{}
+		inline const detail::DataHandle& dataHandle() const { return m_dataHandle; }
 
-			bool createLink(PortIndex targetIndex, NFNode* targetNode);
+		inline typeid_t typeID() const noexcept { return m_dataHandle.typeID(); }
 
-			size_t linkCount() const noexcept;
-
-			void breakAllLinks();
-
-			std::string name() const noexcept { return m_name; }
-
-			void setName(const std::string& name) { m_name = name; }
-
-			const std::vector<PortLink>& links() const noexcept { return m_links; }
-
-			template<typename T>
-			void setDataHandle(T& data, typeid_t typeID)
-			{
-				m_dataHandle.reset();
-				m_dataHandle.assign(data, typeID);
-			}
-
-			inline const DataHandle& dataHandle() const { return m_dataHandle; }
-
-			inline typeid_t typeID() const noexcept { return m_dataHandle.typeID(); }
-
-		public:
-			std::string m_name;
-			std::vector<PortLink> m_links; // Output link to multiple nodes
-			DataHandle m_dataHandle;
-		};
+	private:
+		std::string m_name;
+		std::vector<PortLink> m_links; // Output link to multiple nodes
+		detail::DataHandle m_dataHandle;
+	};
 
 
-	}
 }
