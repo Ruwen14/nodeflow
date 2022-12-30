@@ -40,3 +40,5 @@ inline enumtype operator^(enumtype lhs, enumtype rhs) noexcept { return static_c
 inline enumtype& operator|=(enumtype& lhs, enumtype rhs) noexcept { return lhs = (lhs | rhs);} \
 inline enumtype& operator&=(enumtype& lhs, enumtype rhs) noexcept { return lhs = (lhs & rhs);} \
 inline enumtype& operator^=(enumtype& lhs, enumtype rhs) noexcept { return lhs = (lhs ^ rhs);} \
+
+#define BIT(x) (1 << x)
