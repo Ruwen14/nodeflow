@@ -135,7 +135,10 @@ namespace cpputils
 		template <typename T, typename Enable = void>
 		struct ToStrConverter {
 			static inline std::string convert(const T& t) {
-				static_assert(sizeof(T) == 0, "No specialized converter for given type found.");
+				std::stringstream stream;
+				stream << t;
+				return stream.str();
+// 				static_assert(sizeof(T) == 0, "No specialized converter for given type found.");
 			}
 		};
 
