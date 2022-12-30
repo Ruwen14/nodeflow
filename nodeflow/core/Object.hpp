@@ -41,11 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace nf
 {
-	class NFObject
+	class Object
 	{
 	public:
-		NFObject() = default;
-		virtual ~NFObject() = default;
+		Object() = default;
+		virtual ~Object() = default;
 	
 		std::optional<typeid_t> typeID() const noexcept
 		{
