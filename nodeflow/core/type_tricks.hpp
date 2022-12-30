@@ -42,8 +42,6 @@ namespace nf
 	template <class T, class... Types>
 	inline constexpr bool is_any_of_v = std::disjunction<std::is_same<T, Types>...>{};
 
-
-
 	template< size_t I, typename T, typename Tuple_t>
 	constexpr size_t index_in_tuple_fn() {
 		static_assert(I < std::tuple_size<Tuple_t>::value, "The element is not in the tuple");
@@ -56,9 +54,6 @@ namespace nf
 			return index_in_tuple_fn<I + 1, T, Tuple_t>();
 		}
 	}
-
-
-
 
 	template<typename T, typename Tuple_t>
 	struct index_in_tuple {
