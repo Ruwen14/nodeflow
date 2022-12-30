@@ -65,20 +65,14 @@ namespace nf
 	};
 
 	template<typename To>
-	To* flowevent_cast(nf::FlowEvent* from)
+	To* event_cast(FlowEvent* from)
 	{
-		if (from->eventType() == nf::type_id<To>())
+		if (from->eventType() == To::type)
 		{
-			return static_cast<To*>(from);
+			return STATIC_CAST<To*>(from);
 		}
 		return nullptr;
 	}
-
-	template<> nf::FlowEvent* flowevent_cast<nf::FlowEvent>(nf::FlowEvent* from)
-	{
-		return from;
-	}
-
 }
 
 
