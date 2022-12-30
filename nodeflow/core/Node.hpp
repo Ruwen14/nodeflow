@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 #include "typedefs.hpp"
-#include "core/NFObject.hpp"
+#include "core/Object.hpp"
 #include "core/NodePort.hpp"
 #include "core/Error.hpp"
 #include "utility/Expected.hpp"
@@ -74,7 +74,7 @@ std::string nodeName() const override	\
 
 
 
-	class Node : public NFObject
+	class Node : public Object
 	{
 	public:
 		Node() = default;
