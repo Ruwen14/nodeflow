@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define NF_ASSERT(condition, msg) assert((msg ,condition))
 #endif
 
-
+#define NF_UNUSED(expr) (void)expr
 namespace nf
 {
 	using typeid_t = NF_TYPE_ID;
