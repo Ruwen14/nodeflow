@@ -72,7 +72,7 @@ namespace nf
 			m_UUID = uuid;
 		}
 
-		virtual void onEvent(FlowEvent* event) {}
+		virtual void onEvent(FlowEvent* event) { NF_UNUSED(event); }
 	
 	private:
 		typeid_t m_typeID = 0;
