@@ -91,6 +91,25 @@ namespace nf
 	static constexpr auto has_ostream_operator_v = is_streamable<std::ostream, T>::value;
 
 
+	template<typename T>
+	struct deduce_class_type;
+
+	template<typename Class, typename Value>
+	struct deduce_class_type<Value Class::*>
+	{
+		using type = Class;
+	};
+
+	template<typename T>
+	struct deduce_member_type;
+
+	template<typename Class, typename Value>
+	struct deduce_member_type<Value Class::*>
+	{
+		using type = Value;
+	};
+
+
 	template<typename Ret, class... Params>
 	struct FuncSignature
 	{
