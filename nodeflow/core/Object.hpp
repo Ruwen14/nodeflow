@@ -36,8 +36,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <optional>
 #include <iostream>
 
+
 #include "typedefs.hpp"
+#include "core/UUID.hpp"
 #include "core/FlowEvent.hpp"
+
+#define NF_REGISTER_Type(ObjType)								\
+public:															\
+	static constexpr auto staticType = nf::type_id<ObjType>();	\
+	nf::typeid_t type() const override							\
+	{															\
+		return staticType;										\
+	}		
 
 namespace nf
 {
@@ -55,27 +65,25 @@ namespace nf
 		}
 
 
-		std::optional<std::uint64_t> UUID() const noexcept
+		inline UUID uuid() const noexcept
 		{
-			if (m_UUID != 0)
-				return m_UUID;
-			return std::nullopt;
+			return m_uuid;
 		}
 
-		void assignTypeID(typeid_t id) noexcept
+		inline void assignTypeID(typeid_t id) noexcept
 		{
 			m_typeID = id;
 		}
 
-		void assignUUID(std::uint64_t uuid) noexcept
+		inline void setUUID(UUID uuid) noexcept
 		{
-			m_UUID = uuid;
+			m_uuid = uuid;
 		}
 
 		virtual void onEvent(FlowEvent* event) { NF_UNUSED(event); }
 	
 	private:
 		typeid_t m_typeID = 0;
-		std::uint64_t m_UUID = 0;
+		UUID m_uuid;
 	};
 }
