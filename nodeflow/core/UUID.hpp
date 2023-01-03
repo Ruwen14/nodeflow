@@ -42,10 +42,10 @@ namespace nf
 	{
 	public:
 		UUID();
-		UUID(std::uint64_t uuid);
+		explicit UUID(std::uint64_t uuid);
 
 		[[nodiscard]] static UUID create() { return UUID{}; }
-		[[nodiscard]] static UUID createFrom(std::uint64_t uuid) { return {uuid}; }
+		[[nodiscard]] static UUID createFrom(std::uint64_t uuid) { return UUID{uuid}; }
 
 		inline operator std::uint64_t() const { return m_uuid; }
 
