@@ -581,11 +581,6 @@
     <ClInclude Include="nodeflow\typedefs.hpp" />
     <ClInclude Include="nodeflow\core\type_tricks.hpp" />
     <ClInclude Include="nodeflow\core\FlowEvent.hpp" />
-    <ClInclude Include="nodeflow\lua\include\lauxlib.h" />
-    <ClInclude Include="nodeflow\lua\include\lua.h" />
-    <ClInclude Include="nodeflow\lua\include\lua.hpp" />
-    <ClInclude Include="nodeflow\lua\include\luaconf.h" />
-    <ClInclude Include="nodeflow\lua\include\lualib.h" />
     <ClInclude Include="nodeflow\reflection\function_reflection.hpp" />
     <ClInclude Include="nodeflow\reflection\type_reflection.hpp" />
     <ClInclude Include="nodeflow\utility\any.h" />
@@ -600,17 +595,8 @@
     <ClInclude Include="nodeflow\utility\tmp.h" />
     <ClInclude Include="3rdparty\entt\single_include\entt\entt.hpp" />
     <ClInclude Include="3rdparty\nameof\include\nameof.hpp" />
-    <ClInclude Include="3rdparty\sol\config.hpp" />
-    <ClInclude Include="3rdparty\sol\forward.hpp" />
-    <ClInclude Include="3rdparty\sol\sol.hpp" />
     <ClInclude Include="nodeflow\utility\TypenameAtlas.hpp" />
     <ClInclude Include="nodeflow\Sandbox.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="nodeflow\lua\liblua54.a" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="nodeflow\lua\lua54.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nodeflow\nodes\ConversionNode.cpp" />
