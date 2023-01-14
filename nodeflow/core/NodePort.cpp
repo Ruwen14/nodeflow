@@ -32,7 +32,7 @@ namespace nf
 		targetNode = nullptr;
 	}
 
-	void FlowLink::setTarget(Node* targetNode_) noexcept
+	void FlowLink::setTarget(FlowNode* targetNode_) noexcept
 	{
 		targetNode = targetNode_;
 	}

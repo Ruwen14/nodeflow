@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <type_traits>
 #include <sstream>
-#include <ostream>
 
 
 #include "typedefs.hpp"
@@ -47,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace nf
 {
 	class Node;
+	class FlowNode;
 
 
 	enum class PortDirection
@@ -130,13 +130,24 @@ namespace nf
 			value = std::forward<T>(val);
 		}
 
-		bool serialize(std::ostringstream& archive) const {
-			if constexpr (this->streamable)
-			{
+		bool serialize(std::stringstream& archive) const 
+		{
+			if constexpr (this->streamable) {
 				archive << value;
 				return true;
 			}
-			return false;
+			else
+				return false;
+		}
+
+		bool deserialize(std::stringstream& archive)
+		{
+			if constexpr (has_istream_operator_v<T>) {
+				archive >> value;
+				return true;
+			}
+			else
+				return false;
 		}
 
 	public:
@@ -148,6 +159,13 @@ namespace nf
 	{
 
 	};
+
+
+	template<typename T>
+	struct is_input : std::false_type {};
+
+	template<typename T>
+	struct is_input<nf::InputPort<T>> : std::true_type {};
 
 	struct PortLink
 	{
@@ -174,10 +192,39 @@ namespace nf
 		Node* targetNode = nullptr;
 	};
 
+
+	template<class... Ts>
+	struct ExpandInputPorts
+	{
+		using value = std::tuple<InputPort<Ts>...>;
+	};
+
+	template<class... Ts>
+	struct ExpandInputPorts < std::tuple<Ts...>>
+	{
+		using value = std::tuple<InputPort<Ts>...>;
+	};
+
+
+	template<class... Ts>
+	struct ExpandOutputPorts
+	{
+		using value = std::tuple<OutputPort<Ts>...>;
+	};
+
+	template<class... Ts>
+	struct ExpandOutputPorts < std::tuple<Ts...>>
+	{
+		using value = std::tuple<OutputPort<Ts>...>;
+	};
+
+
+
+
 	struct FlowLink
 	{
 		FlowLink() = default;
-		FlowLink(Node* targetNode_)
+		FlowLink(FlowNode* targetNode_)
 			: targetNode(targetNode_)
 		{}
 
@@ -185,7 +232,7 @@ namespace nf
 
 		void breakLink() noexcept;
 
-		void setTarget(Node* targetNode_) noexcept;
+		void setTarget(FlowNode* targetNode_) noexcept;
 
 		bool operator==(const FlowLink& rhs) const;
 
@@ -195,7 +242,7 @@ namespace nf
 			return stream;
 		}
 
-		Node* targetNode = nullptr;
+		FlowNode* targetNode = nullptr;
 	};
 
 
