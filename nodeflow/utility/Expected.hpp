@@ -185,6 +185,7 @@ Implementation of Expected.hpp based on:
 #include <functional>
 #include <type_traits>
 #include <utility>
+#include <format>
 
 #if defined(__EXCEPTIONS) || defined(_CPPUNWIND)
 #define TL_EXPECTED_EXCEPTIONS_ENABLED
@@ -2564,5 +2565,25 @@ namespace nf {
 		lhs.swap(rhs);
 	}
 } // namespace tl
+
+
+template<typename T, typename E, class CharT>
+struct std::formatter<nf::Expected<T, E>, CharT> : std::formatter<CharT> {
+	// parse() is inherited from the base class
+
+	// Define format() by calling the base class implementation with the wrapped value
+	template<class FormatContext>
+	auto format(const nf::Expected<T, E>& exp, FormatContext& fc) const
+	{
+		if (exp)
+		{
+			if constexpr (std::is_void_v<T>)
+				return std::format_to(fc.out(), "{}", "void");
+			else
+				return std::format_to(fc.out(), "{}", exp.value());
+		}
+		return std::format_to(fc.out(), "{}", exp.error());
+	}
+};
 
 #endif
