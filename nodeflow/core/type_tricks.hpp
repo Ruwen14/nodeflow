@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <type_traits>
 #include <iostream>
+#include <ostream>
+#include <istream>
 #include <functional>
 
 
@@ -90,6 +92,23 @@ namespace nf
 	template<typename T>
 	static constexpr auto has_ostream_operator_v = is_streamable<std::ostream, T>::value;
 
+	template<typename S, typename T>
+	struct is_istreamable
+	{
+		template<typename SS, typename TT>
+		static auto test(int)
+			-> decltype(std::declval<SS&>() >> std::declval<TT&>(), std::true_type());
+
+		template<typename, typename>
+		static auto test(...) -> std::false_type;
+
+		static constexpr auto value = decltype(test<S, T>(0))::value;
+	};
+
+	template<typename T>
+	static constexpr auto has_istream_operator_v = is_istreamable<std::istream, T>::value;
+
+
 
 	template<typename T>
 	struct deduce_class_type;
@@ -108,6 +127,10 @@ namespace nf
 	{
 		using type = Value;
 	};
+
+	template<typename Class>
+	using deduce_member_type_t = typename deduce_member_type<Class>::type;
+
 
 
 	template<typename Ret, class... Params>
