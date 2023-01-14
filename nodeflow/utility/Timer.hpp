@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 #include <iostream>
 
-namespace nf::utility
+namespace nf
 {
 	template<typename Accuracy>
 	class Timer
@@ -47,19 +47,19 @@ namespace nf::utility
 	public:
 		Timer() { tic(); }
 
-		void tic()
+		inline void tic()
 		{
 			start_ = std::chrono::high_resolution_clock::now();
 		}
 
-		void toc() const
+		inline void toc() const
 		{
 			auto now = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, DurationAccuracy> el_double = now - start_;
 			std::cout << "[Finished in " << el_double.count() <<"]\n";
 		}
 
-		void toc(double& out) const
+		inline void toc(double& out) const
 		{
 			auto now = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, DurationAccuracy> el_double = now - start_;
@@ -69,4 +69,28 @@ namespace nf::utility
 	private:
 		std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 	};
+
+	template<typename Accuracy = std::micro>
+	class ScopedTimer
+	{
+	public:
+		ScopedTimer()
+		{
+			start_ = std::chrono::high_resolution_clock::now();
+		}
+
+		~ScopedTimer()
+		{
+			auto now = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, Accuracy> el_double = now - start_;
+			std::cout << "[Finished in " << el_double.count() << "]\n";
+		}
+
+	private:
+		std::chrono::time_point<std::chrono::high_resolution_clock> start_;
+	};
+
+
+
+
 }
