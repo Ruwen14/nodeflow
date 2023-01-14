@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <string_view>
 #include <sstream>
+#include <array>
+#include <optional>
 
 #include "typedefs.hpp"
 #include "core/Object.hpp"
@@ -47,12 +49,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace nf
 {
+	enum class NodeArchetype
+	{
+		Node,
+		DataNode,
+		FlowNode,
+		Flow_EventNode,
+		Flow_ConversionNode,
+		Flow_FunctorNode,
+		Flow_CustomNode
+	};
+
 	enum class ConnectionError
 	{
 		PortAlreadyLinked,
 		PortIndexInvalid,
-		NodeInvalid,
-		UnequalPortTypes
+		UnknownNode,
+		UnequalPortTypes,
+		ConnectionWithItself
 	};
 
 	enum class ConnectionPolicy
@@ -61,18 +75,11 @@ namespace nf
 		OutputToInput
 	};
 
-
-
-
-#define NF_NODE_NAME(name)				\
-public:									\
-std::string nodeName() const override	\
-{										\
-	return std::string(name);			\
-}										\
-
-
-
+	enum class StreamFlag
+	{
+		WriteTo,
+		ReadFrom
+	};
 
 	class Node : public Object
 	{
@@ -81,51 +88,135 @@ std::string nodeName() const override	\
 		virtual ~Node() = default;
 
 	public: // Or better private and friend FlowScript
-		virtual std::string nodeName() const { return "NFNode"; }
 
-		virtual bool serialize(std::ostringstream& archive, 
-			PortDirection dir, PortIndex index) const;
+		/**
+		 * @brief Returns the name of the node
+// 		*/
+		virtual std::string nodeName() const;
+
+
+		/**
+		 * @brief Returns the name of a specific port attached to this node.
+		 * Behaviour is implemented in derived classes
+		*/
+		virtual std::string portName(PortDirection dir, PortIndex index) const;
+
+		/**
+		 * @brief Returns the archetype of a node and therefore describes its behaviour. 
+		 * Users should not override and can ignore this function.
+		 * @return 
+		*/
+		virtual NodeArchetype getArchetype() const;
+
+		/**
+		 * @brief Allows the de/serialization of node output ports depending on the StreamFlag. 
+		 * Useful if you want to read the outputs of nodes in the GUI or set them via widgets. 
+		 * Supports all data types that have the ostream operator<< and istream operator>> implemented.
+		 * @return 'true' if stream operation was successfull / is supported by type.
+		*/
+		virtual bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive);
+
+
+
+
+		/**
+		 * @brief Users can override to react on their custom events emitted from FlowScript
+		 * @param event 
+		 * @return 
+		*/
+		virtual bool onCustomEvent(FlowEvent* event) { NF_UNUSED(event); return false; }
+
+
+
+		virtual Expected<void, Error> onBuild() { return {}; }
+
+		/**
+		 * @brief Called when node is about to be removed/deleted from a FlowScript.
+		 * Might be used to do clean up stuff.
+		 * Behaviour can be specified in derived classes.
+		 * @return 
+		*/
+		virtual void onDestroy() {}
 
 // 	protected:
 	public:
+
+		/**
+		 * @brief Is called during the construction of a node.
+		 * Users should add their ports and perform other initializations in the derived version.
+		 * @return nothing or a user-defined error according to nf::Error that can propagate to the gui
+		*/
 		virtual Expected<void, Error> setup() { return {}; }
 
+
+		/**
+		 * @brief  Workhorse function of a node in which a user-defined calculation can happen. 
+		 * Called for each node during FlowScript::run(). Behaviour can be specified in derived classes.
+		*/
 		virtual void process() {}
 
 	public:
+
+		/**
+		 * @brief Returns the number of ports used in the node
+		 * @param dir Input or Output
+		*/
 		size_t portCount(PortDirection dir) const noexcept;
 
+		/**
+		 * @brief Returns all input ports of the node
+		*/
 		const std::vector<InputPortHandle>& getInputPortList() const noexcept;
 
+		/**
+		 * @brief Returns all output ports of the node
+		*/
 		const std::vector<OutputPortHandle>& getOutputPortList() const noexcept;
 
+		/**
+		 * @brief Returns input port of node specified by 'index'
+		 * ASSERT's existing of port only in debug mode
+		*/
 		const InputPortHandle& getInputPort(PortIndex index) const;
 
+		/**
+		 * @brief Returns output port of node specified by 'index'
+		 * ASSERT's existing of port only in debug mode
+		*/
 		const OutputPortHandle& getOutputPort(PortIndex index) const;
 
-		const InputPortHandle* findInputPort(std::string_view name) const;
 
+		/**
+		 * @brief Returns pointer to the input port of node specified by 'index'
+		 * @return nullptr if port does not exist
+		*/
 		const InputPortHandle* findInputPort(PortIndex index) const;
 
-		const OutputPortHandle* findOutputPort(std::string_view name) const;
-
+		/**
+		 * @brief Returns pointer to the output port of node specified by 'index'
+		 * @return nullptr if port does not exist
+		*/
 		const OutputPortHandle* findOutputPort(PortIndex index) const;
 
 		void formatLinkageTree(std::ostringstream& stream) const;
 
-
+		/**
+		 * @brief Checks port linkage
+		 * @return 'true' if input port of node is linked to an output port of another node
+		*/
 		bool inputPortLinked(PortIndex index) const;
 
+		/**
+		 * @brief Checks port linkage
+		 * @return 'true' if output port of node is linked at least once to an input port of another node
+		*/
 		bool outputPortLinked(PortIndex index) const;
 
 
 		/**
-		 * @brief Inter-Connects two ports. 
-		 * @param policy 
-		 * @param originPort 
-		 * @param targetNode 
-		 * @param targetPort 
-		 * @return 
+		 * @brief Creates a data connection between ports of two nodes according to 'policy'
+		 * @param policy InputToOutput or OutputToInput
+		 * @return nothing or a ConnectionError
 		*/
 		Expected<void, ConnectionError> makeConnection(ConnectionPolicy policy, 
 													   PortIndex originPort, 
@@ -133,36 +224,51 @@ std::string nodeName() const override	\
 													   PortIndex targetPort);
 
 		/**
-		 * @brief Removes a specific Connection
-		 * @param policy 
-		 * @param originPort 
-		 * @param targetNode 
-		 * @param targetPort 
-		 * @return 
+		 * @brief Deletes an existing data connection between ports of two nodes according to 'policy'
+		 * @param policy InputToOutput or OutputToInput
+		 * @return 'true' is connection was successfully removed
 		*/
 		bool breakConnection(ConnectionPolicy policy, 
 							  PortIndex originPort, 
 							  Node& targetNode, 
 							  PortIndex targetPort);
 
-		void breakAllConnections(PortDirection dir = PortDirection::Both);
-
-
-// 		bool breakAllConnections
 
 		/**
-		 * @brief Removes all links associated with this node(targetNode)
-		 * @param targetNote 
+		 * @brief Deletes all port connections from and to this node
+		 * @param dir Input, Output or Both 
 		*/
-		void clearAssociatedLinks(Node* targetNode);
+		void breakAllConnections(PortDirection dir = PortDirection::Both);
 
 	protected:
+		
+
+		/**
+		 * @brief Adds an InputPort of type 'T' to the node. 
+		 * The corresponding port must live as a member in the derived class.
+		 * @tparam T datatype of node.
+		 * @param p InputPort<T>
+		 * @return 'false' if port was already added.
+		*/
 		template<typename T>
 		bool addPort(InputPort<T>& p, const std::string& caption = "");
 
+		/**
+		 * @brief Adds an Output of type 'T' to the node.
+		 * The corresponding port must live as a member in the derived class.
+		 * @tparam T datatype of node.
+		 * @param p Output<T>
+		 * @return 'false' if port was already added.
+		*/
 		template<typename T>
 		bool addPort(OutputPort<T>& p, const std::string& caption = "");
 
+		/**
+		 * @brief Retrieve the data of the output port of a node connected to this port.
+		 * @tparam T datatype
+		 * @param p InputPort<T>
+		 * @return nullptr if there is no connection to this input port
+		*/
 		template<typename T>
 		const T* getInputData(const InputPort<T>& p) const
 		{
@@ -175,6 +281,27 @@ std::string nodeName() const override	\
 			return datahandle.get<T>();
 		}
 
+		/**
+		 * @brief Retrieve the mutable data of the output port of a node connected to this port.
+		 * @tparam T datatype
+		 * @param p InputPort<T>
+		 * @return nullptr if there is no connection to this input port
+		*/
+		template<typename T> 
+		T* getInputDataMutable(const InputPort<T>& p) const 
+		{
+			const PortLink& link = m_inputPorts[p.m_portIndex].m_link;
+			// No input connection
+			if (!link.valid())
+				return nullptr;
+
+			detail::DataHandle& datahandle = link.targetNode->m_outputPorts[link.targetIndex].m_dataHandle;
+			return datahandle.getMutable<T>();
+		}
+
+		/**
+		 * @brief Set the output data of the node port
+		*/
 		template<typename T, typename Ty>
 		void setOutputData(OutputPort<T>& p, Ty&& val) noexcept
 		{
@@ -182,14 +309,16 @@ std::string nodeName() const override	\
 			p.setValue(std::forward<Ty>(val));
 		}
 
-	private:
-
 		/**
-		 * @brief API to make connection from the perspective of the output of a node
-		 * @param outPort 
-		 * @param toNode 
-		 * @param toInPort 
-		 * @return 
+		 * @brief Reserves the necessary memory to store 'size' 'dir' ports. 
+		 * Useful to save memory on nodes with few ports.
+		 * Should be called before ports are added in 'setup' function
+		*/
+		void allocateExpectedPortCount(PortDirection dir, size_t size);
+
+	private:
+		/**
+		 * @brief Internal function to make connection from the perspective of the output of a node
 		*/
 		[[nodiscard]] Expected<void, ConnectionError> makeInterlinkedConnection(PortIndex outPort, 
 																				Node& toNode, 
@@ -197,24 +326,19 @@ std::string nodeName() const override	\
 
 
 		/**
-		 * @brief API to break connection from the perspective of the output of a node
-		 * @param outPortIndex 
-		 * @param toNode 
-		 * @param toInPortIndex 
-		 * @return 
+		 * @brief Internal function to break connection from the perspective of the output of a node
 		*/
 		[[nodiscard]] bool breakInterlinkedConnection(PortIndex outPortIndex, Node& toNode, PortIndex toInPortIndex);
 
 		void clearInterlinkedPorts(PortIndex outPort);
 
 
-
-
-	private:
+	protected:
 		std::vector<OutputPortHandle> m_outputPorts;
 		std::vector<InputPortHandle> m_inputPorts;
 
 	};
+
 
 	template<typename T>
 	bool Node::addPort(InputPort<T>& p, const std::string& caption /*= ""*/)
@@ -231,7 +355,7 @@ std::string nodeName() const override	\
 		return true;
 	}
 
-
+	
 	template<typename T>
 	bool Node::addPort(OutputPort<T>& p, const std::string& caption /*= ""*/)
 	{
@@ -246,4 +370,51 @@ std::string nodeName() const override	\
 		return true;
 	}
 
+	/**
+	 * @brief Checks if the node can be explicitly cast to 'To'-NodeType. 
+	 * Doesn't account for inheritance like dynamic_cast.
+	 * @tparam To 
+	 * @param from 
+	 * @return 
+	*/
+	template<typename To>
+	To* explicit_node_cast(Node* from)
+	{
+		static constexpr typeid_t toTypeID = type_id<To>();
+		if (from && from->typeID() == toTypeID)
+		{
+			NF_ASSERT(dynamic_cast<To*>(from) != nullptr, "Error");
+			return static_cast<To*>(from);
+		}
+		return nullptr;
+	}
 }
+
+
+
+#define NF_NODE_NAME(name)				\
+public:									\
+std::string nodeName() const override	\
+{										\
+	return name;						\
+}										\
+
+
+#define BRACED_INIT_LIST(...) {__VA_ARGS__}
+
+#define NF_PORT_NAMES(inPortNames, outPortNames)						 \
+public:																	 \
+std::string portName(PortDirection dir, PortIndex index) const override  \
+{																		 \
+static constexpr std::array inNames = BRACED_INIT_LIST inPortNames;		 \
+static constexpr std::array outNames = BRACED_INIT_LIST outPortNames;	 \
+	if (dir == PortDirection::Input) {									 \
+		if (index < inNames.size())										 \
+			return inNames[index];										 \
+	}																	 \
+	if (dir == PortDirection::Output) {									 \
+		if (index < outNames.size())									 \
+			return outNames[index];										 \
+	}																	 \
+	return "";															 \
+}																		 \

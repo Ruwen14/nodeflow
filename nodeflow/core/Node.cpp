@@ -4,8 +4,30 @@ using namespace cpputils;
 
 namespace nf
 {
-	bool Node::serialize(std::ostringstream& archive, PortDirection dir, PortIndex index) const
+
+	std::string Node::nodeName() const
 	{
+		return "NFNode";
+	}
+
+	std::string Node::portName(PortDirection dir, PortIndex index) const
+	{
+		NF_UNUSED(dir);
+		NF_UNUSED(index);
+		return "";
+	}
+
+	NodeArchetype Node::getArchetype() const
+	{
+		return NodeArchetype::Node;
+	}	
+
+
+	bool Node::streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive)
+	{
+		NF_UNUSED(flag);
+		NF_UNUSED(archive);
+		NF_UNUSED(index;)
 		return false;
 	}
 
@@ -47,17 +69,6 @@ namespace nf
 		return m_outputPorts[index];
 	}
 
-	const InputPortHandle* Node::findInputPort(std::string_view name) const
-	{
-		for (const auto& port : m_inputPorts)
-		{
-			if (name == port.name())
-			{
-				return &port;
-			}
-		}
-		return nullptr;
-	}
 
 	const InputPortHandle* Node::findInputPort(PortIndex index) const
 	{
@@ -66,18 +77,6 @@ namespace nf
 
 		const auto& port = m_inputPorts[index];
 		return &port;
-	}
-
-	const OutputPortHandle* Node::findOutputPort(std::string_view name) const
-	{
-		for (const auto& port : m_outputPorts)
-		{
-			if (name == port.name())
-			{
-				return &port;
-			}
-		}
-		return nullptr;
 	}
 
 	const OutputPortHandle* Node::findOutputPort(PortIndex index) const
@@ -127,12 +126,45 @@ namespace nf
 		stream << "}\n";
 	}
 
+	void Node::allocateExpectedPortCount(PortDirection dir, size_t size)
+	{
+		NF_ASSERT(dir != PortDirection::Both, "IMPLEMENT ME");
+		if (dir	== PortDirection::Input)
+		{
+			NF_ASSERT(m_inputPorts.size() == 0, "ERROR: bufferExpectedPortCount only valid before port initialization");
+			if (size == 0)
+			{
+				m_inputPorts.reserve(0);
+				m_inputPorts.shrink_to_fit();
+				NF_ASSERT(m_inputPorts.capacity() == 0, "Memory of m_inputPorts couldn't be emptied successfully");
+
+			}
+			else
+				m_inputPorts.reserve(size);
+
+		}
+		else
+		{
+			NF_ASSERT(m_outputPorts.size() == 0, "ERROR: bufferExpectedPortCount only valid before port initialization");
+
+			if (size == 0)
+			{
+				m_outputPorts.reserve(0);
+				m_outputPorts.shrink_to_fit();
+				NF_ASSERT(m_outputPorts.capacity() == 0, "Memory of m_outputPorts couldn't be emptied successfully");
+			}
+			else
+				m_outputPorts.reserve(size);
+
+		}
+
+	}
+
 	Expected<void, ConnectionError> Node::makeInterlinkedConnection(PortIndex outPort, Node& toNode, PortIndex toInPort)
 	{
-		// Check if Link between Ports can be made ------------------
-// 		if (toNode == nullptr)
-// 			return { ConnectionError::ERROR_NodeInvalid };
-
+		// Ports cannot be connected to ports of the same node, otherwise we would have recursion.
+		if (this == &toNode)
+			return make_unexpected(ConnectionError::ConnectionWithItself);
 
 // 		std::cout << (&toNode) << "\n";
 		if (outPort == -1 || toInPort == -1 
@@ -190,7 +222,7 @@ namespace nf
 			return false;
 
 		const auto& port = m_inputPorts[index];
-		return port.hasValidLink();
+		return port.link().valid();
 	}
 
 	bool Node::outputPortLinked(PortIndex index) const
@@ -290,5 +322,7 @@ namespace nf
 			}
 		}
 	}
+
+	
 
 }
