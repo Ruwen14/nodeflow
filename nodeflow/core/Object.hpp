@@ -57,11 +57,9 @@ namespace nf
 		Object() = default;
 		virtual ~Object() = default;
 	
-		std::optional<typeid_t> typeID() const noexcept
+		typeid_t typeID() const noexcept
 		{
-			if (m_typeID != 0)
-				return m_typeID;
-			return std::nullopt;
+			return m_typeID;
 		}
 
 
@@ -80,7 +78,7 @@ namespace nf
 			m_uuid = uuid;
 		}
 
-		virtual void onEvent(FlowEvent* event) { NF_UNUSED(event); }
+		virtual bool onEvent(FlowEvent* event) { NF_UNUSED(event); return false; }
 	
 	private:
 		typeid_t m_typeID = 0;
