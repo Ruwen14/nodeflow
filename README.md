@@ -3,8 +3,7 @@
 
 Flexible C++ node-based dataflow framework, similiar to Unreal Engine's Blueprint system.
 
-![preview](https://github.com/Ruwen14/nodeflow/assets/73891246/d3cedb5a-6a04-4521-82f4-83ce0404c90a)
-
+![preview](https://github.com/Ruwen14/nodeflow/assets/73891246/dfdce7ee-d680-4ce2-9ecc-324c950202bb)
 
 Still in _very_ early development as it's a hobby project. Not ready to use yet.
 
