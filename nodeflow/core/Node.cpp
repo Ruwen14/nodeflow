@@ -4,7 +4,6 @@ using namespace cpputils;
 
 namespace nf
 {
-
 	std::string Node::portName(PortDirection dir, PortIndex index) const
 	{
 		NF_UNUSED(dir);
@@ -15,15 +14,14 @@ namespace nf
 	NodeArchetype Node::getArchetype() const
 	{
 		return NodeArchetype::Node;
-	}	
-
+	}
 
 	bool Node::streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive)
 	{
 		NF_UNUSED(flag);
 		NF_UNUSED(archive);
 		NF_UNUSED(index;)
-		return false;
+			return false;
 	}
 
 	void Node::setUUID(UUID uuid) noexcept
@@ -54,7 +52,6 @@ namespace nf
 		return m_outputPorts;
 	}
 
-
 	const InputPortHandle& Node::getInputPort(PortIndex index) const
 	{
 		NF_ASSERT(index != -1, "Invalid port index");
@@ -68,7 +65,6 @@ namespace nf
 		NF_ASSERT(index < m_outputPorts.size(), "Port index out of range");
 		return m_outputPorts[index];
 	}
-
 
 	const InputPortHandle* Node::findInputPort(PortIndex index) const
 	{
@@ -90,24 +86,22 @@ namespace nf
 
 	void Node::formatLinkageTree(std::ostringstream& stream) const
 	{
-	    stream << "LinkageTree for [Node:" << nodeName() << " @" << this <<"]\n";
+		stream << "LinkageTree for [Node:" << nodeName() << " @" << this << "]\n";
 		stream << "{\n";
 		stream << "    [Output Ports]:\n";
 		for (const auto& oPort : m_outputPorts)
 		{
-			stream << "\t>[Port:" << oPort.name() << "] Link Count: " << oPort.linkCount() <<"\n";
+			stream << "\t>[Port:" << oPort.name() << "] Link Count: " << oPort.linkCount() << "\n";
 			for (const auto& link : oPort.links())
 			{
 				stream << "\t\t\t---<Link>--> ";
 
 				if (!link.valid())
 					stream << " Invalid";
-				stream << "To [Port:" << link.targetNode->getInputPortList()[link.targetIndex].name() 
+				stream << "To [Port:" << link.targetNode->getInputPortList()[link.targetIndex].name()
 					<< "][" << link.targetIndex <<
 					"] of [Node:" << link.targetNode->nodeName() << " @" << link.targetNode << "]\n";
-					
 			}
-
 		}
 		stream << "\n    [Input Ports]:\n";
 		for (const auto& iPort : m_inputPorts)
@@ -117,11 +111,10 @@ namespace nf
 			if (!link.valid())
 				stream << "NOT ASSIGNED\n";
 			else {
-				stream << "To [Port:" << link.targetNode->getOutputPortList()[link.targetIndex].name() 
+				stream << "To [Port:" << link.targetNode->getOutputPortList()[link.targetIndex].name()
 					<< "][" << link.targetIndex << "] of [Node:" <<
 					link.targetNode->nodeName() << " @" << link.targetNode << "]\n";
 			}
-
 		}
 		stream << "}\n";
 	}
@@ -132,19 +125,19 @@ namespace nf
 		if (this == &toNode)
 			return make_unexpected(ConnectionError::ConnectionWithItself);
 
-		if (fromOutput == -1 || toInput == -1 
+		if (fromOutput == -1 || toInput == -1
 			|| !(fromOutput < m_outputPorts.size()) || !(toInput < toNode.m_inputPorts.size()))
 			return make_unexpected(ConnectionError::PortIndexInvalid);
 
 		if (toNode.m_inputPorts[toInput].link().valid())
-			return make_unexpected( ConnectionError::PortAlreadyLinked );
+			return make_unexpected(ConnectionError::PortAlreadyLinked);
 
 		auto fromPortType = m_outputPorts[fromOutput].typeID();
 		auto toPortType = toNode.m_inputPorts[toInput].typeID();
 		if (fromPortType != toPortType)
-			return make_unexpected( ConnectionError::UnequalPortTypes );
+			return make_unexpected(ConnectionError::UnequalPortTypes);
 		// ----------------------------------------------------------
-		
+
 		auto& originPort = m_outputPorts[fromOutput];
 		auto& targetPort = toNode.m_inputPorts[toInput];
 
@@ -167,7 +160,6 @@ namespace nf
 		NF_ASSERT(fromOutput < m_outputPorts.size(), "Port index out of range");
 		NF_ASSERT(toInput < toNode.m_inputPorts.size(), "Port index out of range");
 
-
 		auto& originPort = m_outputPorts[fromOutput];
 		auto& targetPort = toNode.m_inputPorts[toInput];
 
@@ -185,10 +177,9 @@ namespace nf
 		return true;
 	}
 
-
 	void Node::breakAllConnections(PortDirection dir)
 	{
-		if (dir	== PortDirection::Input)
+		if (dir == PortDirection::Input)
 		{
 			for (size_t i = 0; i < m_inputPorts.size(); i++)
 			{
@@ -196,11 +187,11 @@ namespace nf
 				if (!inToOutLink.valid())
 					continue;
 				auto success = inToOutLink.targetNode->breakConnection(inToOutLink.targetIndex,
-														*this, static_cast<PortIndex>(i));
+					*this, static_cast<PortIndex>(i));
 				NF_ASSERT(success, "Faild to break Connection");
 			}
 		}
-		else 
+		else
 		{
 			for (size_t i = 0; i < m_outputPorts.size(); i++)
 			{
@@ -213,9 +204,8 @@ namespace nf
 						continue;
 					}
 					auto success = breakConnection(static_cast<PortIndex>(i),
-												  *outToInLink.targetNode, outToInLink.targetIndex);
+						*outToInLink.targetNode, outToInLink.targetIndex);
 					NF_ASSERT(success, "Faild to break Connection");
-
 				}
 				NF_ASSERT(originPort.linkCount() == 0, "ERROR in clearing links");
 			}
@@ -224,7 +214,7 @@ namespace nf
 
 	void Node::allocateExpectedPortCount(PortDirection dir, size_t size)
 	{
-		if (dir	== PortDirection::Input)
+		if (dir == PortDirection::Input)
 		{
 			NF_ASSERT(m_inputPorts.size() == 0, "ERROR: bufferExpectedPortCount only valid before port initialization");
 			if (size == 0)
@@ -232,11 +222,9 @@ namespace nf
 				m_inputPorts.reserve(0);
 				m_inputPorts.shrink_to_fit();
 				NF_ASSERT(m_inputPorts.capacity() == 0, "Memory of m_inputPorts couldn't be emptied successfully");
-
 			}
 			else
 				m_inputPorts.reserve(size);
-
 		}
 		else
 		{
@@ -252,6 +240,4 @@ namespace nf
 				m_outputPorts.reserve(size);
 		}
 	}
-
-
 }
