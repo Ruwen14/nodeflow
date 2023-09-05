@@ -1,37 +1,33 @@
 // #include "core/NFAbstractNodeModel.hpp"
 
-#include "core/type_tricks.hpp"
+#include "utility/dbgln.hpp"
 
-#include "../3rdparty/cpputils/prettyprint.h"
-
-using namespace cpputils;
+#include <string>
+#include <algorithm>
+#include "nodeflow/nodes/FlowNode.hpp"
 
 // #ifdef _WIN32
 // #pragma comment(lib, "liblua54.a")
 // #endif
 
-#include "archive/CodeGen.hpp"
-
-#include "archive/Reflection.hpp"
-
-namespace nf
-{
-	struct Serializer
-	{
-		uint64_t id;
-		std::function<void(std::ostringstream&, void*)> func;
-	};
-
-	template<typename T>
-	Serializer MakeSerializer()
-	{
-		auto lambda = [](std::ostringstream& stream, void* data) {
-			stream << *static_cast<T*>(data);
-		};
-
-		return { entt::type_hash<T>::value(), lambda };
-	}
-}
+// namespace nf
+// {
+// 	struct Serializer
+// 	{
+// 		uint64_t id;
+// 		std::function<void(std::ostringstream&, void*)> func;
+// 	};
+//
+// 	template<typename T>
+// 	Serializer MakeSerializer()
+// 	{
+// 		auto lambda = [](std::ostringstream& stream, void* data) {
+// 			stream << *static_cast<T*>(data);
+// 		};
+//
+// 		return { entt::type_hash<T>::value(), lambda };
+// 	}
+// }
 
 // using Serializer = std::function<void(std::stringstream& archive, void* data)>;
 //
@@ -45,454 +41,398 @@ namespace nf
 //
 // 	return lambda;
 // }
-
-struct CPPCodeInstruction
-{
-	enum InstructionType
-	{
-		VariableInitialization,
-		VariableSet,
-		VariableGet,
-		FreeFunctionCall,
-		MemberFunctionCall
-	};
-
-	template<auto func, bool e = false>
-	static CPPCodeInstruction GenCallInstruction_FreeFunction()
-	{
-		using codeContext = nf::FunctionCodeContext<func>;
-		using retType = codeContext::ReturnType;
-
-		CPPCodeInstruction ci;
-		ci.instructionType = CPPCodeInstruction::FreeFunctionCall;
-
-		std::stringstream stream;
-		if constexpr (!std::is_same_v<retType, void>)
-		{
-			stream << codeContext::ReturnTypeName() << " $r1 = ";
-		}
-
-		stream << codeContext::FunctionName() << "(";
-
-		if constexpr (constexpr int argCount = codeContext::ArgumentCount() != 0)
-		{
-			ci.functionArgumentCount = argCount;
-			auto argNames = codeContext::ArgumentTypeNames();
-
-			for (size_t i = 0; i < argNames.size(); i++)
-			{
-				stream << "$a" << i + 1;
-
-				if (i != argNames.size() - 1)
-				{
-					stream << ", ";
-				}
-			}
-		}
-
-		stream << ");";
-
-		ci.instruction = stream.str();
-		return ci;
-	}
-
-	InstructionType instructionType;
-	int functionArgumentCount = -1;
-	std::string instruction;
-};
-
-#include "core/NodePort.hpp"
-#include "script/FlowModule.hpp"
-#include "core/Node.hpp"
-#include "core/Error.hpp"
-#include "../3rdparty/cpputils/timer.h"
-#include "utility/Expected.hpp"
-
-#include "nodes/FunctorNode.hpp"
-#include "archive/FreeFunctionNode.hpp"
-#include "utility/Timer.hpp"
-
-#include "nodes/FlowNode.hpp"
-#include "nodes/EventNodeV1.hpp"
-#include "script/FlowScript.hpp"
-#include "nodes/EventNode.hpp"
-#include "nodes/ConversionNode.hpp"
-#include "utility/dbgln.hpp"
-
-int fib(int n)
-{
-	if (n <= 1)
-		return n;
-	return fib(n - 1) + fib(n - 2);
-}
-
-namespace nf {
-#define NF_SERIALIZE_INPUT(port)		 \
-if constexpr (port.streamable)			 \
-{										 \
-	if (auto input = getInputData(port)) \
-	{									 \
-		Serializer << *input;			 \
-		return true;					 \
-	}									 \
-	return false;						 \
-}									     \
-return false;							 \
-
-	class IntegerAddNode : public nf::FlowNode
-	{
-	public:
-		Expected<void, Error> setup() override
-		{
-			addPort(inputPort1, "MyInputPort1");
-			addPort(resultPort, "MyResultPort");
-			addPort(inputPort2, "MyInputPort2");
-
-			return {};
-		}
-
-		void process() override
-		{
-			auto input1 = getInputData(inputPort1);
-			auto input2 = getInputData(inputPort2);
-			if (input1 && input2);
-			setOutputData(resultPort, std::sin<int>(fib(*input1 + *input2)));
-		}
-
-	private:
-		nf::InputPort<int> inputPort1;
-		nf::InputPort<int> inputPort2;
-		nf::OutputPort<double> resultPort;
-	};
-
-	class DoubleIntegerSourceNode : public nf::FlowNode
-	{
-	public:
-		Expected<void, Error> setup() override
-		{
-			addPort(sourcePort1, "MySourcePort1");
-			addPort(sourcePort2, "MySourcePort2");
-
-			return {};
-		}
-
-		void process() override
-		{
-		}
-
-	private:
-		nf::OutputPort<int> sourcePort1{ 4 };
-		nf::OutputPort<int> sourcePort2{ 5 };
-	};
-
-#include "core/UUID.hpp"
-
-	nf::UUID getUUID()
-	{
-		static auto uuid = nf::UUID::create();
-		return uuid;
-	}
-
-	class TestClass
-	{
-	public:
-		int memberMethod()
-		{
-			return 123;
-		}
-
-		static int staticMethod()
-		{
-			return 0;
-		}
-	};
-
-	template<auto method, class clazz>
-	class TestFunctor
-	{
-	public:
-
-		TestFunctor(const TestClass& clazz)
-			: c(clazz)
-		{
-		}
-
-		void process()
-		{
-			auto e = std::invoke(method, c);
-			pprint(e);
-		}
-		clazz c;
-	};
-#include <cmath>
-
-	double addNumbers(int a, int b)
-	{
-		return (a + b);
-	}
-
-	template<auto method>
-	class ClassMethodNode : public FlowNode
-	{
-	public:
-		using MSig_t = nf::FuncSignature<std::function<decltype(method)>>;
-		using MClass_t = MSig_t::ClassType_t;
-		using MReturn_T = MSig_t::ReturnType_t;
-		using MArgument_ts = MSig_t::ParamTypes_t;
-
-	public:
-		InputPort<MClass_t> m_thisPort;
-	};
-
-	class CustomEvent : public FlowEvent
-	{
-		NF_REGISTER_EVENT(CustomEvent);
-	public:
-		CustomEvent(int a, int b)
-			: m_a(a), m_b(b)
-		{}
-
-	public:
-		int m_a;
-		int m_b;
-	};
-
-	class ScriptEvent
-	{
-	public:
-
-	private:
-		std::unique_ptr<FlowEvent> event;
-	};
-
-	template<typename Event, class... Args>
-	void myEvent(Args&&... args)
-	{
-		using types = std::tuple<nf::deduce_member_type_t<Args>...>;
-	}
-
-	struct MyEvent
-	{
-		int keyCode;
-		bool successfull;
-	};
-
-	template<class U, class B>
-	struct AsTuple
-	{
-		using type = std::pair<U, B>;
-	};
-
-	template<typename Event, typename Key, typename... Args>
-	void importEvent(std::pair<Key, Args>&& ...args) {
-		using fieldTypes = std::tuple<nf::deduce_member_type_t<Args>...>;
-		std::vector<std::string_view> vec{ {args.first}... };
-		// 	pprint(type_name<decltype(args.first)>()...);
-	}
-
-	template<auto Callable>
-	std::unique_ptr<FlowNode> importConversion(const std::string& namePath)
-	{
-		using FSig_t = FuncSignature<decltype(std::function{ Callable }) > ;
-		using To_t = FSig_t::ReturnType_t;
-		using From_ts = FSig_t::ParamTypes_t;
-		static_assert(std::tuple_size_v<From_ts> == 1, "Callable must be of signature: 'ToType Callable(FromType)'");
-		using From_t = std::tuple_element_t<0, From_ts>;
-
-		return std::make_unique< ConversionNodeImpl<From_t, To_t, Callable>>();
-	}
-
-	std::string converter(int from)
-	{
-		return std::to_string(from);
-	}
-
-	double addNumbers2(int a, int b)
-	{
-		return a + b;
-	}
-
-	int strToInt(std::string str)
-	{
-		return std::stoi(str);
-	}
-}
-
-struct Position
-{
-	float x;
-	float y;
-};
-
-struct Children
-{
-	std::vector<int> childs;
-};
-
-struct IsMovable
-{
-	bool movable = false;
-};
-
-auto allEntities(const entt::registry& reg)
-{
-	std::vector<entt::entity> entities;
-	reg.each([&](auto entity) {
-		entities.push_back(entity);
-	});
-	return entities;
-}
-
-namespace nf
-{
-	// 	class Scene;
-
-	// 	class Entity;
-
-	// 	class Entity
-	// 	{
-	// 	public:
-	// 		Entity(entt::entity handle)
-	// 			: m_handle(handle)
-	// 		{}
-	//
-	// // 		template<typename Component, typename... Args>
-	// // 		Component& addComponent(Args&&... args)
-	// // 		{
-	// // 			return m_scene.m_registry.emplace<Component>(m_handle, std::forward<Args>(args)...);
-	// // 		}
-	//
-	// // 		template<typename Component>
-	// // 		Component& getComponent()
-	// // 		{
-	// // 			return m_scene.m_registry.get
-	// // 		}
-	// //
-	//
-	// 	private:
-	// 		entt::entity m_handle;
-	// // 	};
-	// //
-	// 	class Scene
-	// 	{
-	// 	public:
-	// 		Scene() = default;
-	//
-	// 		Entity createEntity()
-	// 		{
-	// 			auto enttentity = m_registry.create();
-	// 			Entity entity{ enttentity, *this };
-	// 			return entity;
-	// 		}
-	//
-	// // 		template<typename... Components, typename...Args>
-	// // 		Entity createEntity(Args&&... args)
-	// // 		{
-	// // 			auto entity = createEntity();
-	// // 			entity.addComponent()
-	// //
-	// // 		}
-	//
-	// 	private:
-	// 		entt::registry m_registry;
-	// 		std::vector<Entity> m_entities;
-	//
-	//
-	// 		friend class Entity;
-	// 	};
-}
-
-template<auto Func>
-struct Reflector
-{
-	static constexpr auto FunctionName() noexcept
-	{
-		std::string_view pretty_function{ ENTT_PRETTY_FUNCTION };
-		auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
-		auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
-		auto valuebefore = value.substr(0, value.find_first_of('('));
-		auto valuelast = valuebefore.substr(valuebefore.find_last_of(' ') + 1);
-		return valuelast;
-	}
-};
-
-namespace nf
-{
-	template<typename T>
-	struct B
-	{
-		class UK2Node_FunctionEntry;
-		class UFunction;
-		template<typename C>
-		static const UK2Node_FunctionEntry* FindLocalEntryPoint(const UFunction* Function) {
-			return nullptr;
-		}
-	};
-}
-using namespace nf;
-
-#include "3rdparty/nameof/include/nameof.hpp"
-
-#include <numeric>
-#include <any>
-
-nf::Node* PrepareCallWithNodeBackend()
-{
-	auto nodeModule = std::make_shared<nf::FlowModule>("FirstModule");
-	nodeModule->registerCustomNode<nf::IntegerAddNode>("Basics/IntegerAddNode").or_else([](auto Error) {pprint(Error); });
-	nodeModule->registerCustomNode<nf::DoubleIntegerSourceNode>("Basics/DoubleIntegerSourceNode").or_else([](auto Error) {pprint(Error); });
-
-	nf::FlowScript script(nodeModule);
-	auto doubleIntegerSourceNode = script.spawnNode("Basics/DoubleIntegerSourceNode").value();
-	auto intgerAddNode = script.spawnNode("Basics/IntegerAddNode").value();
-
-	script.connectPorts(doubleIntegerSourceNode, 0, intgerAddNode, 0).or_else([](auto Error) {pprint(Error); });
-	script.connectPorts(doubleIntegerSourceNode, 1, intgerAddNode, 1).or_else([](auto Error) {pprint(Error); });
-
-	auto node = script.findNode(intgerAddNode);
-
-	return node;
-
-	// 	ankerl::nanobench::Bench().run("CallWithNodeBackend", [&] {
-	// 		static_cast<nf::IntegerAddNode*>(node)->process();
-	// 		ankerl::nanobench::doNotOptimizeAway(node);
-	// 		});
-
-	// 	dbgln(*node->getOutputPort(0).dataHandle().get<int>());
-}
-
-int levenshtein_distance(const std::string& s1, const std::string& s2) {
-	size_t len1 = s1.length();
-	size_t len2 = s2.length();
-	std::vector<std::vector<int>> distance(len1 + 1, std::vector<int>(len2 + 1));
-
-	for (size_t i = 0; i <= len1; ++i) {
-		distance[i][0] = i;
-	}
-	for (size_t j = 0; j <= len2; ++j) {
-		distance[0][j] = j;
-	}
-
-	for (size_t i = 1; i <= len1; ++i) {
-		for (size_t j = 1; j <= len2; ++j) {
-			int substitution_cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
-			distance[i][j] = std::min({ distance[i - 1][j] + 1,          // deletion
-									   distance[i][j - 1] + 1,          // insertion
-									   distance[i - 1][j - 1] + substitution_cost }); // substitution
-		}
-	}
-
-	return distance[len1][len2];
-}
-
-void fuzzy_seach(const std::string& search, const std::vector<std::string>& db)
-{
-	for (auto& sample : db)
-	{
-		auto lvDist = levenshtein_distance(search, sample);
-		dbgln("Word:{} has distance of:{}", sample, lvDist);
-	}
-}
+//
+// struct CPPCodeInstruction
+// {
+// 	enum InstructionType
+// 	{
+// 		VariableInitialization,
+// 		VariableSet,
+// 		VariableGet,
+// 		FreeFunctionCall,
+// 		MemberFunctionCall
+// 	};
+//
+// 	template<auto func, bool e = false>
+// 	static CPPCodeInstruction GenCallInstruction_FreeFunction()
+// 	{
+// 		using codeContext = nf::FunctionCodeContext<func>;
+// 		using retType = codeContext::ReturnType;
+//
+// 		CPPCodeInstruction ci;
+// 		ci.instructionType = CPPCodeInstruction::FreeFunctionCall;
+//
+// 		std::stringstream stream;
+// 		if constexpr (!std::is_same_v<retType, void>)
+// 		{
+// 			stream << codeContext::ReturnTypeName() << " $r1 = ";
+// 		}
+//
+// 		stream << codeContext::FunctionName() << "(";
+//
+// 		if constexpr (constexpr int argCount = codeContext::ArgumentCount() != 0)
+// 		{
+// 			ci.functionArgumentCount = argCount;
+// 			auto argNames = codeContext::ArgumentTypeNames();
+//
+// 			for (size_t i = 0; i < argNames.size(); i++)
+// 			{
+// 				stream << "$a" << i + 1;
+//
+// 				if (i != argNames.size() - 1)
+// 				{
+// 					stream << ", ";
+// 				}
+// 			}
+// 		}
+//
+// 		stream << ");";
+//
+// 		ci.instruction = stream.str();
+// 		return ci;
+// 	}
+//
+// 	InstructionType instructionType;
+// 	int functionArgumentCount = -1;
+// 	std::string instruction;
+// };
+
+// int fib(int n)
+// {
+// 	if (n <= 1)
+// 		return n;
+// 	return fib(n - 1) + fib(n - 2);
+// }
+//
+// namespace nf {
+// #define NF_SERIALIZE_INPUT(port)		 \
+// if constexpr (port.streamable)			 \
+// {										 \
+// 	if (auto input = getInputData(port)) \
+// 	{									 \
+// 		Serializer << *input;			 \
+// 		return true;					 \
+// 	}									 \
+// 	return false;						 \
+// }									     \
+// return false;							 \
+//
+// 	class IntegerAddNode : public nf::FlowNode
+// 	{
+// 	public:
+// 		Expected<void, Error> setup() override
+// 		{
+// 			addPort(inputPort1, "MyInputPort1");
+// 			addPort(resultPort, "MyResultPort");
+// 			addPort(inputPort2, "MyInputPort2");
+//
+// 			return {};
+// 		}
+//
+// 		void process() override
+// 		{
+// 			auto input1 = getInputData(inputPort1);
+// 			auto input2 = getInputData(inputPort2);
+// 			if (input1 && input2);
+// 			setOutputData(resultPort, std::sin<int>(fib(*input1 + *input2)));
+// 		}
+//
+// 	private:
+// 		nf::InputPort<int> inputPort1;
+// 		nf::InputPort<int> inputPort2;
+// 		nf::OutputPort<double> resultPort;
+// 	};
+//
+// 	class DoubleIntegerSourceNode : public nf::FlowNode
+// 	{
+// 	public:
+// 		Expected<void, Error> setup() override
+// 		{
+// 			addPort(sourcePort1, "MySourcePort1");
+// 			addPort(sourcePort2, "MySourcePort2");
+//
+// 			return {};
+// 		}
+//
+// 		void process() override
+// 		{
+// 		}
+//
+// 	private:
+// 		nf::OutputPort<int> sourcePort1{ 4 };
+// 		nf::OutputPort<int> sourcePort2{ 5 };
+// 	};
+//
+// #include "core/UUID.hpp"
+//
+// 	nf::UUID getUUID()
+// 	{
+// 		static auto uuid = nf::UUID::create();
+// 		return uuid;
+// 	}
+//
+// 	class TestClass
+// 	{
+// 	public:
+// 		int memberMethod()
+// 		{
+// 			return 123;
+// 		}
+//
+// 		static int staticMethod()
+// 		{
+// 			return 0;
+// 		}
+// 	};
+//
+// 	template<auto method, class clazz>
+// 	class TestFunctor
+// 	{
+// 	public:
+//
+// 		TestFunctor(const TestClass& clazz)
+// 			: c(clazz)
+// 		{
+// 		}
+//
+// 		void process()
+// 		{
+// 			auto e = std::invoke(method, c);
+// 			pprint(e);
+// 		}
+// 		clazz c;
+// 	};
+// #include <cmath>
+//
+// 	double addNumbers(int a, int b)
+// 	{
+// 		return (a + b);
+// 	}
+//
+// 	template<auto method>
+// 	class ClassMethodNode : public FlowNode
+// 	{
+// 	public:
+// 		using MSig_t = nf::FuncSignature<std::function<decltype(method)>>;
+// 		using MClass_t = MSig_t::ClassType_t;
+// 		using MReturn_T = MSig_t::ReturnType_t;
+// 		using MArgument_ts = MSig_t::ParamTypes_t;
+//
+// 	public:
+// 		InputPort<MClass_t> m_thisPort;
+// 	};
+//
+// 	class CustomEvent : public FlowEvent
+// 	{
+// 		NF_REGISTER_EVENT(CustomEvent);
+// 	public:
+// 		CustomEvent(int a, int b)
+// 			: m_a(a), m_b(b)
+// 		{}
+//
+// 	public:
+// 		int m_a;
+// 		int m_b;
+// 	};
+//
+// 	class ScriptEvent
+// 	{
+// 	public:
+//
+// 	private:
+// 		std::unique_ptr<FlowEvent> event;
+// 	};
+//
+// 	template<typename Event, class... Args>
+// 	void myEvent(Args&&... args)
+// 	{
+// 		using types = std::tuple<nf::deduce_member_type_t<Args>...>;
+// 	}
+//
+// 	struct MyEvent
+// 	{
+// 		int keyCode;
+// 		bool successfull;
+// 	};
+//
+// 	template<class U, class B>
+// 	struct AsTuple
+// 	{
+// 		using type = std::pair<U, B>;
+// 	};
+//
+// 	template<typename Event, typename Key, typename... Args>
+// 	void importEvent(std::pair<Key, Args>&& ...args) {
+// 		using fieldTypes = std::tuple<nf::deduce_member_type_t<Args>...>;
+// 		std::vector<std::string_view> vec{ {args.first}... };
+// 		// 	pprint(type_name<decltype(args.first)>()...);
+// 	}
+//
+// 	template<auto Callable>
+// 	std::unique_ptr<FlowNode> importConversion(const std::string& namePath)
+// 	{
+// 		using FSig_t = FuncSignature<decltype(std::function{ Callable }) > ;
+// 		using To_t = FSig_t::ReturnType_t;
+// 		using From_ts = FSig_t::ParamTypes_t;
+// 		static_assert(std::tuple_size_v<From_ts> == 1, "Callable must be of signature: 'ToType Callable(FromType)'");
+// 		using From_t = std::tuple_element_t<0, From_ts>;
+//
+// 		return std::make_unique< ConversionNodeImpl<From_t, To_t, Callable>>();
+// 	}
+//
+// 	std::string converter(int from)
+// 	{
+// 		return std::to_string(from);
+// 	}
+//
+// 	double addNumbers2(int a, int b)
+// 	{
+// 		return a + b;
+// 	}
+//
+// 	int strToInt(std::string str)
+// 	{
+// 		return std::stoi(str);
+// 	}
+// }
+//
+// struct Position
+// {
+// 	float x;
+// 	float y;
+// };
+
+// struct Children
+// {
+// 	std::vector<int> childs;
+// };
+//
+// struct IsMovable
+// {
+// 	bool movable = false;
+// };
+//
+// auto allEntities(const entt::registry& reg)
+// {
+// 	std::vector<entt::entity> entities;
+// 	reg.each([&](auto entity) {
+// 		entities.push_back(entity);
+// 	});
+// 	return entities;
+// }
+
+// namespace nf
+// {
+// 	// 	class Scene;
+//
+// 	// 	class Entity;
+//
+// 	// 	class Entity
+// 	// 	{
+// 	// 	public:
+// 	// 		Entity(entt::entity handle)
+// 	// 			: m_handle(handle)
+// 	// 		{}
+// 	//
+// 	// // 		template<typename Component, typename... Args>
+// 	// // 		Component& addComponent(Args&&... args)
+// 	// // 		{
+// 	// // 			return m_scene.m_registry.emplace<Component>(m_handle, std::forward<Args>(args)...);
+// 	// // 		}
+// 	//
+// 	// // 		template<typename Component>
+// 	// // 		Component& getComponent()
+// 	// // 		{
+// 	// // 			return m_scene.m_registry.get
+// 	// // 		}
+// 	// //
+// 	//
+// 	// 	private:
+// 	// 		entt::entity m_handle;
+// 	// // 	};
+// 	// //
+// 	// 	class Scene
+// 	// 	{
+// 	// 	public:
+// 	// 		Scene() = default;
+// 	//
+// 	// 		Entity createEntity()
+// 	// 		{
+// 	// 			auto enttentity = m_registry.create();
+// 	// 			Entity entity{ enttentity, *this };
+// 	// 			return entity;
+// 	// 		}
+// 	//
+// 	// // 		template<typename... Components, typename...Args>
+// 	// // 		Entity createEntity(Args&&... args)
+// 	// // 		{
+// 	// // 			auto entity = createEntity();
+// 	// // 			entity.addComponent()
+// 	// //
+// 	// // 		}
+// 	//
+// 	// 	private:
+// 	// 		entt::registry m_registry;
+// 	// 		std::vector<Entity> m_entities;
+// 	//
+// 	//
+// 	// 		friend class Entity;
+// 	// 	};
+// }
+//
+// template<auto Func>
+// struct Reflector
+// {
+// 	static constexpr auto FunctionName() noexcept
+// 	{
+// 		std::string_view pretty_function{ ENTT_PRETTY_FUNCTION };
+// 		auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
+// 		auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
+// 		auto valuebefore = value.substr(0, value.find_first_of('('));
+// 		auto valuelast = valuebefore.substr(valuebefore.find_last_of(' ') + 1);
+// 		return valuelast;
+// 	}
+// };
+//
+// namespace nf
+// {
+// 	template<typename T>
+// 	struct B
+// 	{
+// 		class UK2Node_FunctionEntry;
+// 		class UFunction;
+// 		template<typename C>
+// 		static const UK2Node_FunctionEntry* FindLocalEntryPoint(const UFunction* Function) {
+// 			return nullptr;
+// 		}
+// 	};
+// }
+// using namespace nf;
+//
+// nf::Node* PrepareCallWithNodeBackend()
+// {
+// 	auto nodeModule = std::make_shared<nf::FlowModule>("FirstModule");
+// 	nodeModule->registerCustomNode<nf::IntegerAddNode>("Basics/IntegerAddNode").or_else([](auto Error) {pprint(Error); });
+// 	nodeModule->registerCustomNode<nf::DoubleIntegerSourceNode>("Basics/DoubleIntegerSourceNode").or_else([](auto Error) {pprint(Error); });
+//
+// 	nf::FlowScript script(nodeModule);
+// 	auto doubleIntegerSourceNode = script.spawnNode("Basics/DoubleIntegerSourceNode").value();
+// 	auto intgerAddNode = script.spawnNode("Basics/IntegerAddNode").value();
+//
+// 	script.connectPorts(doubleIntegerSourceNode, 0, intgerAddNode, 0).or_else([](auto Error) {pprint(Error); });
+// 	script.connectPorts(doubleIntegerSourceNode, 1, intgerAddNode, 1).or_else([](auto Error) {pprint(Error); });
+//
+// 	auto node = script.findNode(intgerAddNode);
+//
+// 	return node;
+//
+// 	// 	ankerl::nanobench::Bench().run("CallWithNodeBackend", [&] {
+// 	// 		static_cast<nf::IntegerAddNode*>(node)->process();
+// 	// 		ankerl::nanobench::doNotOptimizeAway(node);
+// 	// 		});
+//
+// 	// 	dbgln(*node->getOutputPort(0).dataHandle().get<int>());
+// }
 
 int main()
 {
