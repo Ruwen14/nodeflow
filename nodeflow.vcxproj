@@ -122,7 +122,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
@@ -142,7 +142,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

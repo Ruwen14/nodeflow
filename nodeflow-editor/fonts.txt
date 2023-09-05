@@ -1,0 +1,38 @@
+LogContentStreaming: Texture pool size now 1000 MB
+LogSlate: Took 0.000242 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K)
+LogSlate: Took 0.000154 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Italic.ttf' (157K)
+LogSlate: Took 0.000149 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/DroidSansMono.ttf' (77K)
+LogSlate: Took 0.000158 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Bold.ttf' (160K)
+LogViewport: Scene viewport resized to 921x718, mode Windowed.
+LogSlate: Took 0.000158 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Light.ttf' (167K)
+LogSlate: Took 0.000201 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K)
+LogViewport: Scene viewport resized to 1492x902, mode Windowed.
+LogViewport: Scene viewport resized to 921x718, mode Windowed.
+LogViewport: Scene viewport resized to 1492x902, mode Windowed.
+LogWorldSubsystemInput: UEnhancedInputDeveloperSettings::bEnableWorldSubsystem is false, the world subsystem will not be created!
+LogWorldSubsystemInput: UEnhancedInputDeveloperSettings::bEnableWorldSubsystem is false, the world subsystem will not be created!
+LogWorldSubsystemInput: UEnhancedInputDeveloperSettings::bEnableWorldSubsystem is false, the world subsystem will not be created!
+LogViewport: Scene viewport resized to 470x284, mode Windowed.
+LogAssetEditorSubsystem: Opening Asset editor for Blueprint /Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter.ThirdPersonCharacter
+LogWorldSubsystemInput: UEnhancedInputDeveloperSettings::bEnableWorldSubsystem is false, the world subsystem will not be created!
+LogChaos: FPhysicsSolverBase::AsyncDt:-1.000000
+LogSlate: Took 0.000195 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-BoldCondensed.ttf' (158K)
+LogDerivedDataCache: C:/Users/ruwen/AppData/Local/UnrealEngine/Common/DerivedDataCache: Maintenance finished in +00:00:00.076 and deleted 0 files with total size 0 MiB and 0 empty folders. Scanned 639 files in 1163 folders with total size 20 MiB.
+LogSlate: Window 'Content Browser' being destroyed
+LogSlate: Window 'Content Browser' being destroyed
+LogUObjectHash: Compacting FUObjectHashTables data took   1.35ms
+LogFileHelpers: Editor autosave (incl. external actors) for '/Game/ThirdPersonBP/Maps/ThirdPersonExampleMap' took 0.027
+OBJ SavePackage: Generating thumbnails for [2] asset(s) in package [/Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter] ([2] browsable assets)...
+LogWorldSubsystemInput: UEnhancedInputDeveloperSettings::bEnableWorldSubsystem is false, the world subsystem will not be created!
+OBJ SavePackage:     Rendered thumbnail for [BlueprintGeneratedClass /Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter.ThirdPersonCharacter_C]
+LogWorldSubsystemInput: UEnhancedInputDeveloperSettings::bEnableWorldSubsystem is false, the world subsystem will not be created!
+OBJ SavePackage:     Rendered thumbnail for [Blueprint /Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter.ThirdPersonCharacter]
+OBJ SavePackage: Finished generating thumbnails for package [/Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter]
+LogPackageLocalizationCache: Processed 41 localized package path(s) for 1 prioritized culture(s) in 0.008508 seconds
+LogSerialization: UsePackageTrailer: 'true'
+LogSavePackage: Moving output files for package: /Temp/Autosaves/Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter_Auto1
+LogSavePackage: Moving '../../../../../../Users/ruwen/AppData/Local/UnrealEngine/5.2/Saved/ThirdPersonCharacter_Auto1E23BD24C4C8B135510CA208233AA5301.tmp' to '../../../../../../Users/ruwen/AppData/Local/UnrealEngine/5.2/Saved/Autosaves/Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter_Auto1.uasset'
+LogFileHelpers: Auto-saving content packages took 0.129
+LogD3D12RHI: Warning: Descriptor cache ran out of sub allocated descriptor blocks! Moving to Context local View heap strategy
+LogD3D12RHI: This should only happen in the Editor where it doesn't matter as much. If it happens in game you should increase the device global heap size!
+LogD3D12RHI: OnlineHeap RollOver Detected. Increase the heap size to prevent creation of additional heaps

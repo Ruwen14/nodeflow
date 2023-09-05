@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <string_view>
-#include "typedefs.hpp"
+#include "nodeflow/typedefs.hpp"
 
 
 namespace nf
