@@ -33,56 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "core/Node.hpp"
 
-namespace nf
+namespace nf::qt
 {
-	enum class FlowDirection
-	{
-		Before,
-		Next
-	};
+	class QtNodeWidget;
 
-	class FlowNode : public Node
-	{
-	public:
-		NF_NODE_NAME("FlowNode");
+	class QtFlowNodeWidget;
 
-	public:
-		NodeArchetype getArchetype() const override;
+	class QtDataNodeWidget;
 
-		bool onEvent(FlowEvent* event) override;
-
-		inline void setExecNext(FlowNode& next) { m_outExecPort.execLink.makeLink(&next); forceNextExec(next); }
-
-		inline void setExecBefore(FlowNode& before)  {  m_inExecPort.execLink.makeLink(&before); }
-
-		inline void forceNextExec(FlowNode& next) { m_nextExec = &next; }
-
-		inline FlowNode* getExecNext() const noexcept { return m_outExecPort.execLink.targetNode; }
-
-		inline FlowNode* getExecBefore() const noexcept { return m_inExecPort.execLink.targetNode; }
-
-		void breakFlow(FlowDirection dir);
-
-
-	public:
-		FlowPort& defaultFlowPort(FlowDirection dir);
-
-		bool hasAdditionalFlowPorts() const;
-
-		virtual std::vector<FlowPort*> additionalFlowPorts() const;
-
-		virtual std::string flowPortName(FlowDirection dir, PortIndex index) const;
-
-	private:
-		FlowPort m_inExecPort;
-		FlowPort m_outExecPort;
-		// Optional. Used when we have multiple Output-FlowLinks
-		// and need to change which node is executed next during execution (ex. Branches, Loops)
-		FlowNode* m_nextExec; 
-// 		FlowLink m_nextExec;
-	};
 }
-
-

@@ -95,6 +95,18 @@ namespace nf
 		return detail::Fnv1aHasher<nf::typeid_t>::hash(tName.data(), tName.size());
 	}
 
+	template<auto Func>
+	static constexpr auto func_name() noexcept
+	{
+		// works only for MSVC because cdecl
+		std::string_view pretty_function{ NF_FUNC_SIGNATURE };
+		auto charsBeforeBraces = pretty_function.substr(0, pretty_function.find_first_of('('));
+		auto name = charsBeforeBraces.substr(charsBeforeBraces.rfind("cdecl") + 6);
+		return name;
+	}
+
+
+
 	template<typename Type>
 	struct refltype
 	{

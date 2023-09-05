@@ -36,13 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <string_view>
 #include <sstream>
-#include <array>
-#include <optional>
+#include <unordered_map>
+
 
 #include "typedefs.hpp"
-#include "core/Object.hpp"
 #include "core/NodePort.hpp"
 #include "core/Error.hpp"
+#include "core/UUID.hpp"
+#include "core/FlowEvent.hpp"
 #include "utility/Expected.hpp"
 #include "utility/TypenameAtlas.hpp"
 
@@ -57,7 +58,8 @@ namespace nf
 		Flow_EventNode,
 		Flow_ConversionNode,
 		Flow_FunctorNode,
-		Flow_CustomNode
+		Flow_CustomNode,
+		Lang_IfElse
 	};
 
 	enum class ConnectionError
@@ -69,19 +71,16 @@ namespace nf
 		ConnectionWithItself
 	};
 
-	enum class ConnectionPolicy
-	{
-		InputToOutput,
-		OutputToInput
-	};
-
 	enum class StreamFlag
 	{
 		WriteTo,
 		ReadFrom
 	};
 
-	class Node : public Object
+	
+
+
+	class Node 
 	{
 	public:
 		Node() = default;
@@ -92,8 +91,12 @@ namespace nf
 		/**
 		 * @brief Returns the name of the node
 // 		*/
-		virtual std::string nodeName() const;
+		virtual std::string nodeName() const = 0;
 
+		inline void assignTypeID(typeid_t id) noexcept
+		{
+			NF_ASSERT(false, "not Implemented");
+		}
 
 		/**
 		 * @brief Returns the name of a specific port attached to this node.
@@ -124,7 +127,7 @@ namespace nf
 		 * @param event 
 		 * @return 
 		*/
-		virtual bool onCustomEvent(FlowEvent* event) { NF_UNUSED(event); return false; }
+		virtual bool onEvent(FlowEvent* event) { NF_UNUSED(event); return false; }
 
 
 
@@ -146,6 +149,8 @@ namespace nf
 		 * Users should add their ports and perform other initializations in the derived version.
 		 * @return nothing or a user-defined error according to nf::Error that can propagate to the gui
 		*/
+
+		// ToDo Maybe pass a NodeMetaContext to setup, where its name, portnames... can be decicided.
 		virtual Expected<void, Error> setup() { return {}; }
 
 
@@ -156,6 +161,15 @@ namespace nf
 		virtual void process() {}
 
 	public:
+
+		/**
+		 * @brief Returns the unique id associated with this node
+		 * @return UUID
+		*/
+		inline UUID uuid() const noexcept { return m_uuid; };
+
+		void setUUID(UUID uuid) noexcept;
+
 
 		/**
 		 * @brief Returns the number of ports used in the node
@@ -201,44 +215,24 @@ namespace nf
 		void formatLinkageTree(std::ostringstream& stream) const;
 
 		/**
-		 * @brief Checks port linkage
-		 * @return 'true' if input port of node is linked to an output port of another node
-		*/
-		bool inputPortLinked(PortIndex index) const;
-
-		/**
-		 * @brief Checks port linkage
-		 * @return 'true' if output port of node is linked at least once to an input port of another node
-		*/
-		bool outputPortLinked(PortIndex index) const;
-
-
-		/**
-		 * @brief Creates a data connection between ports of two nodes according to 'policy'
-		 * @param policy InputToOutput or OutputToInput
+		 * @brief Creates a data connection between output of this node to input of another'
 		 * @return nothing or a ConnectionError
 		*/
-		Expected<void, ConnectionError> makeConnection(ConnectionPolicy policy, 
-													   PortIndex originPort, 
-													   Node& targetNode, 
-													   PortIndex targetPort);
+		[[nodiscard]] Expected<void, ConnectionError> makeConnection(PortIndex fromOutput, Node& toNode, PortIndex toInput, bool interlink = true);
+		
 
 		/**
-		 * @brief Deletes an existing data connection between ports of two nodes according to 'policy'
-		 * @param policy InputToOutput or OutputToInput
+		 * @brief Deletes an existing data connection between output of this nodes to another'
 		 * @return 'true' is connection was successfully removed
 		*/
-		bool breakConnection(ConnectionPolicy policy, 
-							  PortIndex originPort, 
-							  Node& targetNode, 
-							  PortIndex targetPort);
+		[[nodiscard]] bool breakConnection(PortIndex fromOutput, Node& toNode, PortIndex toInput);
 
 
 		/**
 		 * @brief Deletes all port connections from and to this node
-		 * @param dir Input, Output or Both 
+		 * @param dir Input, Output
 		*/
-		void breakAllConnections(PortDirection dir = PortDirection::Both);
+		void breakAllConnections(PortDirection dir);
 
 	protected:
 		
@@ -316,29 +310,16 @@ namespace nf
 		*/
 		void allocateExpectedPortCount(PortDirection dir, size_t size);
 
-	private:
-		/**
-		 * @brief Internal function to make connection from the perspective of the output of a node
-		*/
-		[[nodiscard]] Expected<void, ConnectionError> makeInterlinkedConnection(PortIndex outPort, 
-																				Node& toNode, 
-																				PortIndex toInPort);
-
-
-		/**
-		 * @brief Internal function to break connection from the perspective of the output of a node
-		*/
-		[[nodiscard]] bool breakInterlinkedConnection(PortIndex outPortIndex, Node& toNode, PortIndex toInPortIndex);
-
-		void clearInterlinkedPorts(PortIndex outPort);
-
+		
 
 	protected:
 		std::vector<OutputPortHandle> m_outputPorts;
 		std::vector<InputPortHandle> m_inputPorts;
-
+		UUID m_uuid;
+		
 	};
 
+	
 
 	template<typename T>
 	bool Node::addPort(InputPort<T>& p, const std::string& caption /*= ""*/)
@@ -370,24 +351,24 @@ namespace nf
 		return true;
 	}
 
-	/**
-	 * @brief Checks if the node can be explicitly cast to 'To'-NodeType. 
-	 * Doesn't account for inheritance like dynamic_cast.
-	 * @tparam To 
-	 * @param from 
-	 * @return 
-	*/
-	template<typename To>
-	To* explicit_node_cast(Node* from)
-	{
-		static constexpr typeid_t toTypeID = type_id<To>();
-		if (from && from->typeID() == toTypeID)
-		{
-			NF_ASSERT(dynamic_cast<To*>(from) != nullptr, "Error");
-			return static_cast<To*>(from);
-		}
-		return nullptr;
-	}
+// 	/**
+// 	 * @brief Checks if the node can be explicitly cast to 'To'-NodeType. 
+// 	 * Doesn't account for inheritance like dynamic_cast.
+// 	 * @tparam To 
+// 	 * @param from 
+// 	 * @return 
+// 	*/
+// 	template<typename To>
+// 	To* explicit_node_cast(Node* from)
+// 	{
+// 		static constexpr typeid_t toTypeID = type_id<To>();
+// 		if (from && from->typeID() == toTypeID)
+// 		{
+// 			NF_ASSERT(dynamic_cast<To*>(from) != nullptr, "Error");
+// 			return static_cast<To*>(from);
+// 		}
+// 		return nullptr;
+// 	}
 }
 
 

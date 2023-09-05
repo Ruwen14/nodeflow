@@ -1,3 +1,4 @@
+
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -32,57 +33,88 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
+#include <tuple>
 
-#include "core/Node.hpp"
+#include "typedefs.hpp"
+#include "core/type_tricks.hpp"
+#include "nodes/FlowNode.hpp"
 
-namespace nf
-{
-	enum class FlowDirection
+namespace nf {
+
+
+
+
+
+
+
+
+
+	template<class EventType, class... Fields>
+	class EventNodeV1 {};
+
+	template<class Event, class... Fields>
+	class EventNodeV1<Event, std::tuple<Fields...>> : public FlowNode
 	{
-		Before,
-		Next
+	public:
+		using OutputTypes_t = std::tuple<Fields...>;
+		using OutputPorts_t = ExpandOutputPorts<OutputTypes_t>::value;
+		static constexpr bool hasFields = std::tuple_size_v<OutputPorts_t> != 0;
+
+
+		Expected<void, Error> setup() override
+		{
+			if constexpr (hasFields)
+				std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_eventFields);
+			return {};
+		}
+
+		NodeArchetype getArchetype() const override
+		{
+			return NodeArchetype::Flow_EventNode;
+		}
+
+		// Visitor Pattern 
+		// Or Make template<Event> class BaseEventNode with virtual template<typename Event> parseEvent
+		bool constructFromEvent(const Event& event /*We need a callback function here*/)
+		{
+			return false;
+		}
+		
+		bool setFieldNames(const std::vector<std::string_view>& fieldNames)
+		{
+			if constexpr (hasFields)
+			{
+				if (fieldNames.size() < m_outputPorts.size())
+				{
+					NF_ASSERT(false, "Event has more fields than provided fieldNames");
+					return false;
+				}
+
+				for (size_t i = 0; i < m_outputPorts.size(); i++)
+				{
+					auto& oPort = m_outputPorts[i];
+					oPort.setName(std::string(fieldNames[i]));
+				}
+
+				return true;
+			}
+			else
+				return false;
+
+		}
+
+		const std::vector<std::string>& fieldNames() const 
+		{
+			return {};
+		}
+
+	public:
+		OutputPorts_t m_eventFields;
 	};
 
-	class FlowNode : public Node
-	{
-	public:
-		NF_NODE_NAME("FlowNode");
-
-	public:
-		NodeArchetype getArchetype() const override;
-
-		bool onEvent(FlowEvent* event) override;
-
-		inline void setExecNext(FlowNode& next) { m_outExecPort.execLink.makeLink(&next); forceNextExec(next); }
-
-		inline void setExecBefore(FlowNode& before)  {  m_inExecPort.execLink.makeLink(&before); }
-
-		inline void forceNextExec(FlowNode& next) { m_nextExec = &next; }
-
-		inline FlowNode* getExecNext() const noexcept { return m_outExecPort.execLink.targetNode; }
-
-		inline FlowNode* getExecBefore() const noexcept { return m_inExecPort.execLink.targetNode; }
-
-		void breakFlow(FlowDirection dir);
 
 
-	public:
-		FlowPort& defaultFlowPort(FlowDirection dir);
+	
 
-		bool hasAdditionalFlowPorts() const;
 
-		virtual std::vector<FlowPort*> additionalFlowPorts() const;
-
-		virtual std::string flowPortName(FlowDirection dir, PortIndex index) const;
-
-	private:
-		FlowPort m_inExecPort;
-		FlowPort m_outExecPort;
-		// Optional. Used when we have multiple Output-FlowLinks
-		// and need to change which node is executed next during execution (ex. Branches, Loops)
-		FlowNode* m_nextExec; 
-// 		FlowLink m_nextExec;
-	};
 }
-
-

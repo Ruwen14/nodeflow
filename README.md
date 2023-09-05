@@ -36,3 +36,22 @@ https://s1t2.com/blog/brief-intro-k2nodes
   -  any.hpp https://github.com/ChaiScript/ChaiScript/blob/3aa1fa8278efaa369487f5a7203f3b483a6ae09c/include/chaiscript/dispatchkit/any.hpp
   -  boxed_value https://github.com/ChaiScript/ChaiScript/blob/3aa1fa8278efaa369487f5a7203f3b483a6ae09c/include/chaiscript/dispatchkit/boxed_value.hpp
   -  compile time typeid https://github.dev/ChaiScript/ChaiScript/blob/develop/include/chaiscript/dispatchkit/type_conversions.hpp -->
+  -  see compiled template instations: https://cppinsights.io/
+
+    registration::class_<MyStruct>("MyStruct")
+         .constructor<>()
+         .property("data", &MyStruct::data)
+         .method("func", &MyStruct::func);
+
+
+
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(example, m) {
+    py::class_<Pet>(m, "Pet")
+        .def(py::init<const std::string &>())
+        .def("setName", &Pet::setName)
+        .def("getName", &Pet::getName);
+}

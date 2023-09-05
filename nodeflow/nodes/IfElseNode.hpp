@@ -33,56 +33,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
+#include "typedefs.hpp"
 #include "core/Node.hpp"
+#include "nodes/FlowNode.hpp"
+
 
 namespace nf
 {
-	enum class FlowDirection
-	{
-		Before,
-		Next
-	};
-
-	class FlowNode : public Node
+	class IfElseNode : public FlowNode
 	{
 	public:
-		NF_NODE_NAME("FlowNode");
+
+		NF_NODE_NAME("IfElse")
 
 	public:
+		IfElseNode();
+
 		NodeArchetype getArchetype() const override;
 
-		bool onEvent(FlowEvent* event) override;
+		Expected<void, Error> setup() override;
 
-		inline void setExecNext(FlowNode& next) { m_outExecPort.execLink.makeLink(&next); forceNextExec(next); }
+		void process() override;
 
-		inline void setExecBefore(FlowNode& before)  {  m_inExecPort.execLink.makeLink(&before); }
+		void setExecFlowIf(FlowNode& node);
 
-		inline void forceNextExec(FlowNode& next) { m_nextExec = &next; }
-
-		inline FlowNode* getExecNext() const noexcept { return m_outExecPort.execLink.targetNode; }
-
-		inline FlowNode* getExecBefore() const noexcept { return m_inExecPort.execLink.targetNode; }
-
-		void breakFlow(FlowDirection dir);
-
-
-	public:
-		FlowPort& defaultFlowPort(FlowDirection dir);
-
-		bool hasAdditionalFlowPorts() const;
-
-		virtual std::vector<FlowPort*> additionalFlowPorts() const;
-
-		virtual std::string flowPortName(FlowDirection dir, PortIndex index) const;
+		void setExecFlowElse(FlowNode& node);
 
 	private:
-		FlowPort m_inExecPort;
-		FlowPort m_outExecPort;
-		// Optional. Used when we have multiple Output-FlowLinks
-		// and need to change which node is executed next during execution (ex. Branches, Loops)
-		FlowNode* m_nextExec; 
-// 		FlowLink m_nextExec;
+		InputPort<bool> m_condition;
+		ExecutionLink m_linkExitElse;
+
+		
 	};
 }
-
-

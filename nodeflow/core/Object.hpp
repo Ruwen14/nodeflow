@@ -62,7 +62,6 @@ namespace nf
 			return m_typeID;
 		}
 
-
 		inline UUID uuid() const noexcept
 		{
 			return m_uuid;

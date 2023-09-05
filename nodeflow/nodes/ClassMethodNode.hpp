@@ -33,56 +33,71 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "core/Node.hpp"
+#include "nodes/FunctorNode.hpp"
 
-namespace nf
+template<auto method>
+class ClassMethodNode : public FlowNode
 {
-	enum class FlowDirection
-	{
-		Before,
-		Next
-	};
-
-	class FlowNode : public Node
-	{
-	public:
-		NF_NODE_NAME("FlowNode");
-
-	public:
-		NodeArchetype getArchetype() const override;
-
-		bool onEvent(FlowEvent* event) override;
-
-		inline void setExecNext(FlowNode& next) { m_outExecPort.execLink.makeLink(&next); forceNextExec(next); }
-
-		inline void setExecBefore(FlowNode& before)  {  m_inExecPort.execLink.makeLink(&before); }
-
-		inline void forceNextExec(FlowNode& next) { m_nextExec = &next; }
-
-		inline FlowNode* getExecNext() const noexcept { return m_outExecPort.execLink.targetNode; }
-
-		inline FlowNode* getExecBefore() const noexcept { return m_inExecPort.execLink.targetNode; }
-
-		void breakFlow(FlowDirection dir);
+public:
+	using MSig_t = nf::FuncSignature<std::function<decltype(method)>>;
+	using MClass_t = MSig_t::ClassType_t;
+	using MReturn_T = MSig_t::ReturnType_t;
+	using MArgument_ts = MSig_t::ParamTypes_t;
 
 
-	public:
-		FlowPort& defaultFlowPort(FlowDirection dir);
-
-		bool hasAdditionalFlowPorts() const;
-
-		virtual std::vector<FlowPort*> additionalFlowPorts() const;
-
-		virtual std::string flowPortName(FlowDirection dir, PortIndex index) const;
-
-	private:
-		FlowPort m_inExecPort;
-		FlowPort m_outExecPort;
-		// Optional. Used when we have multiple Output-FlowLinks
-		// and need to change which node is executed next during execution (ex. Branches, Loops)
-		FlowNode* m_nextExec; 
-// 		FlowLink m_nextExec;
-	};
-}
+public:
+	InputPort<MClass_t> m_thisPort;
+};
 
 
+
+// 
+// 
+// template<auto method, class clazz>
+// class TestFunctor
+// {
+// public:
+// 
+// 
+// 	TestFunctor(const TestClass& clazz)
+// 		: c(clazz)
+// 	{
+// 
+// 	}
+// 
+// 	void process()
+// 	{
+// 		auto e = std::invoke(method, c);
+// 		pprint(e);
+// 	}
+// 	clazz c;
+// };
+
+
+
+
+
+
+
+
+// template<class class_>
+// class ClassNodeBuilder
+// {
+// public:
+// 	using classType = class_;
+// 
+// 
+// 	template<auto member>
+// 	auto& property(std::string_view name)
+// 	{
+// 		using memberType = nf::deduce_member_type<decltype(member)>::type;
+// 		return *this;
+// 	}
+// 
+// 	template<auto func>
+// 	auto& method(std::string_view name)
+// 	{
+// 		return *this;
+// 	}
+// 
+// };

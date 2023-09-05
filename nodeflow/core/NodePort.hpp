@@ -52,8 +52,7 @@ namespace nf
 	enum class PortDirection
 	{
 		Input,
-		Output,
-		Both
+		Output
 	};
 
 	enum class PortType
@@ -176,7 +175,7 @@ namespace nf
 
 		inline bool valid() const noexcept { return targetNode != nullptr && targetIndex != -1;}
 			
-		void breakLink() noexcept;
+		void unlink() noexcept;
 		
 		void setTarget(PortIndex targetIndex_, Node* targetNode_) noexcept;
 
@@ -221,10 +220,10 @@ namespace nf
 
 
 
-	struct FlowLink
+	struct ExecutionLink
 	{
-		FlowLink() = default;
-		FlowLink(FlowNode* targetNode_)
+		ExecutionLink() = default;
+		ExecutionLink(FlowNode* targetNode_)
 			: targetNode(targetNode_)
 		{}
 
@@ -232,11 +231,11 @@ namespace nf
 
 		void breakLink() noexcept;
 
-		void setTarget(FlowNode* targetNode_) noexcept;
+		void makeLink(FlowNode* targetNode_) noexcept;
 
-		bool operator==(const FlowLink& rhs) const;
+		bool operator==(const ExecutionLink& rhs) const;
 
-		friend std::ostream& operator<< (std::ostream& stream, const FlowLink& link)
+		friend std::ostream& operator<< (std::ostream& stream, const ExecutionLink& link)
 		{
 			stream << "FlowLink{targetNode=" << link.targetNode << "}";
 			return stream;
@@ -244,6 +243,20 @@ namespace nf
 
 		FlowNode* targetNode = nullptr;
 	};
+
+	class FlowPort
+	{
+	public:
+		FlowPort() = default;
+		FlowPort(ExecutionLink link_)
+			: execLink(link_)
+		{}
+
+	public:
+		ExecutionLink execLink;
+	};
+
+
 
 
 	class InputPortHandle
@@ -255,11 +268,11 @@ namespace nf
 			: m_name(caption), m_link(-1, nullptr), m_dataTypeID(typeID)
 		{}
 
-		bool makeLink(PortIndex targetIndex, Node* targetNode);
+		bool createLink(PortLink link);
 
 		bool hasValidLink() const noexcept;
 
-		void breakLink() noexcept;
+		void removeLink() noexcept;
 
 		std::string name() const noexcept { return m_name; }
 
@@ -286,7 +299,7 @@ namespace nf
 			: m_name(caption), m_dataHandle(data, typeID)
 		{}
 
-		bool createLink(PortIndex targetIndex, Node* targetNode);
+		bool createLink(PortLink link);
 
 		bool removeLink(PortLink link);
 
