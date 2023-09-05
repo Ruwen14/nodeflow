@@ -433,12 +433,8 @@ using namespace nf;
 
 #include "3rdparty/nameof/include/nameof.hpp"
 
-
 #include <numeric>
 #include <any>
-
-
-
 
 nf::Node* PrepareCallWithNodeBackend()
 {
