@@ -26,4 +26,4 @@ Still in _very_ early development as it's a hobby project. Not ready to use yet.
 
 
 ## Installation & Build
-- CMake yet to be setup
+- CMake yet to be setup.
