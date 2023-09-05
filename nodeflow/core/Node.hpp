@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utility/Expected.hpp"
 #include "utility/TypenameAtlas.hpp"
 
-
 namespace nf
 {
 	enum class NodeArchetype
@@ -57,7 +56,8 @@ namespace nf
 		Flow_EventNode,
 		Flow_ConversionNode,
 		Flow_FunctorNode,
-		Flow_CustomNode
+		Flow_CustomNode,
+		Lang_IfElse
 	};
 
 	enum class ConnectionError
@@ -94,7 +94,6 @@ namespace nf
 // 		*/
 		virtual std::string nodeName() const;
 
-
 		/**
 		 * @brief Returns the name of a specific port attached to this node.
 		 * Behaviour is implemented in derived classes
@@ -102,31 +101,26 @@ namespace nf
 		virtual std::string portName(PortDirection dir, PortIndex index) const;
 
 		/**
-		 * @brief Returns the archetype of a node and therefore describes its behaviour. 
+		 * @brief Returns the archetype of a node and therefore describes its behaviour.
 		 * Users should not override and can ignore this function.
-		 * @return 
+		 * @return
 		*/
 		virtual NodeArchetype getArchetype() const;
 
 		/**
-		 * @brief Allows the de/serialization of node output ports depending on the StreamFlag. 
-		 * Useful if you want to read the outputs of nodes in the GUI or set them via widgets. 
+		 * @brief Allows the de/serialization of node output ports depending on the StreamFlag.
+		 * Useful if you want to read the outputs of nodes in the GUI or set them via widgets.
 		 * Supports all data types that have the ostream operator<< and istream operator>> implemented.
 		 * @return 'true' if stream operation was successfull / is supported by type.
 		*/
 		virtual bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive);
 
-
-
-
 		/**
 		 * @brief Users can override to react on their custom events emitted from FlowScript
-		 * @param event 
-		 * @return 
+		 * @param event
+		 * @return
 		*/
 		virtual bool onCustomEvent(FlowEvent* event) { NF_UNUSED(event); return false; }
-
-
 
 		virtual Expected<void, Error> onBuild() { return {}; }
 
@@ -134,11 +128,11 @@ namespace nf
 		 * @brief Called when node is about to be removed/deleted from a FlowScript.
 		 * Might be used to do clean up stuff.
 		 * Behaviour can be specified in derived classes.
-		 * @return 
+		 * @return
 		*/
 		virtual void onDestroy() {}
 
-// 	protected:
+		// 	protected:
 	public:
 
 		/**
@@ -148,9 +142,8 @@ namespace nf
 		*/
 		virtual Expected<void, Error> setup() { return {}; }
 
-
 		/**
-		 * @brief  Workhorse function of a node in which a user-defined calculation can happen. 
+		 * @brief  Workhorse function of a node in which a user-defined calculation can happen.
 		 * Called for each node during FlowScript::run(). Behaviour can be specified in derived classes.
 		*/
 		virtual void process() {}
@@ -185,7 +178,6 @@ namespace nf
 		*/
 		const OutputPortHandle& getOutputPort(PortIndex index) const;
 
-
 		/**
 		 * @brief Returns pointer to the input port of node specified by 'index'
 		 * @return nullptr if port does not exist
@@ -212,39 +204,36 @@ namespace nf
 		*/
 		bool outputPortLinked(PortIndex index) const;
 
-
 		/**
 		 * @brief Creates a data connection between ports of two nodes according to 'policy'
 		 * @param policy InputToOutput or OutputToInput
 		 * @return nothing or a ConnectionError
 		*/
-		Expected<void, ConnectionError> makeConnection(ConnectionPolicy policy, 
-													   PortIndex originPort, 
-													   Node& targetNode, 
-													   PortIndex targetPort);
+		Expected<void, ConnectionError> makeConnection(ConnectionPolicy policy,
+			PortIndex originPort,
+			Node& targetNode,
+			PortIndex targetPort);
 
 		/**
 		 * @brief Deletes an existing data connection between ports of two nodes according to 'policy'
 		 * @param policy InputToOutput or OutputToInput
 		 * @return 'true' is connection was successfully removed
 		*/
-		bool breakConnection(ConnectionPolicy policy, 
-							  PortIndex originPort, 
-							  Node& targetNode, 
-							  PortIndex targetPort);
-
+		bool breakConnection(ConnectionPolicy policy,
+			PortIndex originPort,
+			Node& targetNode,
+			PortIndex targetPort);
 
 		/**
 		 * @brief Deletes all port connections from and to this node
-		 * @param dir Input, Output or Both 
+		 * @param dir Input, Output or Both
 		*/
 		void breakAllConnections(PortDirection dir = PortDirection::Both);
 
 	protected:
-		
 
 		/**
-		 * @brief Adds an InputPort of type 'T' to the node. 
+		 * @brief Adds an InputPort of type 'T' to the node.
 		 * The corresponding port must live as a member in the derived class.
 		 * @tparam T datatype of node.
 		 * @param p InputPort<T>
@@ -287,8 +276,8 @@ namespace nf
 		 * @param p InputPort<T>
 		 * @return nullptr if there is no connection to this input port
 		*/
-		template<typename T> 
-		T* getInputDataMutable(const InputPort<T>& p) const 
+		template<typename T>
+		T* getInputDataMutable(const InputPort<T>& p) const
 		{
 			const PortLink& link = m_inputPorts[p.m_portIndex].m_link;
 			// No input connection
@@ -305,12 +294,12 @@ namespace nf
 		template<typename T, typename Ty>
 		void setOutputData(OutputPort<T>& p, Ty&& val) noexcept
 		{
-// 			pprint(nf::type_name<decltype(val)>());
+			// 			pprint(nf::type_name<decltype(val)>());
 			p.setValue(std::forward<Ty>(val));
 		}
 
 		/**
-		 * @brief Reserves the necessary memory to store 'size' 'dir' ports. 
+		 * @brief Reserves the necessary memory to store 'size' 'dir' ports.
 		 * Useful to save memory on nodes with few ports.
 		 * Should be called before ports are added in 'setup' function
 		*/
@@ -320,10 +309,9 @@ namespace nf
 		/**
 		 * @brief Internal function to make connection from the perspective of the output of a node
 		*/
-		[[nodiscard]] Expected<void, ConnectionError> makeInterlinkedConnection(PortIndex outPort, 
-																				Node& toNode, 
-																				PortIndex toInPort);
-
+		[[nodiscard]] Expected<void, ConnectionError> makeInterlinkedConnection(PortIndex outPort,
+			Node& toNode,
+			PortIndex toInPort);
 
 		/**
 		 * @brief Internal function to break connection from the perspective of the output of a node
@@ -332,13 +320,10 @@ namespace nf
 
 		void clearInterlinkedPorts(PortIndex outPort);
 
-
 	protected:
 		std::vector<OutputPortHandle> m_outputPorts;
 		std::vector<InputPortHandle> m_inputPorts;
-
 	};
-
 
 	template<typename T>
 	bool Node::addPort(InputPort<T>& p, const std::string& caption /*= ""*/)
@@ -351,11 +336,9 @@ namespace nf
 		auto& atlas = TypenameAtlas::instance();
 		atlas.add<T>();
 
-
 		return true;
 	}
 
-	
 	template<typename T>
 	bool Node::addPort(OutputPort<T>& p, const std::string& caption /*= ""*/)
 	{
@@ -371,11 +354,11 @@ namespace nf
 	}
 
 	/**
-	 * @brief Checks if the node can be explicitly cast to 'To'-NodeType. 
+	 * @brief Checks if the node can be explicitly cast to 'To'-NodeType.
 	 * Doesn't account for inheritance like dynamic_cast.
-	 * @tparam To 
-	 * @param from 
-	 * @return 
+	 * @tparam To
+	 * @param from
+	 * @return
 	*/
 	template<typename To>
 	To* explicit_node_cast(Node* from)
@@ -390,15 +373,12 @@ namespace nf
 	}
 }
 
-
-
 #define NF_NODE_NAME(name)				\
 public:									\
 std::string nodeName() const override	\
 {										\
 	return name;						\
 }										\
-
 
 #define BRACED_INIT_LIST(...) {__VA_ARGS__}
 

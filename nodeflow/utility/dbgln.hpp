@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <sstream>
 #include <type_traits>
+#include <iostream>
+
 
 #include "../3rdparty/cpputils/magic_enum.h"
 

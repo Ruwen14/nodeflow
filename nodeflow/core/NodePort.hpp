@@ -221,10 +221,10 @@ namespace nf
 
 
 
-	struct FlowLink
+	struct ExecutionLink
 	{
-		FlowLink() = default;
-		FlowLink(FlowNode* targetNode_)
+		ExecutionLink() = default;
+		ExecutionLink(FlowNode* targetNode_)
 			: targetNode(targetNode_)
 		{}
 
@@ -232,11 +232,11 @@ namespace nf
 
 		void breakLink() noexcept;
 
-		void setTarget(FlowNode* targetNode_) noexcept;
+		void makeLink(FlowNode* targetNode_) noexcept;
 
-		bool operator==(const FlowLink& rhs) const;
+		bool operator==(const ExecutionLink& rhs) const;
 
-		friend std::ostream& operator<< (std::ostream& stream, const FlowLink& link)
+		friend std::ostream& operator<< (std::ostream& stream, const ExecutionLink& link)
 		{
 			stream << "FlowLink{targetNode=" << link.targetNode << "}";
 			return stream;
@@ -244,6 +244,20 @@ namespace nf
 
 		FlowNode* targetNode = nullptr;
 	};
+
+	class FlowPort
+	{
+	public:
+		FlowPort() = default;
+		FlowPort(ExecutionLink link_)
+			: execLink(link_)
+		{}
+
+	public:
+		ExecutionLink execLink;
+	};
+
+
 
 
 	class InputPortHandle

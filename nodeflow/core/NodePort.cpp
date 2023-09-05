@@ -27,17 +27,17 @@ namespace nf
 
 #pragma  region FlowLink
 
-	void FlowLink::breakLink() noexcept
+	void ExecutionLink::breakLink() noexcept
 	{
 		targetNode = nullptr;
 	}
 
-	void FlowLink::setTarget(FlowNode* targetNode_) noexcept
+	void ExecutionLink::makeLink(FlowNode* targetNode_) noexcept
 	{
 		targetNode = targetNode_;
 	}
 
-	bool FlowLink::operator==(const FlowLink& rhs) const
+	bool ExecutionLink::operator==(const ExecutionLink& rhs) const
 	{
 		return targetNode == rhs.targetNode;
 	}

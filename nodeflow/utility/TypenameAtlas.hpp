@@ -82,7 +82,7 @@ namespace nf
 		inline const atlas_t& atlas() const { return m_atlas; }
 
 		std::set<std::string> listTypenames() const;
-		
+
 		bool hasDuplicates() const;
 
 	private:

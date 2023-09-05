@@ -46,26 +46,42 @@ namespace nf
 	class FlowNode : public Node
 	{
 	public:
-
 		NF_NODE_NAME("FlowNode");
+
 	public:
 		NodeArchetype getArchetype() const override;
 
 		bool onEvent(FlowEvent* event) override;
 
-		inline void setFlowNext(FlowNode& targetNode) { m_linkNext.setTarget(&targetNode); }
+		inline void setExecNext(FlowNode& next) { m_outExecPort.execLink.makeLink(&next); forceNextExec(next); }
 
-		inline void setFlowBefore(FlowNode& targetNode) { m_linkBefore.setTarget(&targetNode); }
+		inline void setExecBefore(FlowNode& before)  {  m_inExecPort.execLink.makeLink(&before); }
 
-		inline FlowNode* getFlowNext() const { return m_linkNext.targetNode; }
+		inline void forceNextExec(FlowNode& next) { m_nextExec = &next; }
 
-		inline FlowNode* getFlowBefore() const { return m_linkBefore.targetNode; }
+		inline FlowNode* getExecNext() const noexcept { return m_outExecPort.execLink.targetNode; }
+
+		inline FlowNode* getExecBefore() const noexcept { return m_inExecPort.execLink.targetNode; }
 
 		void breakFlow(FlowDirection dir);
 
+
+	public:
+		FlowPort& defaultFlowPort(FlowDirection dir);
+
+		bool hasAdditionalFlowPorts() const;
+
+		virtual std::vector<FlowPort*> additionalFlowPorts() const;
+
+		virtual std::string flowPortName(FlowDirection dir, PortIndex index) const;
+
 	private:
-		FlowLink m_linkNext;
-		FlowLink m_linkBefore;
+		FlowPort m_inExecPort;
+		FlowPort m_outExecPort;
+		// Optional. Used when we have multiple Output-FlowLinks
+		// and need to change which node is executed next during execution (ex. Branches, Loops)
+		FlowNode* m_nextExec; 
+// 		FlowLink m_nextExec;
 	};
 }
 
