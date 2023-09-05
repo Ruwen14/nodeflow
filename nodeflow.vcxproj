@@ -124,11 +124,14 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>nodeflow_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>nodeflow_pch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <Profile>true</Profile>
+      <Profile>false</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,6 +146,9 @@
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>nodeflow_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>nodeflow_pch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,6 +177,7 @@
     <ClInclude Include="nodeflow\core\Object.hpp" />
     <ClInclude Include="nodeflow\core\type_tricks.hpp" />
     <ClInclude Include="nodeflow\core\UUID.hpp" />
+    <ClInclude Include="nodeflow\nodeflow_pch.h" />
     <ClInclude Include="nodeflow\nodes\IfElseNode.hpp" />
     <ClInclude Include="nodeflow\nodes\ClassMethodNode.hpp" />
     <ClInclude Include="nodeflow\nodes\ConversionNode.hpp" />
@@ -210,6 +217,13 @@
     <ClCompile Include="nodeflow\core\Node.cpp" />
     <ClCompile Include="nodeflow\core\NodePort.cpp" />
     <ClCompile Include="nodeflow\core\UUID.cpp" />
+    <ClCompile Include="nodeflow\main.cpp" />
+    <ClCompile Include="nodeflow\nodeflow_pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nodeflow_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nodeflow_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="nodeflow\nodes\ConversionNode.cpp" />
     <ClCompile Include="nodeflow\nodes\DataNode.cpp" />
     <ClCompile Include="nodeflow\nodes\EventNode.cpp" />
@@ -218,7 +232,6 @@
     <ClCompile Include="nodeflow\script\FlowModule.cpp" />
     <ClCompile Include="nodeflow\nodes\FlowNode.cpp" />
     <ClCompile Include="nodeflow\script\FlowScript.cpp" />
-    <ClCompile Include="nodeflow\main.cpp" />
     <ClCompile Include="nodeflow\utility\TypenameAtlas.cpp" />
   </ItemGroup>
   <ItemGroup>
