@@ -1,4 +1,3 @@
-
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -43,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodes/EventNode.hpp"
 
 namespace nf
-{	
+{
 	enum class CreateNodeError
 	{
 		UnknownNodeName,
@@ -52,25 +51,23 @@ namespace nf
 
 	using NodeHandle = UUID;
 
-
 	class FlowScript
 	{
-
 	public:
 		FlowScript(std::shared_ptr<FlowModule> scriptModule)
 			: m_scriptModule(std::move(scriptModule))
 		{}
 
-// 		Node* variables() const;
-		
+		// 		Node* variables() const;
+
 		void precomputeExecutionOrder();
 
 		/**
 		 * @brief Broadcasts custom event to all nodes within script.
 		 Nodes can react on event by overriding onEvent method.
-		 * @tparam EventType 
-		 * @tparam ...EventArgs 
-		 * @param ...eventArgs 
+		 * @tparam EventType
+		 * @tparam ...EventArgs
+		 * @param ...eventArgs
 		*/
 		template<typename EventType, typename... EventArgs>
 		void broadcastEvent(EventArgs&&... eventArgs)
@@ -79,7 +76,6 @@ namespace nf
 			for (auto& node : m_callablesNodes)
 				node->onEvent(&event);
 		}
-
 
 		nf::Node* findNode(NodeHandle node) const;
 
@@ -90,20 +86,18 @@ namespace nf
 		{
 			static constexpr typeid_t nodeTypeID = type_id<NodeType>();
 
-			std::for_each(m_callablesNodes.begin(), m_callablesNodes.end(), [](std::unique_ptr<FlowNode>& node) 
+			std::for_each(m_callablesNodes.begin(), m_callablesNodes.end(), [](std::unique_ptr<FlowNode>& node)
 			{
 			});
 		}
-
 
 		Expected<NodeHandle, Error> spawnNode(const std::string& namePath);
 
 		bool removeNode(NodeHandle node);
 
-		Expected<void, ConnectionError> connectPorts(NodeHandle outNodeUUID, PortIndex outPort, 
-													 NodeHandle inNodeUUID, PortIndex inPort, 
-													 ConversionPolicy conv = ConversionPolicy::DontAddConversion);
-
+		Expected<void, ConnectionError> connectPorts(NodeHandle outNodeUUID, PortIndex outPort,
+			NodeHandle inNodeUUID, PortIndex inPort,
+			ConversionPolicy conv = ConversionPolicy::DontAddConversion);
 
 		bool disconnectPorts(NodeHandle outNodeUUID, PortIndex outPort, NodeHandle inNodeUUID, PortIndex inPort);
 
@@ -111,24 +105,20 @@ namespace nf
 
 		bool disconnectFlow(NodeHandle outNode, NodeHandle inNode);
 
-
-
 		void setStartEvent();
 
 		void setStartEventNode();
-
 
 		std::string nodeOutputAsStr(NodeHandle node, PortIndex index);
 
 		void setNodeOutputFromStr(NodeHandle node, PortIndex index, const std::string& str);
 
-
 		StartEventNode& startEventNode() const;
-		
+
 		bool build();
 
 		void run();
-		
+
 		/*
 		ExpectedRef<FlowNode, Error> spawnNode(const std::string& namePath);
 
@@ -136,7 +126,7 @@ namespace nf
 		*/
 
 		/*
-		Expected<void, ConnectionError> connectNodes(Node& outNode, PortIndex outPort, 
+		Expected<void, ConnectionError> connectNodes(Node& outNode, PortIndex outPort,
 												Node& inNode, PortIndex inPort);
 
 		bool disconnectNodes(Node& outNode, PortIndex outPort, Node& inNode, PortIndex inPort);
@@ -149,19 +139,17 @@ namespace nf
 
 		bool isUUIDUnique(UUID uuid) const;
 
-
 		Expected<NodeHandle, Error> createNode(const std::string& namePath);
 
 		Expected<NodeHandle, Error> createVariable(const std::string& namePath);
 
 		bool debugAllConnectionsRemovedTo(nf::Node* node) const;
 
-
-	public :
+	public:
 		std::vector<std::unique_ptr<FlowNode>> m_callablesNodes;
 		std::vector<std::unique_ptr<DataNode>> m_variableNodes;
 		std::shared_ptr<FlowModule> m_scriptModule;
 
-// 		std::vector<BuildError> errorList
+		// 		std::vector<BuildError> errorList
 	};
 }

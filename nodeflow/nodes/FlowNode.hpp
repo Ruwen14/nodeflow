@@ -55,7 +55,7 @@ namespace nf
 
 		inline void setExecNext(FlowNode& next) { m_outExecPort.execLink.makeLink(&next); forceNextExec(next); }
 
-		inline void setExecBefore(FlowNode& before)  {  m_inExecPort.execLink.makeLink(&before); }
+		inline void setExecBefore(FlowNode& before) { m_inExecPort.execLink.makeLink(&before); }
 
 		inline void forceNextExec(FlowNode& next) { m_nextExec = &next; }
 
@@ -64,7 +64,6 @@ namespace nf
 		inline FlowNode* getExecBefore() const noexcept { return m_inExecPort.execLink.targetNode; }
 
 		void breakFlow(FlowDirection dir);
-
 
 	public:
 		FlowPort& defaultFlowPort(FlowDirection dir);
@@ -80,9 +79,7 @@ namespace nf
 		FlowPort m_outExecPort;
 		// Optional. Used when we have multiple Output-FlowLinks
 		// and need to change which node is executed next during execution (ex. Branches, Loops)
-		FlowNode* m_nextExec; 
-// 		FlowLink m_nextExec;
+		FlowNode* m_nextExec;
+		// 		FlowLink m_nextExec;
 	};
 }
-
-
