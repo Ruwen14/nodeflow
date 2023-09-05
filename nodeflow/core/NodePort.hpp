@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <type_traits>
 #include <sstream>
 
-
 #include "typedefs.hpp"
 #include "type_tricks.hpp"
 #include "../reflection/type_reflection.hpp"
@@ -47,7 +46,6 @@ namespace nf
 {
 	class Node;
 	class FlowNode;
-
 
 	enum class PortDirection
 	{
@@ -81,7 +79,6 @@ namespace nf
 
 		inline operator PortIndex() const { return m_portIndex; }
 
-
 		PortIndex index() const noexcept
 		{
 			return m_portIndex;
@@ -102,14 +99,12 @@ namespace nf
 		PortIndex m_portIndex = -1;
 	};
 
-
 	template<typename T>
 	class InputPort : public Port<T>
 	{
 		friend Node;
 		static_assert(std::is_same_v<T, void> != true, "Node can't have input of type <void>");
 	};
-
 
 	template<typename T>
 	class OutputPort : public Port<T>
@@ -121,15 +116,14 @@ namespace nf
 			: value(defaultValue)
 		{}
 
-
 		template<typename T>
 		void setValue(T&& val)
 		{
-// 			pprint(nf::type_name<decltype(val)>());
+			// 			pprint(nf::type_name<decltype(val)>());
 			value = std::forward<T>(val);
 		}
 
-		bool serialize(std::stringstream& archive) const 
+		bool serialize(std::stringstream& archive) const
 		{
 			if constexpr (this->streamable) {
 				archive << value;
@@ -156,9 +150,7 @@ namespace nf
 	template<>
 	class OutputPort<void> : public Port<void>
 	{
-
 	};
-
 
 	template<typename T>
 	struct is_input : std::false_type {};
@@ -173,14 +165,14 @@ namespace nf
 			: targetIndex(targetIndex_), targetNode(targetNode_)
 		{}
 
-		inline bool valid() const noexcept { return targetNode != nullptr && targetIndex != -1;}
-			
+		inline bool valid() const noexcept { return targetNode != nullptr && targetIndex != -1; }
+
 		void unlink() noexcept;
-		
+
 		void setTarget(PortIndex targetIndex_, Node* targetNode_) noexcept;
 
 		bool operator==(const PortLink& rhs) const;
-			
+
 		friend std::ostream& operator<< (std::ostream& stream, const PortLink& link)
 		{
 			stream << "{port=" << link.targetIndex << ", node=" << link.targetNode << "}";
@@ -190,7 +182,6 @@ namespace nf
 		PortIndex targetIndex = -1;
 		Node* targetNode = nullptr;
 	};
-
 
 	template<class... Ts>
 	struct ExpandInputPorts
@@ -204,7 +195,6 @@ namespace nf
 		using value = std::tuple<InputPort<Ts>...>;
 	};
 
-
 	template<class... Ts>
 	struct ExpandOutputPorts
 	{
@@ -216,9 +206,6 @@ namespace nf
 	{
 		using value = std::tuple<OutputPort<Ts>...>;
 	};
-
-
-
 
 	struct ExecutionLink
 	{
@@ -256,15 +243,12 @@ namespace nf
 		ExecutionLink execLink;
 	};
 
-
-
-
 	class InputPortHandle
 	{
 		friend Node;
 	public:
 		InputPortHandle() = default;
-		InputPortHandle( typeid_t typeID, const std::string& caption = "")
+		InputPortHandle(typeid_t typeID, const std::string& caption = "")
 			: m_name(caption), m_link(-1, nullptr), m_dataTypeID(typeID)
 		{}
 
@@ -279,7 +263,7 @@ namespace nf
 		void setName(const std::string& name) { m_name = name; }
 
 		PortLink link() const noexcept { return m_link; }
-		
+
 		inline typeid_t typeID() const noexcept { return m_dataTypeID; }
 
 	private:
@@ -331,6 +315,4 @@ namespace nf
 		std::vector<PortLink> m_links; // Output link to multiple nodes
 		detail::DataHandle m_dataHandle;
 	};
-
-
 }
