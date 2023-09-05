@@ -20,8 +20,21 @@ namespace nf
 	{
 		NF_UNUSED(flag);
 		NF_UNUSED(archive);
-		NF_UNUSED(index;)
-			return false;
+		NF_UNUSED(index);
+		return false;
+	}
+
+	bool Node::setOutputFromString(PortIndex index, const std::string& val)
+	{
+		NF_UNUSED(index);
+		NF_UNUSED(val);
+		return false;
+	}
+
+	std::optional<std::string> Node::getOutputAsString(PortIndex index)
+	{
+		NF_UNUSED(index);
+		return std::nullopt;
 	}
 
 	void Node::setUUID(UUID uuid) noexcept

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string_view>
 #include <sstream>
 #include <unordered_map>
+#include <optional>
 
 #include "typedefs.hpp"
 #include "core/NodePort.hpp"
@@ -113,6 +114,20 @@ namespace nf
 		 * @return 'true' if stream operation was successfull / is supported by type.
 		*/
 		virtual bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive);
+
+		/**
+		 * @brief Allows to set value of a node output specifiec by index by string.
+		 * Only works when port type supports istream operator>>
+		 * @return 'true' if operation was successfull. 'false' if not (for example when missing istream operator>>).
+		*/
+		[[nodiscard]] virtual bool setOutputFromString(PortIndex index, const std::string& val);
+
+		/**
+		 * @brief Gets output of node specified by index as string for debugging purposes.
+		 * Only works when port type supports ostream operator<<
+		 * @return value as 'std::string' if possible. 'std::nullopt' if not (for example when missing ostream operator<<).
+		*/
+		virtual std::optional<std::string> getOutputAsString(PortIndex index);
 
 		/**
 		 * @brief Users can override to react on their custom events emitted from FlowScript
