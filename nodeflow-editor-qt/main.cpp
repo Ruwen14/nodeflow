@@ -228,7 +228,7 @@ public:
 		caseSensitivityCB->setFont(font);
 		connect(caseSensitivityCB, &QCheckBox::stateChanged, this, [this](int state) {
 			proxyModel->setFilterCaseSensitivity(state == Qt::Checked ? Qt::CaseSensitive : Qt::CaseInsensitive);
-		view->expandAll(); // Current Sort might collapse matches, so update it.
+			view->expandAll(); // Current Sort might collapse matches, so update it.
 		});
 
 		auto headerLay = new QHBoxLayout();
@@ -288,7 +288,7 @@ public:
 
 int main(int argc, char* argv[])
 {
-	constexpr auto a = 3;
+	constexpr auto a = 12;
 	constexpr auto k = nf::type_id<int>();
 
 	qsrand(QDateTime::currentDateTime().toTime_t());
