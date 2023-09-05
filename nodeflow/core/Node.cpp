@@ -5,11 +5,6 @@ using namespace cpputils;
 namespace nf
 {
 
-	std::string Node::nodeName() const
-	{
-		return "NFNode";
-	}
-
 	std::string Node::portName(PortDirection dir, PortIndex index) const
 	{
 		NF_UNUSED(dir);
@@ -29,6 +24,11 @@ namespace nf
 		NF_UNUSED(archive);
 		NF_UNUSED(index;)
 		return false;
+	}
+
+	void Node::setUUID(UUID uuid) noexcept
+	{
+		m_uuid = uuid;
 	}
 
 	size_t Node::portCount(PortDirection dir) const noexcept
@@ -126,9 +126,104 @@ namespace nf
 		stream << "}\n";
 	}
 
+	Expected<void, ConnectionError> Node::makeConnection(PortIndex fromOutput, Node& toNode, PortIndex toInput, bool interlink /*= true*/)
+	{
+		// Ports cannot be connected to ports of the same node, otherwise we would have recursion.
+		if (this == &toNode)
+			return make_unexpected(ConnectionError::ConnectionWithItself);
+
+		if (fromOutput == -1 || toInput == -1 
+			|| !(fromOutput < m_outputPorts.size()) || !(toInput < toNode.m_inputPorts.size()))
+			return make_unexpected(ConnectionError::PortIndexInvalid);
+
+		if (toNode.m_inputPorts[toInput].link().valid())
+			return make_unexpected( ConnectionError::PortAlreadyLinked );
+
+		auto fromPortType = m_outputPorts[fromOutput].typeID();
+		auto toPortType = toNode.m_inputPorts[toInput].typeID();
+		if (fromPortType != toPortType)
+			return make_unexpected( ConnectionError::UnequalPortTypes );
+		// ----------------------------------------------------------
+		
+		auto& originPort = m_outputPorts[fromOutput];
+		auto& targetPort = toNode.m_inputPorts[toInput];
+
+		PortLink linkForward{ toInput, &toNode };
+		if (originPort.hasLink(linkForward))
+			return make_unexpected(ConnectionError::PortAlreadyLinked);
+
+		originPort.createLink(linkForward);
+		if (interlink) {
+			PortLink linkBackward{ fromOutput, this };
+			targetPort.createLink(linkBackward);
+		}
+
+		return {};
+	}
+
+	bool Node::breakConnection(PortIndex fromOutput, Node& toNode, PortIndex toInput)
+	{
+		NF_ASSERT((fromOutput != -1 && toInput != -1), "Invalid port index");
+		NF_ASSERT(fromOutput < m_outputPorts.size(), "Port index out of range");
+		NF_ASSERT(toInput < toNode.m_inputPorts.size(), "Port index out of range");
+
+
+		auto& originPort = m_outputPorts[fromOutput];
+		auto& targetPort = toNode.m_inputPorts[toInput];
+
+		PortLink linkToBeRemoved(toInput, &toNode);
+		if (!originPort.hasLink(linkToBeRemoved))
+		{
+			NF_ASSERT(false, "Link doesn't exist");
+			return false;
+		}
+
+		// Notify input port of linked node
+		NF_ASSERT(targetPort.link().targetNode == this, "ERROR");
+		targetPort.removeLink();
+		originPort.removeLink(linkToBeRemoved);
+		return true;
+	}
+
+
+	void Node::breakAllConnections(PortDirection dir)
+	{
+		if (dir	== PortDirection::Input)
+		{
+			for (size_t i = 0; i < m_inputPorts.size(); i++)
+			{
+				PortLink inToOutLink = m_inputPorts[i].link();
+				if (!inToOutLink.valid())
+					continue;
+				auto success = inToOutLink.targetNode->breakConnection(inToOutLink.targetIndex,
+														*this, static_cast<PortIndex>(i));
+				NF_ASSERT(success, "Faild to break Connection");
+			}
+		}
+		else 
+		{
+			for (size_t i = 0; i < m_outputPorts.size(); i++)
+			{
+				auto& originPort = m_outputPorts[i];
+				for (const PortLink& outToInLink : originPort.links())
+				{
+					if (!outToInLink.valid())
+					{
+						NF_ASSERT(false, "Out-Link not valid. Why is that?");
+						continue;
+					}
+					auto success = breakConnection(static_cast<PortIndex>(i),
+												  *outToInLink.targetNode, outToInLink.targetIndex);
+					NF_ASSERT(success, "Faild to break Connection");
+
+				}
+				NF_ASSERT(originPort.linkCount() == 0, "ERROR in clearing links");
+			}
+		}
+	}
+
 	void Node::allocateExpectedPortCount(PortDirection dir, size_t size)
 	{
-		NF_ASSERT(dir != PortDirection::Both, "IMPLEMENT ME");
 		if (dir	== PortDirection::Input)
 		{
 			NF_ASSERT(m_inputPorts.size() == 0, "ERROR: bufferExpectedPortCount only valid before port initialization");
@@ -155,174 +250,8 @@ namespace nf
 			}
 			else
 				m_outputPorts.reserve(size);
-
-		}
-
-	}
-
-	Expected<void, ConnectionError> Node::makeInterlinkedConnection(PortIndex outPort, Node& toNode, PortIndex toInPort)
-	{
-		// Ports cannot be connected to ports of the same node, otherwise we would have recursion.
-		if (this == &toNode)
-			return make_unexpected(ConnectionError::ConnectionWithItself);
-
-// 		std::cout << (&toNode) << "\n";
-		if (outPort == -1 || toInPort == -1 
-			|| !(outPort < m_outputPorts.size()) || !(toInPort < toNode.m_inputPorts.size()))
-			return make_unexpected(ConnectionError::PortIndexInvalid);
-
-		if (toNode.m_inputPorts[toInPort].hasValidLink())
-			return make_unexpected( ConnectionError::PortAlreadyLinked );
-
-		auto fromPortType = m_outputPorts[outPort].typeID();
-		auto toPortType = toNode.m_inputPorts[toInPort].typeID();
-		if (fromPortType != toPortType)
-			return make_unexpected( ConnectionError::UnequalPortTypes );
-		// ----------------------------------------------------------
-		
-		auto& originPort = m_outputPorts[outPort];
-		auto& targetPort = toNode.m_inputPorts[toInPort];
-
-		if (std::find(originPort.links().begin(), originPort.links().end(), PortLink(toInPort, &toNode)) != originPort.links().end())
-			return make_unexpected( ConnectionError::PortAlreadyLinked );
-
-
-		originPort.createLink(toInPort, &toNode);
-		// Add this Link to the output of the target node
-		targetPort.makeLink(outPort, this);
-
-		return {};
-	}
-
-
-
-	bool Node::breakInterlinkedConnection(PortIndex outPortIndex, Node& toNode, PortIndex toInPortIndex)
-	{
-		NF_ASSERT((outPortIndex != -1 && toInPortIndex != -1), "Invalid port index");
-		NF_ASSERT(outPortIndex < m_outputPorts.size(), "Port index out of range");
-
-
-		OutputPortHandle& outPort = m_outputPorts[outPortIndex];
-		PortLink linkToBeRemoved(toInPortIndex, &toNode);
-		NF_ASSERT(outPort.hasLink(linkToBeRemoved), "Link doesn't exist");
-		if (!outPort.hasLink(linkToBeRemoved))
-			return false;
-
-		// Notify input port of linked node
-		NF_ASSERT(toInPortIndex < toNode.m_inputPorts.size(), "Port index out of range");
-		InputPortHandle& targetInPort = toNode.m_inputPorts[toInPortIndex];
-		targetInPort.breakLink();
-		outPort.removeLink(linkToBeRemoved);
-		return true;
-	}
-
-	bool Node::inputPortLinked(PortIndex index) const
-	{
-		if (index == -1 || !(index < m_inputPorts.size()) )
-			return false;
-
-		const auto& port = m_inputPorts[index];
-		return port.link().valid();
-	}
-
-	bool Node::outputPortLinked(PortIndex index) const
-	{
-		if (index == -1 || !(index < m_outputPorts.size()) )
-			return false;
-
-		const auto& port = m_outputPorts[index];
-
-		if (port.linkCount() == 0)
-			return false;
-
-		for (const auto& link : port.links())
-		{
-			if (!link.valid())
-				return false;
-		}
-		return true;
-	}
-
-	Expected<void, ConnectionError> Node::makeConnection(ConnectionPolicy policy, 
-														   PortIndex originPort,
-														   Node& targetNode,
-														   PortIndex targetPort)
-	{
-		if (policy == ConnectionPolicy::OutputToInput)
-			return makeInterlinkedConnection(originPort, targetNode, targetPort);
-		return targetNode.makeInterlinkedConnection(targetPort, *this, originPort);
-	}
-	
-
-	void Node::clearInterlinkedPorts(PortIndex outPort)
-	{
-		NF_ASSERT(outPort != -1, "Invalid port index");
-		NF_ASSERT(outPort < m_outputPorts.size(), "Port index out of range");
-
-		OutputPortHandle& port = m_outputPorts[outPort];
-
-		// Clear all links from other nodes to this port
-		for (const PortLink& link : port.links())
-		{
-			if (!link.valid())
-				continue;
-
-			InputPortHandle& linkedTargetPort = link.targetNode->m_inputPorts[link.targetIndex];
-			linkedTargetPort.breakLink();
-		}
-
-		// Clear all links to other nodes
-		port.breakAllLinks();
-
-	}
-
-
-	bool Node::breakConnection(ConnectionPolicy policy, 
-								  PortIndex originPort,
-								  Node& targetNode,
-								  PortIndex targetPort)
-	{
-		if (policy == ConnectionPolicy::OutputToInput)
-			return breakInterlinkedConnection(originPort, targetNode, targetPort);
-		return targetNode.breakInterlinkedConnection(targetPort, *this, originPort);
-	}
-
-	void Node::breakAllConnections(PortDirection dir /*= PortDirection::Both*/)
-	{
-		if (dir	== PortDirection::Input || dir == PortDirection::Both)
-		{
-			for (size_t i = 0; i < m_inputPorts.size(); i++)
-			{
-				InputPortHandle& inPort = m_inputPorts[i];
-				PortLink inLink = inPort.link();
-				if (!inLink.valid())
-					continue;
-
-				this->breakConnection(ConnectionPolicy::InputToOutput,
-									  static_cast<PortIndex>(i),
-									  *inLink.targetNode,
-									  inLink.targetIndex);
-			}
-		}
-
-		if (dir == PortDirection::Output || dir == PortDirection::Both)
-		{
-			for (size_t i = 0; i < m_outputPorts.size(); i++)
-			{
-				OutputPortHandle& outPort = m_outputPorts[i];
-				for (const PortLink& outLink : outPort.links())
-				{
-					NF_ASSERT(outLink.valid(), "Out-Link not valid");
-					this->breakConnection(ConnectionPolicy::OutputToInput, 
-										  static_cast<PortIndex>(i), 
-										  *outLink.targetNode, 
-										  outLink.targetIndex);
-
-				}
-			}
 		}
 	}
 
-	
 
 }

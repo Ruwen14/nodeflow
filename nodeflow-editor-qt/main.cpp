@@ -4,6 +4,7 @@
 #include "FlowEditor.hpp"
 #include "Panels.hpp"
 #include "nodeflow/utility/dbgln.hpp"
+#include "nodeflow/reflection/type_reflection.hpp"
 
 void setStyleMode(const QString& mode)
 {
@@ -114,53 +115,53 @@ public:
 	{
 		setObjectName("TreeWidget");
 		setStyleSheet(R"(
-QTreeView
-{
-	background-color: rgb(26, 26, 26);
-}
-#TreeWidget
-{
-	background-color: rgb(56, 56, 56);
-}
+						QTreeView
+						{
+							background-color: rgb(26, 26, 26);
+						}
+						#TreeWidget
+						{
+							background-color: rgb(56, 56, 56);
+						}
 
-QLineEdit
-{
-	background-color: rgb(15, 15, 15);
-	border: 1px solid rgb(53, 53, 53);
-	border-radius: 9px;
-	padding: 1px;
-	spacing: 0px;
-	margin: 0px;
-}
+						QLineEdit
+						{
+							background-color: rgb(15, 15, 15);
+							border: 1px solid rgb(53, 53, 53);
+							border-radius: 9px;
+							padding: 1px;
+							spacing: 0px;
+							margin: 0px;
+						}
 
-QLineEdit:focus
-{
-	border: 1px solid rgb(6, 100, 195);
-}
+						QLineEdit:focus
+						{
+							border: 1px solid rgb(6, 100, 195);
+						}
 
-QCheckBox
-{
-	border-radius: 10px;
-	padding: 1px;
-	spacing: 5px;
-	color: rgb(14, 134, 255);
-}
+						QCheckBox
+						{
+							border-radius: 10px;
+							padding: 1px;
+							spacing: 5px;
+							color: rgb(14, 134, 255);
+						}
 
-QCheckBox::indicator
-{
-	width: 20 px;
-	height: 20 px;
-}
+						QCheckBox::indicator
+						{
+							width: 20 px;
+							height: 20 px;
+						}
 
-QCheckBox:unchecked
-{
-	color: lightGray;
-}
+						QCheckBox:unchecked
+						{
+							color: lightGray;
+						}
 
-QCheckBox:checked
-{
-	color: lightGray;
-}
+						QCheckBox:checked
+						{
+							color: lightGray;
+						}
 
 		)");
 
@@ -193,7 +194,7 @@ QCheckBox:checked
 		{
 			auto item = rootItem->child(i);
 			//
-			for (size_t i = 0; i < 100; i++)
+			for (size_t i = 0; i < 1000; i++)
 				item->appendRow(new QStandardItem(cursiveFIcon, QString("item %0").arg(i)));
 		}
 
@@ -212,9 +213,9 @@ QCheckBox:checked
 		searchEdit->addAction(QIcon("C:/Users/ruwen/OneDrive/Desktop/nodeflow/nodeflow-editor/icons/find.svg"),
 			QLineEdit::LeadingPosition);
 
-		connect(searchEdit, &QLineEdit::textChanged, this, &SearchTreeWidget::waitForEditFinished);
-		connect(searchFinishedTimer, &QTimer::timeout, this, &SearchTreeWidget::filterSearchResults);
-		// 		connect(searchEdit, &QLineEdit::textChanged, this, &SearchTreeWidget::filterSearchResults);
+		// 		connect(searchEdit, &QLineEdit::textChanged, this, &SearchTreeWidget::waitForEditFinished);
+		// 		connect(searchFinishedTimer, &QTimer::timeout, this, &SearchTreeWidget::filterSearchResults);
+		connect(searchEdit, &QLineEdit::textChanged, this, &SearchTreeWidget::filterSearchResults);
 
 		auto headerTitle = new QLabel("All Possible Actions");
 		auto font = QApplication::font();
@@ -287,6 +288,11 @@ public:
 
 int main(int argc, char* argv[])
 {
+	constexpr auto a = 3;
+	constexpr auto k = nf::type_id<int>();
+
+	qsrand(QDateTime::currentDateTime().toTime_t());
+
 	QApplication app(argc, argv);
 	app.setStyle("Fusion");
 	//
@@ -297,9 +303,9 @@ int main(int argc, char* argv[])
 	// 	c.load("C:/Users/ruwen/OneDrive/Desktop/nodeflow/nodeflow-editor/icons/icon_BluePrintEditor_Function_16px_png.png");
 	// 	c.save("C:/Users/ruwen/OneDrive/Desktop/nodeflow/nodeflow-editor/icons/icon_BluePrintEditor_Function_16px_png.png");
 
-	// 	SearchTreeWidget w;
+// 	SearchTreeWidget w;
 	// 	auto k = w.children();
-	// 	w.show();
+// 	w.show();
 
 	nf::FlowEditor w;
 	w.show();

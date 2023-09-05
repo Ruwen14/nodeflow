@@ -93,6 +93,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,6 +110,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -120,12 +122,13 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\Users\ruwen\OneDrive\Desktop\nodeflow;C:\Users\ruwen\OneDrive\Desktop\nodeflow\nodeflow</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,13 +142,14 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>C:\Users\ruwen\OneDrive\Desktop\nodeflow\nodeflow;C:\Users\ruwen\OneDrive\Desktop\nodeflow</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -154,32 +158,37 @@
     <ClInclude Include="nodeflow-gui\NodeStyle.hpp" />
     <ClInclude Include="nodeflow-gui\qt\NodeWidget.hpp" />
     <ClInclude Include="nodeflow\archive\CodeGen.hpp" />
-    <ClInclude Include="nodeflow\nodes\ClassMethodNode.hpp" />
     <ClInclude Include="nodeflow\core\DataHandle.hpp" />
+    <ClInclude Include="nodeflow\core\Error.hpp" />
+    <ClInclude Include="nodeflow\core\FlowEvent.hpp" />
+    <ClInclude Include="nodeflow\core\FlowStateMachine.hpp" />
+    <ClInclude Include="nodeflow\core\Node.hpp" />
+    <ClInclude Include="nodeflow\core\NodeMetaContext.hpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="nodeflow\core\NodePort.hpp" />
+    <ClInclude Include="nodeflow\core\Object.hpp" />
+    <ClInclude Include="nodeflow\core\type_tricks.hpp" />
+    <ClInclude Include="nodeflow\core\UUID.hpp" />
+    <ClInclude Include="nodeflow\nodes\IfElseNode.hpp" />
+    <ClInclude Include="nodeflow\nodes\ClassMethodNode.hpp" />
     <ClInclude Include="nodeflow\nodes\ConversionNode.hpp" />
     <ClInclude Include="nodeflow\nodes\DataNode.hpp" />
-    <ClInclude Include="nodeflow\core\Error.hpp" />
     <ClInclude Include="nodeflow\nodes\EventNode.hpp" />
     <ClInclude Include="nodeflow\nodes\EventNodeV1.hpp" />
-    <ClInclude Include="nodeflow\core\UUID.hpp" />
     <ClInclude Include="nodeflow\script\FlowModule.hpp" />
     <ClInclude Include="nodeflow\nodes\FlowNode.hpp" />
     <ClInclude Include="nodeflow\script\FlowScript.hpp" />
-    <ClInclude Include="nodeflow\core\FlowStateMachine.hpp" />
     <ClInclude Include="nodeflow\archive\FreeFunctionNode.hpp" />
-    <ClInclude Include="nodeflow\core\Node.hpp" />
-    <ClInclude Include="nodeflow\core\Object.hpp" />
     <ClInclude Include="nodeflow\archive\NFPainter.hpp" />
     <ClInclude Include="nodeflow\archive\NFTypeInfo.hpp" />
     <ClInclude Include="nodeflow\nodes\FunctorNode.hpp" />
     <ClInclude Include="nodeflow\archive\NodeStyle.hpp" />
     <ClInclude Include="nodeflow\archive\NumericConversion.hpp" />
-    <ClInclude Include="nodeflow\core\NodePort.hpp" />
     <ClInclude Include="nodeflow\archive\Reflection.hpp" />
     <ClInclude Include="nodeflow\archive\TypeConversion.hpp" />
     <ClInclude Include="nodeflow\typedefs.hpp" />
-    <ClInclude Include="nodeflow\core\type_tricks.hpp" />
-    <ClInclude Include="nodeflow\core\FlowEvent.hpp" />
     <ClInclude Include="nodeflow\reflection\function_reflection.hpp" />
     <ClInclude Include="nodeflow\reflection\type_reflection.hpp" />
     <ClInclude Include="nodeflow\utility\any.h" />
@@ -198,18 +207,33 @@
     <ClInclude Include="nodeflow\Sandbox.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodeflow\core\Node.cpp" />
+    <ClCompile Include="nodeflow\core\NodePort.cpp" />
+    <ClCompile Include="nodeflow\core\UUID.cpp" />
     <ClCompile Include="nodeflow\nodes\ConversionNode.cpp" />
     <ClCompile Include="nodeflow\nodes\DataNode.cpp" />
-    <ClCompile Include="nodeflow\core\UUID.cpp" />
     <ClCompile Include="nodeflow\nodes\EventNode.cpp" />
+    <ClCompile Include="nodeflow\nodes\IfElseNode.cpp" />
     <ClCompile Include="nodeflow\Sandbox.cpp" />
     <ClCompile Include="nodeflow\script\FlowModule.cpp" />
     <ClCompile Include="nodeflow\nodes\FlowNode.cpp" />
     <ClCompile Include="nodeflow\script\FlowScript.cpp" />
-    <ClCompile Include="nodeflow\core\Node.cpp" />
-    <ClCompile Include="nodeflow\core\NodePort.cpp" />
     <ClCompile Include="nodeflow\main.cpp" />
     <ClCompile Include="nodeflow\utility\TypenameAtlas.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="3rdparty\entt\natvis\entt\config.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\container.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\core.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\entity.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\locator.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\meta.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\platform.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\poly.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\process.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\resource.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\entt\signal.natvis" />
+    <Natvis Include="3rdparty\entt\natvis\NatvisFile.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

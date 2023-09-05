@@ -24,9 +24,13 @@ namespace nf
 	public:
 		CollapsableSection(const QString& title, QLayout* contentLayout, QWidget* parent = nullptr);
 
-		void collapseSection();
+		void expand();
+		void collapse();
 
-	public:
+	private:
+		void toggle(bool checked);
+
+	private:
 		QToolButton* collapseButton;
 		QParallelAnimationGroup* collapseAnimation;
 		QScrollArea* contentArea;
@@ -92,12 +96,12 @@ namespace nf
 		QList<QString> m_availVarTypes;
 	};
 
-	class ScriptVariablesSection : public QWidget 
+	class ScriptVariablesSection : public QWidget
 	{
 		Q_OBJECT
 	public:
 		ScriptVariablesSection(const QList<QString>& availabelVarTypes, QWidget* parent = nullptr);
-		
+
 	private:
 		void setupNewVariableCreator(const QList<QString>& availabelVarTypes, QVBoxLayout* mainLay);
 
@@ -107,7 +111,6 @@ namespace nf
 		QLineEdit* m_varDefaultValueEdit;
 		QPushButton* m_addVarButton;
 	};
-
 
 	class ScriptContentPanel : public QWidget
 	{

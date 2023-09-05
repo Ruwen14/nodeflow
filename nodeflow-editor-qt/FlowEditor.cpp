@@ -10,7 +10,6 @@
 #include "EditorUINode.hpp"
 
 namespace nf {
-
 	class FlowEditorSceneView : public QGraphicsView
 	{
 	public:
@@ -27,7 +26,6 @@ namespace nf {
 			setCacheMode(QGraphicsView::CacheBackground);
 			setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 			setRenderHint(QPainter::Antialiasing);
-
 		}
 
 		void zoomInStep()
@@ -35,7 +33,7 @@ namespace nf {
 			auto factor = std::pow(1.2, 1.0);
 			auto t = transform();
 
-			if (t.m11() > 2.0) 
+			if (t.m11() > 2.0)
 				return;
 			scale(factor, factor);
 		}
@@ -49,7 +47,6 @@ namespace nf {
 				return;
 			scale(factor, factor);
 		}
-
 
 	protected:
 		void drawBackground(QPainter* painter, const QRectF& r) override
@@ -66,14 +63,14 @@ namespace nf {
 				auto bottom = std::floor(tl.y() / gridStep - 0.5);
 				auto top = std::floor(br.y() / gridStep + 1.0);
 
-				for (int xi = int(left); xi <= int(right); ++xi) 
+				for (auto xi = int(left); xi <= int(right); ++xi)
 				{
 					QLineF line(xi * gridStep, bottom * gridStep, xi * gridStep, top * gridStep);
 
 					painter->drawLine(line);
 				}
 
-				for (int yi = int(bottom); yi <= int(top); ++yi) 
+				for (auto yi = int(bottom); yi <= int(top); ++yi)
 				{
 					QLineF line(left * gridStep, yi * gridStep, right * gridStep, yi * gridStep);
 					painter->drawLine(line);
@@ -98,14 +95,11 @@ namespace nf {
 				return;
 			}
 
-
 			if ((static_cast<double>(delta.y()) / std::abs(delta.y())) > 0.0)
 				zoomInStep();
 			else
 				zoomOutStep();
-
 		}
-
 
 		void keyPressEvent(QKeyEvent* event) override
 		{
@@ -137,7 +131,7 @@ namespace nf {
 			}
 			QGraphicsView::keyReleaseEvent(event);
 		}
-// 
+		//
 		void mousePressEvent(QMouseEvent* event) override
 		{
 			if (event->button() == Qt::LeftButton)
@@ -149,7 +143,6 @@ namespace nf {
 		{
 			if (scene()->mouseGrabberItem() == nullptr && event->buttons() == Qt::LeftButton)
 			{
-
 				if (event->modifiers() != Qt::ShiftModifier)
 				{
 					auto diff = m_lastClickPos - mapToScene(event->pos());
@@ -159,7 +152,6 @@ namespace nf {
 
 			QGraphicsView::mouseMoveEvent(event);
 		}
-
 
 	private:
 		QPointF m_lastClickPos{ 0,0 };
@@ -173,7 +165,7 @@ namespace nf {
 
 		auto leftSideDock = new QDockWidget("Script Content");
 		leftSideDock->setFeatures(
-			QDockWidget::DockWidgetFloatable |QDockWidget::DockWidgetMovable
+			QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable
 		);
 		scriptContentPanel = new nf::ScriptContentPanel();
 		leftSideDock->setWidget(scriptContentPanel);
@@ -185,7 +177,6 @@ namespace nf {
 		addDockWidget(Qt::LeftDockWidgetArea, leftSideDock);
 
 		scriptScene->addItem(new nf::EditorUINode());
-
 	}
 
 	FlowEditor::~FlowEditor()
@@ -194,13 +185,10 @@ namespace nf {
 	void FlowEditor::smartResizePanels() const
 	{
 		auto availWidth = QApplication::desktop()->screenGeometry().width();
-
 	}
 
 	void FlowEditor::keyPressEvent(QKeyEvent* event)
 	{
-
-
 		switch (event->key())
 		{
 		case Qt::Key_Escape:
@@ -212,5 +200,4 @@ namespace nf {
 
 		QMainWindow::keyPressEvent(event);
 	}
-
 }

@@ -5,11 +5,14 @@
 
 #include <QGraphicsObject>
 
-# define DEBUG_DRAW_BOUNDING_RECT 0
+#define DEBUG_DRAW_BOUNDING_RECT 0
 
 namespace nf
 {
 	class EditorUINode;
+	class UINodeDataPort;
+	class UINodeFlowPort;
+
 	class NodePainterDelegate
 	{
 	public:
@@ -21,6 +24,8 @@ namespace nf
 		virtual void paintNodeBody(QPainter* painter, const QRectF& geometry, const EditorUINode& node) = 0;
 
 		virtual void paintSelected(QPainter* painter, const QRectF& geometry, const EditorUINode& node) = 0;
+
+		virtual void paintError(QPainter* painter, const QRectF& geometry, const EditorUINode& node) = 0;
 	};
 
 	class PortPainterDelegate
@@ -28,6 +33,10 @@ namespace nf
 	public:
 		PortPainterDelegate() = default;
 		~PortPainterDelegate() = default;
+
+		virtual void paintDataPort(QPainter* painter, QRectF& geom, const UINodeDataPort& port, const QString& caption, bool connected, const QColor& color) = 0;
+
+		virtual void paintFlowPort(QPainter* painter, QRectF& geom, const UINodeFlowPort& port, bool connected) = 0;
 	};
 
 	class DefaultNodePainter : public NodePainterDelegate
@@ -38,6 +47,16 @@ namespace nf
 		void paintNodeBody(QPainter* painter, const QRectF& geometry, const EditorUINode& node) override;
 
 		void paintSelected(QPainter* painter, const QRectF& geometry, const EditorUINode& node) override;
+
+		void paintError(QPainter* painter, const QRectF& geometry, const EditorUINode& node) override;
+	};
+
+	class DefaultPortPainter : public PortPainterDelegate
+	{
+	public:
+		void paintDataPort(QPainter* painter, QRectF& geom, const UINodeDataPort& port, const QString& caption, bool connected, const QColor& color) override;
+
+		void paintFlowPort(QPainter* painter, QRectF& geom, const UINodeFlowPort& port, bool connected) override;
 	};
 
 	class TemporayNodeDrawContext
@@ -47,25 +66,70 @@ namespace nf
 		std::string name;
 	};
 
-	class EditorUINode : public QGraphicsObject
+	class UINodeDataPort : public QGraphicsItem
 	{
 	public:
-		EditorUINode();
+		UINodeDataPort(QGraphicsItem* parent = nullptr);
 
-		EditorUINode(std::unique_ptr<NodePainterDelegate> nodePainter, std::unique_ptr<PortPainterDelegate> portPainter, QGraphicsObject* parent = nullptr);
-
-		void setNodePainterDelegate(std::unique_ptr<NodePainterDelegate> painter);
-
-		void setPortPainterDelegate(std::unique_ptr<PortPainterDelegate> painter);
+		UINodeDataPort(std::shared_ptr<PortPainterDelegate> portPainter, QGraphicsItem* parent = nullptr);
 
 		QRectF boundingRect() const override;
 
 		void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget /* = nullptr */) override;
 
+		bool connected() const noexcept;
+
+	protected:
+		void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+
+	private:
+		QRectF m_portGeometry;
+
+		std::shared_ptr<PortPainterDelegate> m_portPainter;
+		QString m_caption;
+		QColor m_color;
+	};
+
+	class UINodeFlowPort : public QGraphicsItem
+	{
+	public:
+		UINodeFlowPort(QGraphicsItem* parent = nullptr);
+
+		UINodeFlowPort(std::shared_ptr<PortPainterDelegate> portPainter, QGraphicsItem* parent = nullptr);
+		QRectF boundingRect() const override;
+
+		void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget /* = nullptr */) override;
+
+		bool connected() const noexcept;
+
+	private:
+		QRectF m_portGeometry;
+		std::shared_ptr<PortPainterDelegate> m_portPainter;
+	};
+
+	class EditorUINode : public QGraphicsObject
+	{
+	public:
+		EditorUINode();
+
+		EditorUINode(std::unique_ptr<NodePainterDelegate> nodePainter, std::shared_ptr<PortPainterDelegate> portPainter, QGraphicsObject* parent = nullptr);
+
+		void setNodePainterDelegate(std::unique_ptr<NodePainterDelegate> painter);
+
+		void setPortPainterDelegate(std::shared_ptr<PortPainterDelegate> painter);
+
+		QRectF boundingRect() const override;
+
+		void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget /* = nullptr */) override;
+
+		void setInvalid() {}
+
+		bool isInvalid() { return false; }
+
 	private:
 		QRectF m_nodeGemoetry;
 
 		std::unique_ptr<NodePainterDelegate> m_nodePainter;
-		std::unique_ptr<PortPainterDelegate> m_portPainter;
+		std::shared_ptr<PortPainterDelegate> m_portPainter;
 	};
 }

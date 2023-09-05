@@ -5,7 +5,7 @@ namespace nf
 {
 #pragma region PortLink
 
-	void PortLink::breakLink() noexcept
+	void PortLink::unlink() noexcept
 	{
 		targetIndex = -1;
 		targetNode = nullptr;
@@ -27,17 +27,17 @@ namespace nf
 
 #pragma  region FlowLink
 
-	void FlowLink::breakLink() noexcept
+	void ExecutionLink::breakLink() noexcept
 	{
 		targetNode = nullptr;
 	}
 
-	void FlowLink::setTarget(FlowNode* targetNode_) noexcept
+	void ExecutionLink::makeLink(FlowNode* targetNode_) noexcept
 	{
 		targetNode = targetNode_;
 	}
 
-	bool FlowLink::operator==(const FlowLink& rhs) const
+	bool ExecutionLink::operator==(const ExecutionLink& rhs) const
 	{
 		return targetNode == rhs.targetNode;
 	}
@@ -46,11 +46,15 @@ namespace nf
 
 #pragma region InputPortHandle
 
-	bool InputPortHandle::makeLink(PortIndex targetIndex, Node* targetNode)
+	bool InputPortHandle::createLink(PortLink link)
 	{
-		if (targetIndex == -1 || targetNode ==nullptr)
+		if (!link.valid())
+		{
+			NF_ASSERT(false, "Invalid Link");
 			return false;
-		m_link.setTarget(targetIndex, targetNode);
+		}
+		m_link = link;
+		NF_ASSERT(m_link == link, "ERROR");
 		return true;
 	}
 
@@ -59,24 +63,24 @@ namespace nf
 		return m_link.valid();
 	}
 
-	void InputPortHandle::breakLink() noexcept
+	void InputPortHandle::removeLink() noexcept
 	{
-		m_link.breakLink();
+		m_link.unlink();
 	}
 
 #pragma endregion InputPortHandle
 
 #pragma region OutputPortHandle
 
-	bool OutputPortHandle::createLink(PortIndex targetIndex, Node* targetNode)
+	bool OutputPortHandle::createLink(PortLink link)
 	{
-		PortLink link(targetIndex, targetNode);
-		if (link.valid())
+		if (!link.valid())
 		{
-			m_links.push_back(link);
-			return true;
+			NF_ASSERT(false, "Invalid Link");
+			return false;
 		}
-		return false;
+		m_links.push_back(link);
+		return true;
 	}
 
 	bool OutputPortHandle::removeLink(PortLink link)

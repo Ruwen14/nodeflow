@@ -90,7 +90,7 @@ namespace nf
 		font.setPointSize(8);
 		font.setBold(true);
 		collapseButton->setFont(font);
-		connect(collapseButton, &QToolButton::pressed, this, &CollapsableSection::collapseSection);
+		connect(collapseButton, &QToolButton::toggled, this, &CollapsableSection::toggle);
 
 		collapseAnimation = new QParallelAnimationGroup(this);
 		contentArea = new QScrollArea(this);
@@ -133,13 +133,25 @@ namespace nf
 		contentAnimation->setDuration(0);
 		contentAnimation->setStartValue(0);
 		contentAnimation->setEndValue(contentHeight);
+		expand();
 	}
 
-	void CollapsableSection::collapseSection()
+	void CollapsableSection::expand()
 	{
-		bool checked = collapseButton->isChecked();
-		collapseButton->setArrowType(checked ? Qt::ArrowType::RightArrow : Qt::ArrowType::DownArrow);
-		collapseAnimation->setDirection(checked ? QAbstractAnimation::Backward : QAbstractAnimation::Forward);
+		if (!collapseButton->isChecked())
+			collapseButton->toggle();
+	}
+
+	void CollapsableSection::collapse()
+	{
+		if (collapseButton->isChecked())
+			collapseButton->toggle();
+	}
+
+	void CollapsableSection::toggle(bool checked)
+	{
+		collapseButton->setArrowType(checked ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
+		collapseAnimation->setDirection(checked ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
 		collapseAnimation->start();
 	}
 
@@ -387,6 +399,7 @@ namespace nf
 			m_varTypeSelector->addItem(createVariableTicTacIcon(Qt::red), varType);
 		lay->addRow("Type", m_varTypeSelector);
 
+		m_varDefaultValueEdit->setClearButtonEnabled(true);
 		m_varDefaultValueEdit->setPlaceholderText("None");
 		lay->addRow("Default Value", m_varDefaultValueEdit);
 
