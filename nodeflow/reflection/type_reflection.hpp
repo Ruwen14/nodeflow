@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string_view>
 #include "nodeflow/typedefs.hpp"
 
-
 namespace nf
 {
 	namespace detail
@@ -73,10 +72,8 @@ namespace nf
 				}
 				return hashVal;
 			}
-
 		};
 	}
-
 
 	template<typename Type>
 	constexpr auto type_name() noexcept
@@ -86,7 +83,6 @@ namespace nf
 		constexpr auto value = pretty_function.substr(first, pretty_function.find_last_of(NF_FUNC_SIGNATURE_SUFFIX) - first);
 		return value;
 	}
-
 
 	template<typename Type>
 	constexpr nf::typeid_t type_id() noexcept
@@ -104,8 +100,6 @@ namespace nf
 		auto name = charsBeforeBraces.substr(charsBeforeBraces.rfind("cdecl") + 6);
 		return name;
 	}
-
-
 
 	template<typename Type>
 	struct refltype
@@ -137,9 +131,7 @@ namespace nf
 		{
 			return std::array<typeid_t, sizeof...(Types)>{ {nf::type_id<Types>()...}};
 		}
-
 	};
-
 
 	template<typename... Types>
 	struct refltypes<std::tuple<Types...>>
@@ -157,17 +149,12 @@ namespace nf
 		}
 	};
 
-// 	template< typename T >
-// 	struct type_names;
-// 
-// 	template< typename... Ts >
-// 	struct type_names< std::tuple< Ts... > >
-// 	{
-// 		static constexpr std::array<std::string_view, sizeof...(Ts)> value = { {entt::type_name<Ts>::value()...} };
-// 	};
-
-
-
-
-
+	// 	template< typename T >
+	// 	struct type_names;
+	//
+	// 	template< typename... Ts >
+	// 	struct type_names< std::tuple< Ts... > >
+	// 	{
+	// 		static constexpr std::array<std::string_view, sizeof...(Ts)> value = { {entt::type_name<Ts>::value()...} };
+	// 	};
 }
