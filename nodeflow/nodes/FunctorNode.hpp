@@ -41,8 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodes/FlowNode.hpp"
 #include "core/type_tricks.hpp"
 
-
-
 namespace nf
 {
 	template<auto Func>
@@ -52,7 +50,6 @@ namespace nf
 		static std::string staticNodeName;
 		static std::string staticResultPortName;
 		static std::vector<std::string> staticArgPortNames;
-
 
 	public:
 		using FSig_t = typename FuncSignature<decltype(std::function{ Func }) > ;
@@ -64,7 +61,6 @@ namespace nf
 		static constexpr bool hasOutput = !std::is_void_v<FReturn_t>;
 
 	public:
-
 
 		std::string nodeName() const override
 		{
@@ -94,7 +90,7 @@ namespace nf
 			return "";
 		}
 
-		bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive)
+		bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) override
 		{
 			if (index != 0)
 				return false;
@@ -106,7 +102,7 @@ namespace nf
 
 		Expected<void, Error> setup() override
 		{
-			if constexpr(hasInputs)
+			if constexpr (hasInputs)
 				std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_argumentPorts);
 
 			if constexpr (hasOutput)
@@ -115,12 +111,11 @@ namespace nf
 			return {};
 		}
 
-
 		template<typename T>
 		auto getInputStuff(nf::InputPort<T>& port)
 		{
 			int d = 4;
-			int a = port.index()-+7 + d;
+			int a = port.index() - +7 + d;
 			NF_UNUSED(port);
 			return a;
 		}
@@ -148,11 +143,10 @@ namespace nf
 					if (!iPort.link().valid())
 					{
 						return make_unexpected(
-							Error(std::format("Build failed for Node '{}': one or more InputPort(s) not connected ", 
+							Error(std::format("Build failed for Node '{}': one or more InputPort(s) not connected ",
 								nodeName()), 120
 							)
 						);
-
 					}
 				}
 			}
@@ -164,7 +158,6 @@ namespace nf
 			// Move to onCompile() / inBuild() override to save performance;
 			for (const auto& port : m_inputPorts)
 				NF_ASSERT(port.link().valid(), "InputPort not connected");
-			
 
 			if constexpr (hasInputs && hasOutput)
 				m_resultPort.value = applyPortsOnCallable(Func, m_argumentPorts);
@@ -177,24 +170,19 @@ namespace nf
 
 			else
 				Func();
-
 		}
 
 	public:
 		InputPorts_t m_argumentPorts;
 		OutputPort<FReturn_t> m_resultPort;
-
 	};
 
 	template<auto Func>
 	std::string FunctorNode<Func>::staticNodeName = "FunctorNode";
 
-	
 	template<auto Func>
 	std::string FunctorNode<Func>::staticResultPortName = "Result";
 
 	template<auto Func>
 	std::vector<std::string> FunctorNode<Func>::staticArgPortNames;
-
-
 }
