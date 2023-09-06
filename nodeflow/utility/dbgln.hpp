@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../3rdparty/cpputils/magic_enum.h"
 
-
 template<typename... Args>
 void dbgln(std::string_view fmt, Args&&... args)
 {
@@ -72,7 +71,6 @@ std::string outln(T&& t)
 {
 	return outln("{}", std::forward<T>(t));
 }
-
 
 template<typename T, class CharT>
 struct std::formatter<std::vector<T>, CharT> : std::formatter<T, CharT> {
@@ -175,7 +173,7 @@ struct std::formatter<std::optional<T>, CharT> : std::formatter<T, CharT> {
 };
 
 template<typename T, typename T2, class CharT>
-struct std::formatter<std::pair<T,T2>, CharT> : std::formatter<CharT> {
+struct std::formatter<std::pair<T, T2>, CharT> : std::formatter<CharT> {
 	// parse() is inherited from the base class
 
 	// Define format() by calling the base class implementation with the wrapped value
@@ -197,10 +195,8 @@ struct std::formatter<std::map<T, T2>, CharT> : std::formatter<CharT> {
 		{
 			std::format_to(fc.out(), "\t{} : {}", k, v);
 			std::format_to(fc.out(), "{}", "\n");
-
 		}
 		return std::format_to(fc.out(), "{}", '}');
-
 	}
 };
 
@@ -216,12 +212,7 @@ struct std::formatter<std::unordered_map<T, T2>, CharT> : std::formatter<CharT> 
 		{
 			std::format_to(fc.out(), "\t{} : {}", k, v);
 			std::format_to(fc.out(), "{}", "\n");
-
 		}
 		return std::format_to(fc.out(), "{}", '}');
-
 	}
 };
-
-
-
