@@ -33,9 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "typedefs.hpp"
-#include "nodes/FlowNode.hpp"
-
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/nodes/FlowNode.hpp"
 
 namespace nf
 {
@@ -44,7 +43,6 @@ namespace nf
 		DontAddConversion,
 		AddConversionIfNeeded
 	};
-
 
 	class ConversionNode : public FlowNode
 	{
@@ -104,7 +102,6 @@ namespace nf
 	{
 		allocateExpectedPortCount(PortDirection::Input, 1);
 		allocateExpectedPortCount(PortDirection::Output, 1);
-
 	}
 
 	template<typename FromType, typename ToType, auto ConversionCallable>
@@ -112,7 +109,6 @@ namespace nf
 	{
 		return staticNodeName;
 	}
-
 
 	template<typename FromType, typename ToType, auto ConversionCallable>
 	std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::portName(PortDirection dir, PortIndex index) const
@@ -141,8 +137,4 @@ namespace nf
 			return m_toPort.serialize(archive);
 		return m_toPort.deserialize(archive);
 	}
-
 }
-
-
-

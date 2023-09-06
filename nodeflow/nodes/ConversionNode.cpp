@@ -1,8 +1,7 @@
-#include "nodes/ConversionNode.hpp"
+#include "nodeflow/nodes/ConversionNode.hpp"
 
 namespace nf
 {
-
 	std::string ConversionNode::nodeName() const
 	{
 		return "ConversionNode";
@@ -24,10 +23,4 @@ namespace nf
 		NF_ASSERT(m_outputPorts.size() == 1, "Error");
 		return m_outputPorts.at(0).typeID();
 	}
-
 }
-
-
-
-
-

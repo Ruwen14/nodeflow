@@ -1,6 +1,4 @@
-#include "core/Node.hpp"
-#include "../3rdparty/cpputils/prettyprint.h"
-using namespace cpputils;
+#include "nodeflow/core/Node.hpp"
 
 namespace nf
 {

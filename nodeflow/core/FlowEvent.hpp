@@ -33,8 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "reflection/type_reflection.hpp"
-
+#include "nodeflow/reflection/type_reflection.hpp"
 
 #define NF_REGISTER_EVENT(EventType)						\
 public:														\
@@ -74,7 +73,3 @@ namespace nf
 		return nullptr;
 	}
 }
-
-
-
-

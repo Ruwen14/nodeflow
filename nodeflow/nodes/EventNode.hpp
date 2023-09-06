@@ -1,4 +1,3 @@
-
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -35,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <tuple>
 
-#include "typedefs.hpp"
-#include "core/type_tricks.hpp"
-#include "nodes/FlowNode.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/core/type_tricks.hpp"
+#include "nodeflow/nodes/FlowNode.hpp"
 
 namespace nf
 {
@@ -71,7 +70,6 @@ namespace nf
 		{
 		}
 	};
-
 
 	template<typename EventType, auto... MemAccessers>
 	class GeneratedEventNode : public EventNode<EventType>
@@ -114,15 +112,9 @@ namespace nf
 			}
 			else
 				return false;
-
 		}
-
 
 	public:
 		OutputPorts_t m_eventFields;
-
 	};
-
-
-
 }

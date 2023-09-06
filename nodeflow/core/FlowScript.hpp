@@ -1,4 +1,3 @@
-
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -40,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodeflow/core/Error.hpp"
 #include "nodeflow/utility/Expected.hpp"
 #include "nodeflow/core/FlowModule.hpp"
-#include "nodes/EventNode.hpp"
+#include "nodeflow/nodes/EventNode.hpp"
 
 namespace nf
 {

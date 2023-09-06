@@ -40,16 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 #include <utility>
 
-#include "typedefs.hpp"
-#include "core/type_tricks.hpp"
-#include "utility/Expected.hpp"
-#include "core/Error.hpp"
-#include "core/Node.hpp"
-#include "nodes/DataNode.hpp"
-#include "nodes/FlowNode.hpp"
-#include "nodes/FunctorNode.hpp"
-#include "nodes/EventNode.hpp"
-#include "nodes/ConversionNode.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/core/type_tricks.hpp"
+#include "nodeflow/utility/Expected.hpp"
+#include "nodeflow/core/Error.hpp"
+#include "nodeflow/core/Node.hpp"
+#include "nodeflow/nodes/DataNode.hpp"
+#include "nodeflow/nodes/FlowNode.hpp"
+#include "nodeflow/nodes/FunctorNode.hpp"
+#include "nodeflow/nodes/EventNode.hpp"
+#include "nodeflow/nodes/ConversionNode.hpp"
 
 namespace nf {
 	struct lang

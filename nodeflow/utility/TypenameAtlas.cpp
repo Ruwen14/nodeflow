@@ -1,13 +1,11 @@
-#include "utility/TypenameAtlas.hpp"
+#include "nodeflow/utility/TypenameAtlas.hpp"
 
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
 
-
 namespace nf
 {
-
 	std::set<std::string> TypenameAtlas::listTypenames() const
 	{
 		std::set<std::string> ret;
@@ -29,8 +27,4 @@ namespace nf
 
 		return std::adjacent_find(atlasValues.begin(), atlasValues.end()) != atlasValues.end();
 	}
-
 }
-
-
-

@@ -33,9 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "typedefs.hpp"
-#include "core/Node.hpp"
-#include "nodes/FlowNode.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/core/Node.hpp"
+#include "nodeflow/nodes/FlowNode.hpp"
 
 namespace nf
 {

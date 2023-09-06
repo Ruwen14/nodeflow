@@ -1,4 +1,4 @@
-#include "nodes/FlowNode.hpp"
+#include "nodeflow/nodes/FlowNode.hpp"
 
 namespace nf
 {

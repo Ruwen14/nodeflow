@@ -1,8 +1,7 @@
-#include "nodes/EventNode.hpp"
+#include "nodeflow/nodes/EventNode.hpp"
 
-namespace nf 
+namespace nf
 {
-
 	StartEventNode::StartEventNode()
 	{
 		allocateExpectedPortCount(PortDirection::Input, 0);
@@ -21,14 +20,10 @@ namespace nf
 
 	void StartEventNode::process()
 	{
-
 	}
 
 	NodeArchetype StartEventNode::getArchetype() const
 	{
 		return NodeArchetype::Flow_EventNode;
 	}
-
-	
 }
-

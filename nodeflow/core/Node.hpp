@@ -39,13 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <optional>
 
-#include "typedefs.hpp"
-#include "core/NodePort.hpp"
-#include "core/Error.hpp"
-#include "core/UUID.hpp"
-#include "core/FlowEvent.hpp"
-#include "utility/Expected.hpp"
-#include "utility/TypenameAtlas.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/core/NodePort.hpp"
+#include "nodeflow/core/Error.hpp"
+#include "nodeflow/core/UUID.hpp"
+#include "nodeflow/core/FlowEvent.hpp"
+#include "nodeflow/utility/Expected.hpp"
+#include "nodeflow/utility/TypenameAtlas.hpp"
 
 namespace nf
 {

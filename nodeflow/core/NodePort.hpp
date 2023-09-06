@@ -37,10 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <type_traits>
 #include <sstream>
 
-#include "typedefs.hpp"
-#include "type_tricks.hpp"
-#include "../reflection/type_reflection.hpp"
-#include "core/DataHandle.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/core/type_tricks.hpp"
+#include "nodeflow/reflection/type_reflection.hpp"
+#include "nodeflow/core/DataHandle.hpp"
 
 namespace nf
 {

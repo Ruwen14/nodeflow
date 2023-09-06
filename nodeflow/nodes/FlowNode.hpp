@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "core/Node.hpp"
+#include "nodeflow/core/Node.hpp"
 
 namespace nf
 {

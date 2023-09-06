@@ -33,8 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 #include <random>
-#include "typedefs.hpp"
-
+#include "nodeflow/typedefs.hpp"
 
 namespace nf
 {
@@ -45,11 +44,9 @@ namespace nf
 		explicit UUID(std::uint64_t uuid);
 
 		[[nodiscard]] static UUID create() { return UUID{}; }
-		[[nodiscard]] static UUID createFrom(std::uint64_t uuid) { return UUID{uuid}; }
+		[[nodiscard]] static UUID createFrom(std::uint64_t uuid) { return UUID{ uuid }; }
 
 		inline operator std::uint64_t() const { return m_uuid; }
-
-
 
 	private:
 		std::uint64_t m_uuid;
@@ -61,7 +58,7 @@ namespace nf
 	};
 }
 
-namespace std 
+namespace std
 {
 	template <typename T> struct hash;
 
@@ -73,5 +70,4 @@ namespace std
 			return (uint64_t)uuid;
 		}
 	};
-
 }

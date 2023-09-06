@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utility>
 #include <vector>
 
-#include "utility/Singleton.hpp"
-#include "typedefs.hpp"
-#include "reflection/type_reflection.hpp"
+#include "nodeflow/utility/Singleton.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/reflection/type_reflection.hpp"
 
 namespace nf
 {
@@ -82,10 +82,10 @@ namespace nf
 		inline const atlas_t& atlas() const { return m_atlas; }
 
 		std::set<std::string> listTypenames() const;
-		
+
 		bool hasDuplicates() const;
 
 	private:
-		atlas_t m_atlas;
+		atlas_t m_atlas{};
 	};
 }

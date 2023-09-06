@@ -36,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <format>
 
-#include "typedefs.hpp"
-#include "core/Node.hpp"
-#include "nodes/FlowNode.hpp"
-#include "core/type_tricks.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/core/Node.hpp"
+#include "nodeflow/nodes/FlowNode.hpp"
+#include "nodeflow/core/type_tricks.hpp"
 
 namespace nf
 {
