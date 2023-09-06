@@ -122,7 +122,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>nodeflow_pch.h</PrecompiledHeaderFile>
@@ -145,7 +145,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>C:\Users\ruwen\Desktop\Learning_CPP\nodeflow;C:\Users\ruwen\Desktop\Learning_CPP\nodeflow\nodeflow;$(ProjectDir)\nodeflow;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>nodeflow_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>nodeflow_pch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -167,6 +167,8 @@
     <ClInclude Include="nodeflow\core\DataHandle.hpp" />
     <ClInclude Include="nodeflow\core\Error.hpp" />
     <ClInclude Include="nodeflow\core\FlowEvent.hpp" />
+    <ClInclude Include="nodeflow\core\FlowModule.hpp" />
+    <ClInclude Include="nodeflow\core\FlowScript.hpp" />
     <ClInclude Include="nodeflow\core\FlowStateMachine.hpp" />
     <ClInclude Include="nodeflow\core\Node.hpp" />
     <ClInclude Include="nodeflow\core\NodeMetaContext.hpp">
@@ -184,9 +186,7 @@
     <ClInclude Include="nodeflow\nodes\DataNode.hpp" />
     <ClInclude Include="nodeflow\nodes\EventNode.hpp" />
     <ClInclude Include="nodeflow\nodes\EventNodeV1.hpp" />
-    <ClInclude Include="nodeflow\script\FlowModule.hpp" />
     <ClInclude Include="nodeflow\nodes\FlowNode.hpp" />
-    <ClInclude Include="nodeflow\script\FlowScript.hpp" />
     <ClInclude Include="nodeflow\archive\FreeFunctionNode.hpp" />
     <ClInclude Include="nodeflow\archive\NFPainter.hpp" />
     <ClInclude Include="nodeflow\archive\NFTypeInfo.hpp" />
@@ -211,9 +211,10 @@
     <ClInclude Include="3rdparty\entt\single_include\entt\entt.hpp" />
     <ClInclude Include="3rdparty\nameof\include\nameof.hpp" />
     <ClInclude Include="nodeflow\utility\TypenameAtlas.hpp" />
-    <ClInclude Include="nodeflow\Sandbox.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodeflow\core\FlowModule.cpp" />
+    <ClCompile Include="nodeflow\core\FlowScript.cpp" />
     <ClCompile Include="nodeflow\core\Node.cpp" />
     <ClCompile Include="nodeflow\core\NodePort.cpp" />
     <ClCompile Include="nodeflow\core\UUID.cpp" />
@@ -228,10 +229,7 @@
     <ClCompile Include="nodeflow\nodes\DataNode.cpp" />
     <ClCompile Include="nodeflow\nodes\EventNode.cpp" />
     <ClCompile Include="nodeflow\nodes\IfElseNode.cpp" />
-    <ClCompile Include="nodeflow\Sandbox.cpp" />
-    <ClCompile Include="nodeflow\script\FlowModule.cpp" />
     <ClCompile Include="nodeflow\nodes\FlowNode.cpp" />
-    <ClCompile Include="nodeflow\script\FlowScript.cpp" />
     <ClCompile Include="nodeflow\utility\TypenameAtlas.cpp" />
   </ItemGroup>
   <ItemGroup>
