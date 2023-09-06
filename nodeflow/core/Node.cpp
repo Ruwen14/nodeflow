@@ -229,7 +229,7 @@ namespace nf
 	{
 		if (dir == PortDirection::Input)
 		{
-			NF_ASSERT(m_inputPorts.size() == 0, "ERROR: bufferExpectedPortCount only valid before port initialization");
+			NF_ASSERT(m_inputPorts.empty(), "ERROR: bufferExpectedPortCount only valid before port initialization");
 			if (size == 0)
 			{
 				m_inputPorts.reserve(0);
@@ -241,7 +241,7 @@ namespace nf
 		}
 		else
 		{
-			NF_ASSERT(m_outputPorts.size() == 0, "ERROR: bufferExpectedPortCount only valid before port initialization");
+			NF_ASSERT(m_outputPorts.empty(), "ERROR: bufferExpectedPortCount only valid before port initialization");
 
 			if (size == 0)
 			{
