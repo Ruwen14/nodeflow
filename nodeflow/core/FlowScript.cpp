@@ -1,8 +1,7 @@
-#include "script/FlowScript.hpp"
+#include "nodeflow/core/FlowScript.hpp"
 
 namespace nf
 {
-
 	nf::Node* FlowScript::findNode(NodeHandle uuid) const
 	{
 		// FIXME: A data structure like unordered_map would definitely make more sense here.
@@ -72,12 +71,9 @@ namespace nf
 			NF_ASSERT(flowNode->getExecBefore() == nullptr, "Error");
 		}
 
-
-
 		// Remove all data connection from other nodes to this and vice versa
 		foundNode->breakAllConnections(PortDirection::Input);
 		foundNode->breakAllConnections(PortDirection::Output);
-
 
 		NF_ASSERT(debugAllConnectionsRemovedTo(foundNode), "Error");
 
@@ -87,7 +83,6 @@ namespace nf
 			m_variableNodes.erase(m_variableNodes.begin() + pos.second);
 
 		return true;
-
 	}
 
 	/*
@@ -106,7 +101,6 @@ namespace nf
 			NF_ASSERT(false, "UUID collision found!");
 			instance->setUUID(UUID::create());
 		}
-		
 
 		if (auto setupSuccess = instance->setup(); !setupSuccess)
 			return make_unexpected(setupSuccess.error());
@@ -118,17 +112,14 @@ namespace nf
 	}
 	*/
 
-	
-	Expected<void, ConnectionError> FlowScript::connectPorts(NodeHandle outNodeUUID, PortIndex outPort, 
-															 NodeHandle inNodeUUID, PortIndex inPort, 
-															 ConversionPolicy conv /*= ConversionPolicy::DontAddConversion*/)
+	Expected<void, ConnectionError> FlowScript::connectPorts(NodeHandle outNodeUUID, PortIndex outPort, NodeHandle inNodeUUID, PortIndex inPort, ConversionPolicy conv /*= ConversionPolicy::DontAddConversion*/)
 	{
 		NF_UNUSED(conv);
 
 		auto outNode = findNode(outNodeUUID);
 		auto inNode = findNode(inNodeUUID);
 
-		if (!outNode || ! inNode)
+		if (!outNode || !inNode)
 			return make_unexpected(ConnectionError::UnknownNode);
 
 		return outNode->makeConnection(outPort, *inNode, inPort);
@@ -173,8 +164,6 @@ namespace nf
 		NF_ASSERT(outFlowNode->getExecNext() != nullptr, "Error");
 		NF_ASSERT(inFlowNode->getExecBefore() != nullptr, "Error");
 
-
-
 		return true;
 	}
 
@@ -189,7 +178,7 @@ namespace nf
 		auto creator = creators.at(namePath);
 		auto instance = creator();
 
-		// Checks uniqueness of instance UUID. In the very unlikely event that a 
+		// Checks uniqueness of instance UUID. In the very unlikely event that a
 		// collision has occurred, a new UUID is generated and assigned to the instance.
 		while (!isUUIDUnique(instance->uuid()))
 		{
@@ -213,20 +202,15 @@ namespace nf
 		return outNode.makeConnection(ConnectionPolicy::OutputToInput, outPort, inNode, inPort);
 	}
 
-
-	
-
 	bool FlowScript::disconnectNodes(Node& outNode, PortIndex outPort,
 								Node& inNode, PortIndex inPort)
 	{
 		return outNode.breakConnection(ConnectionPolicy::OutputToInput, outPort, inNode, inPort);
 	}
 	*/
-	
 
 	bool FlowScript::disconnectFlow(NodeHandle outNodeUUID, NodeHandle inNodeUUID)
 	{
-
 		auto outNode = findNode(outNodeUUID);
 		auto inNode = findNode(inNodeUUID);
 
@@ -240,7 +224,6 @@ namespace nf
 		if (outNodeType == NodeArchetype::DataNode || outNodeType == NodeArchetype::Node ||
 			inNodeType == NodeArchetype::DataNode || inNodeType == NodeArchetype::Node)
 			return false;
-
 
 		NF_ASSERT(dynamic_cast<FlowNode*>(outNode) != nullptr, "Well we have a problem");
 		NF_ASSERT(dynamic_cast<FlowNode*>(inNode) != nullptr, "Well we have a problem");
@@ -353,9 +336,6 @@ namespace nf
 		return m_callablesNodes[m_callablesNodes.size() - 1]->uuid();
 	}
 
-
-
-
 	Expected<NodeHandle, Error> FlowScript::createVariable(const std::string& namePath)
 	{
 		auto& creators = m_scriptModule->dataCreators();
@@ -405,5 +385,4 @@ namespace nf
 		}
 		return true;
 	}
-
 }

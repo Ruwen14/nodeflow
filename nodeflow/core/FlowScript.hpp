@@ -1,3 +1,4 @@
+
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -35,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <memory>
 
-#include "typedefs.hpp"
-#include "core/Error.hpp"
-#include "utility/Expected.hpp"
-#include "script/FlowModule.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/core/Error.hpp"
+#include "nodeflow/utility/Expected.hpp"
+#include "nodeflow/core/FlowModule.hpp"
 #include "nodes/EventNode.hpp"
 
 namespace nf
@@ -59,8 +60,6 @@ namespace nf
 		{}
 
 		// 		Node* variables() const;
-
-		void precomputeExecutionOrder();
 
 		/**
 		 * @brief Broadcasts custom event to all nodes within script.
@@ -146,9 +145,9 @@ namespace nf
 		bool debugAllConnectionsRemovedTo(nf::Node* node) const;
 
 	public:
-		std::vector<std::unique_ptr<FlowNode>> m_callablesNodes;
-		std::vector<std::unique_ptr<DataNode>> m_variableNodes;
-		std::shared_ptr<FlowModule> m_scriptModule;
+		std::vector<std::unique_ptr<FlowNode>> m_callablesNodes{};
+		std::vector<std::unique_ptr<DataNode>> m_variableNodes{};
+		std::shared_ptr<FlowModule> m_scriptModule = nullptr;
 
 		// 		std::vector<BuildError> errorList
 	};
