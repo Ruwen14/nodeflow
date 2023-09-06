@@ -1,4 +1,3 @@
-
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -52,21 +51,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodes/EventNode.hpp"
 #include "nodes/ConversionNode.hpp"
 
-#include "../3rdparty/cpputils/prettyprint.h"
-using namespace cpputils;
-
-
-
-
 namespace nf {
-
 	struct lang
 	{
 		static constexpr auto While = "WhileLoop";
 		static constexpr auto IfElse = "IfElse";
 		static constexpr auto For = "ForLoop";
 	};
-
 
 	class Node;
 	class FlowNode;
@@ -95,17 +86,14 @@ namespace nf {
 		std::string outputName = "Output";
 	};
 
-
-
-
 	class FlowModule
 	{
 	public:
 		using FlowNodeCreator = std::function<std::unique_ptr<nf::FlowNode>()>;
 		using DataNodeCreator = std::function<std::unique_ptr<VariableNode>()>;
 
-		using FlowNodeCreatorMap = std::map<std::string, FlowNodeCreator>;
-		using DataNodeCreatorMap = std::map<std::string, DataNodeCreator>;
+		using FlowNodeRegistry = std::map<std::string, FlowNodeCreator>;
+		using DataNodeRegistry = std::map<std::string, DataNodeCreator>;
 
 	public:
 		FlowModule() = default;
@@ -122,15 +110,8 @@ namespace nf {
 		template<auto func>
 		Expected<void, RegisterError> registerFunction(const std::string& namePath, const FunctorPortNames& portNames = {});
 
-		template<class ClassNode>
-		Expected<void, Error> registerClass(const std::string& category);
-
 		template<auto Callable>
 		Expected<void, RegisterError> registerConversion(const std::string& namePath, const InOutPortName& portName = {});
-
-		template<class Node>
-		Expected<void, Error> registerStartEventNode(const std::string& namePath);
-
 
 		void setModuleName(const std::string& name);
 
@@ -140,9 +121,9 @@ namespace nf {
 
 		std::set<std::string> registered() const;
 
-		const FlowNodeCreatorMap& nodeCreators() const;
+		const FlowNodeRegistry& nodeCreators() const;
 
-		const DataNodeCreatorMap& dataCreators() const;
+		const DataNodeRegistry& dataCreators() const;
 
 	private:
 
@@ -150,13 +131,10 @@ namespace nf {
 
 	public:
 		std::string m_moduleName;
-		FlowNodeCreatorMap m_flowNodeCreators; // might use map for reduced memory consumption
-		DataNodeCreatorMap m_dataNodeCreators;
+		FlowNodeRegistry m_flowNodeCreators; // might use map for reduced memory consumption
+		DataNodeRegistry m_dataNodeCreators;
 		std::set<std::string> m_categoryNames;
-
-
 	};
-
 
 	template<typename T>
 	Expected<void, RegisterError> FlowModule::registerType(const std::string& namePath)
@@ -232,11 +210,6 @@ namespace nf {
 
 		return {};
 	}
-	template<class ClassNode>
-	Expected<void, Error> FlowModule::registerClass(const std::string& category)
-	{
-		return {};
-	}
 
 	template<auto Callable>
 	Expected<void, RegisterError> FlowModule::registerConversion(const std::string& namePath, const InOutPortName& portName/* = {}*/)
@@ -270,14 +243,4 @@ namespace nf {
 
 		return {};
 	}
-
-	template<class Node>
-	Expected<void, Error> FlowModule::registerStartEventNode(const std::string& namePath)
-	{
-		using Event_t = Node::Event_t;
-		static_assert(std::is_base_of_v<nf::EventNode<Event_t>, Node>, "<Node> needs to be of base <nf::EventNode<T>>");
-
-		return {};
-	}
-
 }

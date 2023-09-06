@@ -1,9 +1,8 @@
-#include "script/FlowModule.hpp"
+#include "nodeflow/core/FlowModule.hpp"
 
 #include <algorithm>
-namespace nf 
+namespace nf
 {
-
 	void FlowModule::setModuleName(const std::string& name)
 	{
 		m_moduleName = name;
@@ -32,12 +31,12 @@ namespace nf
 		return ret;
 	}
 
-	const nf::FlowModule::FlowNodeCreatorMap& FlowModule::nodeCreators() const
+	const nf::FlowModule::FlowNodeRegistry& FlowModule::nodeCreators() const
 	{
 		return m_flowNodeCreators;
 	}
 
-	const nf::FlowModule::DataNodeCreatorMap& FlowModule::dataCreators() const
+	const nf::FlowModule::DataNodeRegistry& FlowModule::dataCreators() const
 	{
 		return m_dataNodeCreators;
 	}
@@ -53,15 +52,10 @@ namespace nf
 		if (m_flowNodeCreators.contains(namePath) || m_dataNodeCreators.contains(namePath))
 			return make_unexpected(RegisterError::NameAlreadyRegistered);
 
-
 		auto found = namePath.find_last_of("/\\");
 		if (found == std::string::npos)
 			return std::make_pair(namePath.substr(found + 1), "");
 
 		return std::make_pair(namePath.substr(found + 1), namePath.substr(0, found));
-
 	}
-
 }
-
-
