@@ -86,7 +86,7 @@ namespace nf
 
 		/**
 		 * @brief Returns the name of the node
-// 		*/
+		*/
 		virtual std::string nodeName() const = 0;
 
 		inline void assignTypeID(typeid_t id) noexcept
@@ -362,29 +362,3 @@ namespace nf
 	// 		return nullptr;
 	// 	}
 }
-
-#define NF_NODE_NAME(name)				\
-public:									\
-std::string nodeName() const override	\
-{										\
-	return name;						\
-}										\
-
-#define BRACED_INIT_LIST(...) {__VA_ARGS__}
-
-#define NF_PORT_NAMES(inPortNames, outPortNames)						 \
-public:																	 \
-std::string portName(PortDirection dir, PortIndex index) const override  \
-{																		 \
-static constexpr std::array inNames = BRACED_INIT_LIST inPortNames;		 \
-static constexpr std::array outNames = BRACED_INIT_LIST outPortNames;	 \
-	if (dir == PortDirection::Input) {									 \
-		if (index < inNames.size())										 \
-			return inNames[index];										 \
-	}																	 \
-	if (dir == PortDirection::Output) {									 \
-		if (index < outNames.size())									 \
-			return outNames[index];										 \
-	}																	 \
-	return "";															 \
-}																		 \

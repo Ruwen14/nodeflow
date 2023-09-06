@@ -46,10 +46,9 @@ namespace nf
 	class FlowNode : public Node
 	{
 	public:
-		NF_NODE_NAME("FlowNode");
-
-	public:
 		NodeArchetype getArchetype() const override;
+
+		std::string nodeName() const override;
 
 		bool onEvent(FlowEvent* event) override;
 
@@ -79,7 +78,7 @@ namespace nf
 		FlowPort m_outExecPort;
 		// Optional. Used when we have multiple Output-FlowLinks
 		// and need to change which node is executed next during execution (ex. Branches, Loops)
-		FlowNode* m_nextExec;
+		FlowNode* m_nextExec = nullptr;
 		// 		FlowLink m_nextExec;
 	};
 }

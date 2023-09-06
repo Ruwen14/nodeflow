@@ -37,17 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "core/Node.hpp"
 #include "nodes/FlowNode.hpp"
 
-
 namespace nf
 {
-
 #pragma region DataNode
 
-	class DataNode : public Node 
+	class DataNode : public Node
 	{
-		NF_NODE_NAME("DataNodeBase");
 	public:
 		DataNode() = default;
+
+		std::string nodeName() const override;
 
 		NodeArchetype getArchetype() const final;
 
@@ -55,9 +54,9 @@ namespace nf
 
 		virtual typeid_t underlyingDataTypeID() const = 0;
 
-// 		virtual bool trySetDataFrom(std::any data);
+		// 		virtual bool trySetDataFrom(std::any data);
 
-		// virtual std::unique_ptr<FlowNode> constructGetter() const = 0;
+				// virtual std::unique_ptr<FlowNode> constructGetter() const = 0;
 
 		template<typename T>
 		static bool setData(DataNode& node, T&& data);
@@ -73,9 +72,10 @@ namespace nf
 	template<typename Type>
 	class DataSetterNode : public FlowNode
 	{
-		NF_NODE_NAME("DataSetterNode");
 	public:
 		DataSetterNode();
+
+		std::string nodeName() const override;
 
 		Expected<void, Error> setup() override;
 
@@ -94,6 +94,12 @@ namespace nf
 		InputPort<Type> m_dataNodeData;
 		InputPort<Type> m_setValue;
 	};
+
+	template<typename Type>
+	std::string nf::DataSetterNode<Type>::nodeName() const
+	{
+		return "DataSetterNode";
+	}
 
 	template<typename Type>
 	Expected<void, Error> DataSetterNode<Type>::setup()
@@ -153,7 +159,6 @@ namespace nf
 	template <typename Type>
 	std::string DataNodeImpl<Type>::staticNodeName = "DataNode";
 
-
 	template<typename Type>
 	DataNodeImpl<Type>::DataNodeImpl(Type&& value)
 	{
@@ -174,7 +179,6 @@ namespace nf
 	template<typename Type>
 	Expected<void, Error> DataNodeImpl<Type>::setup()
 	{
-
 		addPort(m_data);
 		return {};
 	}
@@ -206,7 +210,6 @@ namespace nf
 	{
 		return m_data.typeID;
 	}
-	
 
 #pragma endregion DataNodeImpl
 
@@ -234,5 +237,4 @@ namespace nf
 		auto& actualNode = static_cast<DataNodeImpl<T>&>(node);
 		return actualNode.data();
 	}
-
 }

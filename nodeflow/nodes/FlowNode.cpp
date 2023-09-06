@@ -2,10 +2,14 @@
 
 namespace nf
 {
-
 	NodeArchetype FlowNode::getArchetype() const
 	{
 		return NodeArchetype::FlowNode;
+	}
+
+	std::string FlowNode::nodeName() const
+	{
+		return "FlowNode";
 	}
 
 	bool FlowNode::onEvent(FlowEvent* event)
@@ -33,7 +37,7 @@ namespace nf
 
 	bool FlowNode::hasAdditionalFlowPorts() const
 	{
-		return additionalFlowPorts().size() != 0 ;
+		return additionalFlowPorts().size() != 0;
 	}
 
 	std::vector<FlowPort*> FlowNode::additionalFlowPorts() const
@@ -47,5 +51,4 @@ namespace nf
 		NF_UNUSED(dir);
 		return {};
 	}
-
 }

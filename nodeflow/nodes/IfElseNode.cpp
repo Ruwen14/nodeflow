@@ -1,13 +1,16 @@
 #include "nodes/IfElseNode.hpp"
 
-
 namespace nf
 {
-
 	IfElseNode::IfElseNode()
 	{
 		allocateExpectedPortCount(PortDirection::Input, 1);
 		allocateExpectedPortCount(PortDirection::Output, 0);
+	}
+
+	std::string IfElseNode::nodeName() const
+	{
+		return "IfElse";
 	}
 
 	NodeArchetype IfElseNode::getArchetype() const
@@ -32,12 +35,9 @@ namespace nf
 
 	void IfElseNode::setExecFlowIf(FlowNode& node)
 	{
-
 	}
 
 	void IfElseNode::setExecFlowElse(FlowNode& node)
 	{
-
 	}
-
 }

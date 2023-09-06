@@ -37,17 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "core/Node.hpp"
 #include "nodes/FlowNode.hpp"
 
-
 namespace nf
 {
 	class IfElseNode : public FlowNode
 	{
 	public:
-
-		NF_NODE_NAME("IfElse")
-
-	public:
 		IfElseNode();
+
+		std::string nodeName() const override;
 
 		NodeArchetype getArchetype() const override;
 
@@ -62,7 +59,5 @@ namespace nf
 	private:
 		InputPort<bool> m_condition;
 		ExecutionLink m_linkExitElse;
-
-		
 	};
 }
