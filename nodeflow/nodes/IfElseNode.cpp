@@ -18,7 +18,7 @@ namespace nf
 		return NodeArchetype::Lang_IfElse;
 	}
 
-	Expected<void, Error> IfElseNode::setup()
+	nf::ErrorOr<void> IfElseNode::setup()
 	{
 		addPort(m_condition);
 

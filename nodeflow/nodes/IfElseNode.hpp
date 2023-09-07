@@ -48,7 +48,7 @@ namespace nf
 
 		NodeArchetype getArchetype() const override;
 
-		Expected<void, Error> setup() override;
+		ErrorOr<void> setup() override;
 
 		void process() override;
 

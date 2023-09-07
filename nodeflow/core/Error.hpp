@@ -35,8 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <format>
 #include <string>
 
-namespace nf {
+#include "nodeflow/utility/Expected.hpp"
 
+namespace nf {
 	class Error {
 	public:
 		Error(int code)
@@ -75,6 +76,8 @@ namespace nf {
 		int m_code = 0;
 	};
 
+	template<typename T>
+	using ErrorOr = nf::Expected<T, Error>;
 }
 
 template<class CharT>

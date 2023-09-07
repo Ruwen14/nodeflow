@@ -77,7 +77,7 @@ namespace nf
 
 		std::string nodeName() const override;
 
-		Expected<void, Error> setup() override;
+		ErrorOr<void> setup() override;
 
 		void process() override
 		{
@@ -102,7 +102,7 @@ namespace nf
 	}
 
 	template<typename Type>
-	Expected<void, Error> DataSetterNode<Type>::setup()
+	ErrorOr<void> DataSetterNode<Type>::setup()
 	{
 		addPort(m_dataNodeData);
 		addPort(m_setValue);
@@ -138,7 +138,7 @@ namespace nf
 		DataNodeImpl();
 		DataNodeImpl(Type&& value);
 
-		Expected<void, Error> setup() override;
+		ErrorOr<void> setup() override;
 
 		std::string nodeName() const override;
 
@@ -177,7 +177,7 @@ namespace nf
 	}
 
 	template<typename Type>
-	Expected<void, Error> DataNodeImpl<Type>::setup()
+	ErrorOr<void> DataNodeImpl<Type>::setup()
 	{
 		addPort(m_data);
 		return {};

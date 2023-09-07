@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <type_traits>
 #include <sstream>
+#include <optional>
 
 #include "nodeflow/typedefs.hpp"
 #include "nodeflow/core/type_tricks.hpp"
@@ -75,7 +76,7 @@ namespace nf
 	public:
 		using type_t = T;
 		static constexpr auto typeID = type_id<T>();
-		static constexpr auto streamable = has_ostream_operator_v<T>;
+		static constexpr auto streamable = has_ostream_operator_v<T>; // #ToDo: Fix to detect >> operator
 
 		inline operator PortIndex() const { return m_portIndex; }
 
@@ -123,14 +124,36 @@ namespace nf
 			value = std::forward<T>(val);
 		}
 
+		std::optional<std::string> getAsString() const
+		{
+			if constexpr (this->streamable)
+			{
+				std::stringstream stream;
+				stream << value;
+				return stream.str();
+			}
+			else
+				return std::nullopt;
+		}
+
+		bool setFromString(const std::string& val)
+		{
+			if constexpr (this->streamable)
+			{
+				std::stringstream stream(val);
+				stream >> value;
+				return true;
+			}
+			return false;
+		}
+
 		bool serialize(std::stringstream& archive) const
 		{
 			if constexpr (this->streamable) {
 				archive << value;
 				return true;
 			}
-			else
-				return false;
+			return false;
 		}
 
 		bool deserialize(std::stringstream& archive)
@@ -269,7 +292,7 @@ namespace nf
 	private:
 		std::string m_name;
 		PortLink m_link;
-		typeid_t m_dataTypeID;
+		typeid_t m_dataTypeID{};
 	};
 
 	class OutputPortHandle
@@ -312,7 +335,7 @@ namespace nf
 
 	private:
 		std::string m_name;
-		std::vector<PortLink> m_links; // Output link to multiple nodes
+		std::vector<PortLink> m_links{}; // Output link to multiple nodes
 		detail::DataHandle m_dataHandle;
 	};
 }

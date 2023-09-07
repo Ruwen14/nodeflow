@@ -1,6 +1,5 @@
 #include "NodePort.hpp"
 
-
 namespace nf
 {
 #pragma region PortLink
@@ -21,7 +20,6 @@ namespace nf
 	{
 		return ((targetIndex == rhs.targetIndex) && (targetNode == rhs.targetNode));
 	}
-
 
 #pragma endregion PortLink
 
@@ -111,7 +109,4 @@ namespace nf
 	}
 
 #pragma endregion OutputPortHandle
-
 }
-
-

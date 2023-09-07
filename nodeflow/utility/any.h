@@ -110,7 +110,6 @@ namespace chaiscript {
 				}
 			}
 		};
-
 	} // namespace detail
 } // namespace chaiscript
 

@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodeflow/typedefs.hpp"
 #include "nodeflow/core/type_tricks.hpp"
 #include "nodeflow/utility/Expected.hpp"
-#include "nodeflow/core/Error.hpp"
 #include "nodeflow/core/Node.hpp"
 #include "nodeflow/nodes/DataNode.hpp"
 #include "nodeflow/nodes/FlowNode.hpp"

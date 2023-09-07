@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodeflow/core/Error.hpp"
 #include "nodeflow/core/UUID.hpp"
 #include "nodeflow/core/FlowEvent.hpp"
-#include "nodeflow/utility/Expected.hpp"
 #include "nodeflow/utility/TypenameAtlas.hpp"
 
 namespace nf
@@ -136,7 +135,7 @@ namespace nf
 		*/
 		virtual bool onEvent(FlowEvent* event) { NF_UNUSED(event); return false; }
 
-		virtual Expected<void, Error> onBuild() { return {}; }
+		virtual ErrorOr<void> onBuild() { return {}; }
 
 		/**
 		 * @brief Called when node is about to be removed/deleted from a FlowScript.
@@ -156,7 +155,7 @@ namespace nf
 		*/
 
 		// ToDo Maybe pass a NodeMetaContext to setup, where its name, portnames... can be decicided.
-		virtual Expected<void, Error> setup() { return {}; }
+		virtual ErrorOr<void> setup() { return {}; }
 
 		/**
 		 * @brief  Workhorse function of a node in which a user-defined calculation can happen.

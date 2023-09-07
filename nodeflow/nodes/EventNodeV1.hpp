@@ -1,4 +1,3 @@
-
 /*
 - nodeflow -
 BSD 3-Clause License
@@ -40,15 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodes/FlowNode.hpp"
 
 namespace nf {
-
-
-
-
-
-
-
-
-
 	template<class EventType, class... Fields>
 	class EventNodeV1 {};
 
@@ -60,8 +50,7 @@ namespace nf {
 		using OutputPorts_t = ExpandOutputPorts<OutputTypes_t>::value;
 		static constexpr bool hasFields = std::tuple_size_v<OutputPorts_t> != 0;
 
-
-		Expected<void, Error> setup() override
+		ErrorOr<void> setup() override
 		{
 			if constexpr (hasFields)
 				std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_eventFields);
@@ -73,13 +62,13 @@ namespace nf {
 			return NodeArchetype::Flow_EventNode;
 		}
 
-		// Visitor Pattern 
+		// Visitor Pattern
 		// Or Make template<Event> class BaseEventNode with virtual template<typename Event> parseEvent
 		bool constructFromEvent(const Event& event /*We need a callback function here*/)
 		{
 			return false;
 		}
-		
+
 		bool setFieldNames(const std::vector<std::string_view>& fieldNames)
 		{
 			if constexpr (hasFields)
@@ -100,10 +89,9 @@ namespace nf {
 			}
 			else
 				return false;
-
 		}
 
-		const std::vector<std::string>& fieldNames() const 
+		const std::vector<std::string>& fieldNames() const
 		{
 			return {};
 		}
@@ -111,10 +99,4 @@ namespace nf {
 	public:
 		OutputPorts_t m_eventFields;
 	};
-
-
-
-	
-
-
 }

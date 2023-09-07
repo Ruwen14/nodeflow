@@ -70,7 +70,7 @@ namespace nf
 
 		std::string portName(PortDirection dir, PortIndex index) const override;
 
-		Expected<void, Error> setup() override;
+		ErrorOr<void> setup() override;
 
 		bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) final;
 
@@ -120,7 +120,7 @@ namespace nf
 	}
 
 	template<typename FromType, typename ToType, auto ConversionCallable>
-	Expected<void, Error> ConversionNodeImpl<FromType, ToType, ConversionCallable>::setup()
+	ErrorOr<void> ConversionNodeImpl<FromType, ToType, ConversionCallable>::setup()
 	{
 		addPort(m_fromPort);
 		addPort(m_toPort);

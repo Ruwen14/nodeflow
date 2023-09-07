@@ -13,7 +13,7 @@ namespace nf
 		return "StartEventNode";
 	}
 
-	Expected<void, Error> StartEventNode::setup()
+	nf::ErrorOr<void> StartEventNode::setup()
 	{
 		return {};
 	}

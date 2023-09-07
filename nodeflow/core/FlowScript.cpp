@@ -26,7 +26,7 @@ namespace nf
 		return findNode(uuid) != nullptr;
 	}
 
-	Expected<NodeHandle, Error> FlowScript::spawnNode(const std::string& namePath)
+	ErrorOr<NodeHandle> FlowScript::spawnNode(const std::string& namePath)
 	{
 		auto& nodeCreators = m_scriptModule->nodeCreators();
 		auto& dataCreators = m_scriptModule->dataCreators();
@@ -316,7 +316,7 @@ namespace nf
 		return true;
 	}
 
-	Expected<NodeHandle, Error> FlowScript::createNode(const std::string& namePath)
+	ErrorOr<NodeHandle> FlowScript::createNode(const std::string& namePath)
 	{
 		auto& creators = m_scriptModule->nodeCreators();
 		auto creator = creators.at(namePath);
@@ -336,7 +336,7 @@ namespace nf
 		return m_callablesNodes[m_callablesNodes.size() - 1]->uuid();
 	}
 
-	Expected<NodeHandle, Error> FlowScript::createVariable(const std::string& namePath)
+	ErrorOr<NodeHandle> FlowScript::createVariable(const std::string& namePath)
 	{
 		auto& creators = m_scriptModule->dataCreators();
 		auto creator = creators.at(namePath);

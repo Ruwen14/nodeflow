@@ -100,7 +100,7 @@ namespace nf
 			return m_resultPort.deserialize(archive);
 		}
 
-		Expected<void, Error> setup() override
+		ErrorOr<void> setup() override
 		{
 			if constexpr (hasInputs)
 				std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_argumentPorts);
@@ -134,7 +134,7 @@ namespace nf
 				std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<Tuple>>>{});
 		}
 
-		Expected<void, Error> onBuild() override
+		ErrorOr<void> onBuild() override
 		{
 			if constexpr (hasInputs)
 			{

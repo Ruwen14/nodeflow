@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "nodeflow/typedefs.hpp"
 #include "nodeflow/core/Error.hpp"
-#include "nodeflow/utility/Expected.hpp"
 #include "nodeflow/core/FlowModule.hpp"
 #include "nodeflow/nodes/EventNode.hpp"
 
@@ -89,7 +88,7 @@ namespace nf
 			});
 		}
 
-		Expected<NodeHandle, Error> spawnNode(const std::string& namePath);
+		ErrorOr<NodeHandle> spawnNode(const std::string& namePath);
 
 		bool removeNode(NodeHandle node);
 
@@ -137,9 +136,9 @@ namespace nf
 
 		bool isUUIDUnique(UUID uuid) const;
 
-		Expected<NodeHandle, Error> createNode(const std::string& namePath);
+		ErrorOr<NodeHandle> createNode(const std::string& namePath);
 
-		Expected<NodeHandle, Error> createVariable(const std::string& namePath);
+		ErrorOr<NodeHandle> createVariable(const std::string& namePath);
 
 		bool debugAllConnectionsRemovedTo(nf::Node* node) const;
 

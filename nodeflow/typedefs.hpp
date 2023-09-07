@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 
-
 #define NF_FUNC_SIGNATURE __FUNCSIG__
 #define NF_FUNC_SIGNATURE_PREFIX '<'
 #define NF_FUNC_SIGNATURE_SUFFIX '>'
@@ -43,9 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef NF_TYPE_ID
 #define NF_TYPE_ID std::uint64_t
 #endif // !NF_TYPE_ID
-
-
-
 
 #ifdef NDEBUG
 #define NF_ASSERT(condition, msg) (void(0))

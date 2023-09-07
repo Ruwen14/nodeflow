@@ -47,7 +47,7 @@ namespace nf
 
 		std::string nodeName() const override;
 
-		Expected<void, Error> setup() override;
+		ErrorOr<void> setup() override;
 
 		void process() override;
 
@@ -79,7 +79,7 @@ namespace nf
 		using OutputPorts_t = ExpandOutputPorts<fieldTypes>::value;
 		static constexpr bool hasFields = std::tuple_size_v<OutputPorts_t> != 0;
 
-		Expected<void, Error> setup() override
+		ErrorOr<void> setup() override
 		{
 			if constexpr (hasFields)
 				std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_eventFields);
