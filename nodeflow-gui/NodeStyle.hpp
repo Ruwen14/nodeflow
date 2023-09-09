@@ -1,10 +1,9 @@
 #pragma once
 
-
 namespace nf
 {
-	class NodeStyle
-	{
-	public:
-	};
-}
+class NodeStyle
+{
+public:
+};
+} // namespace nf

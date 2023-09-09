@@ -1,11 +1,9 @@
 #pragma once
 
-
 namespace nf
 {
-	class NodeGeometry
-	{
-	public:
-
-	};
-}
+class NodeGeometry
+{
+public:
+};
+} // namespace nf

@@ -35,41 +35,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "nodeflow/reflection/type_reflection.hpp"
 
-#define NF_REGISTER_EVENT(EventType)						\
-public:														\
-	static constexpr auto type = nf::type_id<EventType>();	\
-	nf::typeid_t eventType() const override					\
-	{														\
-		return type;										\
-	}														\
+#define NF_REGISTER_EVENT(EventType)                       \
+public:                                                    \
+    static constexpr auto type = nf::type_id<EventType>(); \
+    nf::typeid_t eventType() const override                \
+    {                                                      \
+        return type;                                       \
+    }
 
 // Redo for Events
 namespace nf
 {
-	class FlowEvent
-	{
-		// add static EventID
-	public:
-		FlowEvent() = default;
-		virtual ~FlowEvent() = default;
+class FlowEvent
+{
+    // add static EventID
+public:
+    FlowEvent() = default;
+    virtual ~FlowEvent() = default;
 
-	public:
-		template<typename T>
-		bool isEvent() const
-		{
-			return eventType() == T::type;
-		}
+public:
+    template <typename T>
+    bool isEvent() const
+    {
+        return eventType() == T::type;
+    }
 
-		virtual typeid_t eventType() const = 0;
-	};
+    virtual typeid_t eventType() const = 0;
+};
 
-	template<typename To>
-	To* event_cast(FlowEvent* from)
-	{
-		if (from->eventType() == To::type)
-		{
-			return STATIC_CAST<To*>(from);
-		}
-		return nullptr;
-	}
+template <typename To>
+To* event_cast(FlowEvent* from)
+{
+    if (from->eventType() == To::type)
+    {
+        return STATIC_CAST<To*>(from);
+    }
+    return nullptr;
 }
+} // namespace nf

@@ -34,87 +34,91 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <tuple>
 
-#include "nodeflow/typedefs.hpp"
 #include "nodeflow/core/type_tricks.hpp"
 #include "nodeflow/nodes/FlowNode.hpp"
+#include "nodeflow/typedefs.hpp"
 
 namespace nf
 {
-	class StartEventNode : public FlowNode
-	{
-	public:
-		StartEventNode();
+class StartEventNode : public FlowNode
+{
+public:
+    StartEventNode();
 
-		std::string nodeName() const override;
+    std::string nodeName() const override;
 
-		ErrorOr<void> setup() override;
+    ErrorOr<void> setup() override;
 
-		void process() override;
+    void process() override;
 
-		NodeArchetype getArchetype() const override;
-	};
+    NodeArchetype getArchetype() const override;
+};
 
-	template<typename EventType>
-	class EventNode : public FlowNode
-	{
-	public:
-		using Event_t = EventType;
-		virtual void constructFromEvent(const EventType& event) = 0;
+template <typename EventType>
+class EventNode : public FlowNode
+{
+public:
+    using Event_t = EventType;
+    virtual void constructFromEvent(const EventType& event) = 0;
 
-		NodeArchetype getArchetype() const override
-		{
-			return NodeArchetype::Flow_EventNode;
-		}
+    NodeArchetype getArchetype() const override
+    {
+        return NodeArchetype::Flow_EventNode;
+    }
 
-		void process() override
-		{
-		}
-	};
+    void process() override
+    {
+    }
+};
 
-	template<typename EventType, auto... MemAccessers>
-	class GeneratedEventNode : public EventNode<EventType>
-	{
-	public:
-		using fieldTypes = std::tuple<nf::deduce_member_type_t<decltype(MemAccessers)>...>;
-		using OutputPorts_t = ExpandOutputPorts<fieldTypes>::value;
-		static constexpr bool hasFields = std::tuple_size_v<OutputPorts_t> != 0;
+template <typename EventType, auto... MemAccessers>
+class GeneratedEventNode : public EventNode<EventType>
+{
+public:
+    using fieldTypes = std::tuple<nf::deduce_member_type_t<decltype(MemAccessers)>...>;
+    using OutputPorts_t = ExpandOutputPorts<fieldTypes>::value;
+    static constexpr bool hasFields = std::tuple_size_v<OutputPorts_t> != 0;
 
-		ErrorOr<void> setup() override
-		{
-			if constexpr (hasFields)
-				std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_eventFields);
-			return {};
-		}
+    ErrorOr<void> setup() override
+    {
+        if constexpr (hasFields)
+            std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_eventFields);
+        return {};
+    }
 
-		void constructFromEvent(const EventType& event) override
-		{
-			if constexpr (hasFields)
-				std::apply([&event](auto&&... port) { ((port.value = std::invoke(MemAccessers, event)), ...); }, m_eventFields);
-		}
+    void constructFromEvent(const EventType& event) override
+    {
+        if constexpr (hasFields)
+            std::apply(
+                [&event](auto&&... port) {
+                    ((port.value = std::invoke(MemAccessers, event)), ...);
+                },
+                m_eventFields);
+    }
 
-		bool setFieldNames(const std::vector<std::string_view>& fieldNames)
-		{
-			if constexpr (hasFields)
-			{
-				if (fieldNames.size() < this->m_outputPorts.size())
-				{
-					NF_ASSERT(false, "Event has more fields than provided fieldNames");
-					return false;
-				}
+    bool setFieldNames(const std::vector<std::string_view>& fieldNames)
+    {
+        if constexpr (hasFields)
+        {
+            if (fieldNames.size() < this->m_outputPorts.size())
+            {
+                NF_ASSERT(false, "Event has more fields than provided fieldNames");
+                return false;
+            }
 
-				for (size_t i = 0; i < this->m_outputPorts.size(); i++)
-				{
-					auto& oPort = this->m_outputPorts[i];
-					oPort.setName(std::string(fieldNames[i]));
-				}
+            for (size_t i = 0; i < this->m_outputPorts.size(); i++)
+            {
+                auto& oPort = this->m_outputPorts[i];
+                oPort.setName(std::string(fieldNames[i]));
+            }
 
-				return true;
-			}
-			else
-				return false;
-		}
+            return true;
+        }
+        else
+            return false;
+    }
 
-	public:
-		OutputPorts_t m_eventFields;
-	};
-}
+public:
+    OutputPorts_t m_eventFields;
+};
+} // namespace nf

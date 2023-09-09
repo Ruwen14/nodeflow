@@ -32,214 +32,211 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include <string>
-#include <map>
-#include <set>
-#include <memory>
-#include <type_traits>
 #include <functional>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <type_traits>
 #include <utility>
 
-#include "nodeflow/typedefs.hpp"
-#include "nodeflow/core/type_tricks.hpp"
-#include "nodeflow/utility/Expected.hpp"
 #include "nodeflow/core/Node.hpp"
+#include "nodeflow/core/type_tricks.hpp"
+#include "nodeflow/nodes/ConversionNode.hpp"
 #include "nodeflow/nodes/DataNode.hpp"
+#include "nodeflow/nodes/EventNode.hpp"
 #include "nodeflow/nodes/FlowNode.hpp"
 #include "nodeflow/nodes/FunctorNode.hpp"
-#include "nodeflow/nodes/EventNode.hpp"
-#include "nodeflow/nodes/ConversionNode.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/utility/Expected.hpp"
 
-namespace nf {
-	struct lang
-	{
-		static constexpr auto While = "WhileLoop";
-		static constexpr auto IfElse = "IfElse";
-		static constexpr auto For = "ForLoop";
-	};
+namespace nf
+{
+struct lang
+{
+    static constexpr auto While = "WhileLoop";
+    static constexpr auto IfElse = "IfElse";
+    static constexpr auto For = "ForLoop";
+};
 
-	class Node;
-	class FlowNode;
+class Node;
+class FlowNode;
 
-	using VariableNode = DataNode;
+using VariableNode = DataNode;
 
-	template<typename T>
-	using VariableNodeImpl = DataNodeImpl<T>;
+template <typename T>
+using VariableNodeImpl = DataNodeImpl<T>;
 
-	enum class RegisterError
-	{
-		EmptyNamePath,
-		InvalidNamePath,
-		NameAlreadyRegistered
-	};
+enum class RegisterError
+{
+    EmptyNamePath,
+    InvalidNamePath,
+    NameAlreadyRegistered
+};
 
-	struct InOutPortName
-	{
-		std::string inputName = "Input";
-		std::string outputName = "Output";
-	};
+struct InOutPortName
+{
+    std::string inputName = "Input";
+    std::string outputName = "Output";
+};
 
-	struct FunctorPortNames
-	{
-		std::vector<std::string> inputNames;
-		std::string outputName = "Output";
-	};
+struct FunctorPortNames
+{
+    std::vector<std::string> inputNames;
+    std::string outputName = "Output";
+};
 
-	class FlowModule
-	{
-	public:
-		using FlowNodeCreator = std::function<std::unique_ptr<nf::FlowNode>()>;
-		using DataNodeCreator = std::function<std::unique_ptr<VariableNode>()>;
+class FlowModule
+{
+public:
+    using FlowNodeCreator = std::function<std::unique_ptr<nf::FlowNode>()>;
+    using DataNodeCreator = std::function<std::unique_ptr<VariableNode>()>;
 
-		using FlowNodeRegistry = std::map<std::string, FlowNodeCreator>;
-		using DataNodeRegistry = std::map<std::string, DataNodeCreator>;
+    using FlowNodeRegistry = std::map<std::string, FlowNodeCreator>;
+    using DataNodeRegistry = std::map<std::string, DataNodeCreator>;
 
-	public:
-		FlowModule() = default;
-		explicit FlowModule(const std::string& moduleName)
-			: m_moduleName(moduleName) {}
+public:
+    FlowModule() = default;
+    explicit FlowModule(const std::string& moduleName)
+        : m_moduleName(moduleName)
+    {
+    }
 
-	public:
-		template<typename T>
-		Expected<void, RegisterError> registerType(const std::string& namePath);
+public:
+    template <typename T>
+    Expected<void, RegisterError> registerType(const std::string& namePath);
 
-		template<class Node>
-		Expected<void, RegisterError> registerCustomNode(const std::string& namePath);
+    template <class Node>
+    Expected<void, RegisterError> registerCustomNode(const std::string& namePath);
 
-		template<auto func>
-		Expected<void, RegisterError> registerFunction(const std::string& namePath, const FunctorPortNames& portNames = {});
+    template <auto func>
+    Expected<void, RegisterError> registerFunction(const std::string& namePath);
 
-		template<auto Callable>
-		Expected<void, RegisterError> registerConversion(const std::string& namePath, const InOutPortName& portName = {});
+    template <auto Callable>
+    Expected<void, RegisterError> registerConversion(const std::string& namePath,
+                                                     const InOutPortName& portName = {});
 
-		void setModuleName(const std::string& name);
+    void setModuleName(const std::string& name);
 
-		std::string moduleName() const;
+    std::string moduleName() const;
 
-		const std::set<std::string>& categories() const;
+    std::set<std::string> registered() const;
 
-		std::set<std::string> registered() const;
+    const FlowNodeRegistry& nodeCreators() const;
 
-		const FlowNodeRegistry& nodeCreators() const;
+    const DataNodeRegistry& dataCreators() const;
 
-		const DataNodeRegistry& dataCreators() const;
+private:
+    Expected<std::pair<std::string, std::string>, RegisterError> helperParseNamePath(
+        const std::string& namePath) const;
 
-	private:
+public:
+    std::string m_moduleName;
+    FlowNodeRegistry m_flowNodeCreators; // might use map for reduced memory consumption
+    DataNodeRegistry m_dataNodeCreators;
+};
 
-		Expected<std::pair<std::string, std::string>, RegisterError> helperParseNamePath(const std::string& namePath) const;
+template <typename T>
+Expected<void, RegisterError> FlowModule::registerType(const std::string& namePath)
+{
+    static_assert(!std::is_base_of<nf::Node, T>::value,
+                  "<T> is not allowed to be of base <nf::Node>");
 
-	public:
-		std::string m_moduleName;
-		FlowNodeRegistry m_flowNodeCreators; // might use map for reduced memory consumption
-		DataNodeRegistry m_dataNodeCreators;
-		std::set<std::string> m_categoryNames;
-	};
+    auto parseResult = helperParseNamePath(namePath);
+    if (!parseResult)
+        return make_unexpected(parseResult.error());
 
-	template<typename T>
-	Expected<void, RegisterError> FlowModule::registerType(const std::string& namePath)
-	{
-		static_assert(!std::is_base_of<nf::Node, T>::value, "<T> is not allowed to be of base <nf::Node>");
+    auto& [baseName, categoryName] = parseResult.value();
 
-		auto parseResult = helperParseNamePath(namePath);
-		if (!parseResult)
-			return make_unexpected(parseResult.error());
+    DataNodeImpl<T>::staticNodeName = baseName;
+    auto makerLambda = []() {
+        std::unique_ptr<nf::DataNode> uptr = std::make_unique<DataNodeImpl<T>>();
+        uptr->assignTypeID(type_id<DataNodeImpl<T>>());
+        return uptr;
+    };
 
-		auto& [baseName, categoryName] = parseResult.value();
-
-		if (!categoryName.empty()) m_categoryNames.insert(categoryName);
-
-		DataNodeImpl<T>::staticNodeName = baseName;
-		auto makerLambda = []() {
-			std::unique_ptr<nf::DataNode> uptr = std::make_unique<DataNodeImpl<T>>();
-			uptr->assignTypeID(type_id<DataNodeImpl<T>>());
-			return uptr;
-		};
-
-		m_dataNodeCreators[namePath] = std::move(makerLambda);
-		return {};
-	}
-
-	template<class Node>
-	Expected<void, RegisterError> FlowModule::registerCustomNode(const std::string& namePath)
-	{
-		static_assert(std::is_base_of_v<nf::FlowNode, Node>, "<Node> needs to be of base <nf::FlowNode>");
-
-		auto parseResult = helperParseNamePath(namePath);
-		if (!parseResult)
-			return make_unexpected(parseResult.error());
-
-		auto& [tmp, categoryName] = parseResult.value();
-
-		if (!categoryName.empty()) m_categoryNames.insert(categoryName);
-
-		auto makerLambda = []() {
-			std::unique_ptr<nf::FlowNode> uptr = std::make_unique<Node>();
-			uptr->assignTypeID(type_id<Node>());
-			return uptr;
-		};
-
-		m_flowNodeCreators[namePath] = std::move(makerLambda);
-		return {};
-	}
-
-	template<auto func>
-	Expected<void, RegisterError> FlowModule::registerFunction(const std::string& namePath, const FunctorPortNames& portNames/* = {}*/)
-	{
-		static_assert(!std::is_member_function_pointer<decltype(func)>::value, "Callable must be lambda or free function");
-
-		auto parseResult = helperParseNamePath(namePath);
-		if (!parseResult)
-			return make_unexpected(parseResult.error());
-
-		auto& [baseName, categoryName] = parseResult.value();
-
-		if (!categoryName.empty()) m_categoryNames.insert(categoryName);
-
-		FunctorNode<func>::staticNodeName = baseName;
-		FunctorNode<func>::staticResultPortName = portNames.outputName;
-		if (!portNames.inputNames.empty()) FunctorNode<func>::staticArgPortNames = portNames.inputNames;
-
-		auto makerLambda = []() {
-			std::unique_ptr<nf::FlowNode> uptr = std::make_unique<FunctorNode<func>>();
-			uptr->assignTypeID(type_id<FunctorNode<func>>());
-			return uptr;
-		};
-
-		m_flowNodeCreators[namePath] = std::move(makerLambda);
-
-		return {};
-	}
-
-	template<auto Callable>
-	Expected<void, RegisterError> FlowModule::registerConversion(const std::string& namePath, const InOutPortName& portName/* = {}*/)
-	{
-		static_assert(!std::is_member_function_pointer<decltype(Callable)>::value, "Callable must be lambda or free function");
-		auto parseResult = helperParseNamePath(namePath);
-		if (!parseResult)
-			return make_unexpected(parseResult.error());
-
-		auto& [baseName, categoryName] = parseResult.value();
-
-		if (!categoryName.empty()) m_categoryNames.insert(categoryName);
-
-		using FSig_t = FuncSignature<decltype(std::function{ Callable }) > ;
-		using To_t = FSig_t::ReturnType_t;
-		using From_ts = FSig_t::ParamTypes_t;
-		static_assert(std::tuple_size_v<From_ts> == 1, "Callable must be of signature: 'ToType Callable(FromType)'");
-		using From_t = std::tuple_element_t<0, From_ts>; // top-most const already removed;
-
-		ConversionNodeImpl<From_t, To_t, Callable>::staticNodeName = baseName;
-		ConversionNodeImpl<From_t, To_t, Callable>::staticInputPortName = portName.inputName;
-		ConversionNodeImpl<From_t, To_t, Callable>::staticOutputPortName = portName.outputName;
-
-		auto makerLambda = []() {
-			std::unique_ptr<nf::FlowNode> uptr = std::make_unique<ConversionNodeImpl<From_t, To_t, Callable>>();
-			uptr->assignTypeID(type_id<ConversionNodeImpl<From_t, To_t, Callable>>());
-			return uptr;
-		};
-
-		m_flowNodeCreators[namePath] = std::move(makerLambda);
-
-		return {};
-	}
+    m_dataNodeCreators[namePath] = std::move(makerLambda);
+    return {};
 }
+
+template <class Node>
+Expected<void, RegisterError> FlowModule::registerCustomNode(const std::string& namePath)
+{
+    static_assert(std::is_base_of_v<nf::FlowNode, Node>,
+                  "<Node> needs to be of base <nf::FlowNode>");
+
+    auto parseResult = helperParseNamePath(namePath);
+    if (!parseResult)
+        return make_unexpected(parseResult.error());
+
+    auto& [tmp, categoryName] = parseResult.value();
+
+    auto makerLambda = []() {
+        std::unique_ptr<nf::FlowNode> uptr = std::make_unique<Node>();
+        uptr->assignTypeID(type_id<Node>());
+        return uptr;
+    };
+
+    m_flowNodeCreators[namePath] = std::move(makerLambda);
+    return {};
+}
+
+template <auto func>
+nf::Expected<void, nf::RegisterError> FlowModule::registerFunction(const std::string& namePath)
+{
+    static_assert(!std::is_member_function_pointer<decltype(func)>::value,
+                  "Callable must be lambda or free function");
+
+    if (namePath.empty())
+        return make_unexpected(RegisterError::EmptyNamePath);
+
+    if (m_flowNodeCreators.contains(namePath) || m_dataNodeCreators.contains(namePath))
+        return make_unexpected(RegisterError::NameAlreadyRegistered);
+
+    FunctorNode<func>::staticNodeName = namePath;
+
+    auto makerLambda = []() {
+        std::unique_ptr<nf::FlowNode> uptr = std::make_unique<FunctorNode<func>>();
+        return uptr;
+    };
+
+    m_flowNodeCreators[namePath] = std::move(makerLambda);
+
+    return {};
+}
+
+template <auto Callable>
+Expected<void, RegisterError> FlowModule::registerConversion(
+    const std::string& namePath, const InOutPortName& portName /* = {}*/)
+{
+    static_assert(!std::is_member_function_pointer<decltype(Callable)>::value,
+                  "Callable must be lambda or free function");
+    auto parseResult = helperParseNamePath(namePath);
+    if (!parseResult)
+        return make_unexpected(parseResult.error());
+
+    auto& [baseName, categoryName] = parseResult.value();
+
+    using FSig_t = FuncSignature<decltype(std::function{ Callable })>;
+    using To_t = FSig_t::ReturnType_t;
+    using From_ts = FSig_t::ParamTypes_t;
+    static_assert(std::tuple_size_v<From_ts> == 1,
+                  "Callable must be of signature: 'ToType Callable(FromType)'");
+    using From_t = std::tuple_element_t<0, From_ts>; // top-most const already removed;
+
+    ConversionNodeImpl<From_t, To_t, Callable>::staticNodeName = baseName;
+    ConversionNodeImpl<From_t, To_t, Callable>::staticInputPortName = portName.inputName;
+    ConversionNodeImpl<From_t, To_t, Callable>::staticOutputPortName = portName.outputName;
+
+    auto makerLambda = []() {
+        std::unique_ptr<nf::FlowNode> uptr =
+            std::make_unique<ConversionNodeImpl<From_t, To_t, Callable>>();
+        uptr->assignTypeID(type_id<ConversionNodeImpl<From_t, To_t, Callable>>());
+        return uptr;
+    };
+
+    m_flowNodeCreators[namePath] = std::move(makerLambda);
+
+    return {};
+}
+} // namespace nf

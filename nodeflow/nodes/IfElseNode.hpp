@@ -33,31 +33,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "nodeflow/typedefs.hpp"
 #include "nodeflow/core/Node.hpp"
 #include "nodeflow/nodes/FlowNode.hpp"
+#include "nodeflow/typedefs.hpp"
 
 namespace nf
 {
-	class IfElseNode : public FlowNode
-	{
-	public:
-		IfElseNode();
+class IfElseNode : public FlowNode
+{
+public:
+    IfElseNode();
 
-		std::string nodeName() const override;
+    std::string nodeName() const override;
 
-		NodeArchetype getArchetype() const override;
+    NodeArchetype getArchetype() const override;
 
-		ErrorOr<void> setup() override;
+    ErrorOr<void> setup() override;
 
-		void process() override;
+    void process() override;
 
-		void setExecFlowIf(FlowNode& node);
+    void setExecFlowIf(FlowNode& node);
 
-		void setExecFlowElse(FlowNode& node);
+    void setExecFlowElse(FlowNode& node);
 
-	private:
-		InputPort<bool> m_condition;
-		ExecutionLink m_linkExitElse;
-	};
-}
+private:
+    InputPort<bool> m_condition;
+    ExecutionLink m_linkExitElse;
+};
+} // namespace nf

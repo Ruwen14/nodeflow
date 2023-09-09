@@ -33,59 +33,66 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include "nodeflow/utility/Singleton.hpp"
-#include "nodeflow/typedefs.hpp"
 #include "nodeflow/reflection/type_reflection.hpp"
+#include "nodeflow/typedefs.hpp"
+#include "nodeflow/utility/Singleton.hpp"
 
 namespace nf
 {
-	class TypenameAtlas : public Singleton<TypenameAtlas>
-	{
-	public:
-		using atlas_t = std::unordered_map<typeid_t, std::string>;
+class TypenameAtlas : public Singleton<TypenameAtlas>
+{
+  public:
+    using atlas_t = std::unordered_map<typeid_t, std::string>;
 
-	public:
-		TypenameAtlas() = default;
+  public:
+    TypenameAtlas() = default;
 
-		template<typename Type>
-		bool add()
-		{
-			auto id = type_id<Type>();
-			auto typeName = type_name<Type>();
-			if (m_atlas.contains(id))
-			{
-				NF_ASSERT(m_atlas.at(id) == typeName, "Hash collision of function: type_name<T>() detected. Please fix affected type name");
-				return false;
-			}
-			m_atlas[id] = typeName;
-			return true;
-		}
+    template <typename Type>
+    bool add()
+    {
+        auto id = type_id<Type>();
+        auto typeName = type_name<Type>();
+        if (m_atlas.contains(id))
+        {
+            NF_ASSERT(m_atlas.at(id) == typeName,
+                      "Hash collision of function: type_name<T>() detected. Please fix affected type name");
+            return false;
+        }
+        m_atlas[id] = typeName;
+        return true;
+    }
 
-		template<typename Type>
-		inline const std::string& get() const
-		{
-			return m_atlas.at(type_id<Type>());
-		}
+    template <typename Type>
+    inline const std::string &get() const
+    {
+        return m_atlas.at(type_id<Type>());
+    }
 
-		inline const std::string& get(typeid_t id) const
-		{
-			return m_atlas.at(id);
-		}
+    inline const std::string &get(typeid_t id) const
+    {
+        return m_atlas.at(id);
+    }
 
-		inline bool contains(typeid_t id) const { return m_atlas.contains(id); }
+    inline bool contains(typeid_t id) const
+    {
+        return m_atlas.contains(id);
+    }
 
-		inline const atlas_t& atlas() const { return m_atlas; }
+    inline const atlas_t &atlas() const
+    {
+        return m_atlas;
+    }
 
-		std::set<std::string> listTypenames() const;
+    std::set<std::string> listTypenames() const;
 
-		bool hasDuplicates() const;
+    bool hasDuplicates() const;
 
-	private:
-		atlas_t m_atlas{};
-	};
-}
+  private:
+    atlas_t m_atlas{};
+};
+} // namespace nf

@@ -33,53 +33,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "type_reflection.hpp"
 #include "../core/type_tricks.hpp"
+#include "type_reflection.hpp"
 
-
-namespace  nf
+namespace nf
 {
-	template<auto Func>
-	struct reflfunc
-	{
-		
-		using signature_t = typename nf::FuncSignature<decltype(std::function{ Func }) > ;
-		using return_t = signature_t::ReturnType_t;
-		using argument_ts = signature_t::ParamTypes_t;
+template <auto Func>
+struct reflfunc
+{
+    using signature_t = typename nf::FuncSignature<decltype(std::function{ Func })>;
+    using return_t = signature_t::ReturnType_t;
+    using argument_ts = signature_t::ParamTypes_t;
 
+    static constexpr bool ismethod() noexcept
+    {
+        return std::is_member_function_pointer_v<decltype(Func)>();
+    }
 
-		static constexpr bool ismethod() noexcept
-		{
-			return std::is_member_function_pointer_v<decltype(Func)>();
-		}
+    static constexpr typeid_t id() noexcept
+    {
+        return 123;
+    }
 
-		static constexpr typeid_t id() noexcept
-		{
-			return 123;
-		}
+    static constexpr auto name() noexcept
+    {
+        return "";
+    }
 
+    static constexpr auto returnTypeName() noexcept
+    {
+        return nf::type_name<return_t>();
+    }
 
-		static constexpr auto name() noexcept
-		{
-			return "";
-		}
+    static constexpr auto argTypeNames() noexcept
+    {
+        return nf::refltypes<argument_ts>::names();
+    }
 
-		static constexpr auto returnTypeName() noexcept
-		{
-			return nf::type_name<return_t>();
-		}
-
-		static constexpr auto argTypeNames() noexcept
-		{
-			return nf::refltypes<argument_ts>::names();
-		}
-
-		static constexpr auto argCount() noexcept
-		{
-			return std::tuple_size_v<argument_ts>;
-		}
-
-
-	};
-}
-
+    static constexpr auto argCount() noexcept
+    {
+        return std::tuple_size_v<argument_ts>;
+    }
+};
+} // namespace nf

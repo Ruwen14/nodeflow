@@ -288,12 +288,13 @@ public:
 
 int main(int argc, char* argv[])
 {
-	constexpr auto a = 12;
+	constexpr auto a = 15;
 	constexpr auto k = nf::type_id<int>();
 
 	qsrand(QDateTime::currentDateTime().toTime_t());
 
 	QApplication app(argc, argv);
+
 	app.setStyle("Fusion");
 	//
 	setStyleMode("darkmode");

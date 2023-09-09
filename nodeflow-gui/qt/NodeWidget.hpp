@@ -33,13 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-
 namespace nf::qt
 {
-	class QtNodeWidget;
+class QtNodeWidget;
 
-	class QtFlowNodeWidget;
+class QtFlowNodeWidget;
 
-	class QtDataNodeWidget;
-
-}
+class QtDataNodeWidget;
+} // namespace nf::qt

@@ -33,64 +33,63 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <string>
 #include <chrono>
 #include <iostream>
+#include <string>
 
 namespace nf
 {
-	template<typename Accuracy>
-	class Timer
-	{
-		using DurationAccuracy = Accuracy;
+template <typename Accuracy>
+class Timer
+{
+    using DurationAccuracy = Accuracy;
 
-	public:
-		Timer() { tic(); }
+public:
+    Timer()
+    {
+        tic();
+    }
 
-		inline void tic()
-		{
-			start_ = std::chrono::high_resolution_clock::now();
-		}
+    inline void tic()
+    {
+        start_ = std::chrono::high_resolution_clock::now();
+    }
 
-		inline void toc() const
-		{
-			auto now = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, DurationAccuracy> el_double = now - start_;
-			std::cout << "[Finished in " << el_double.count() <<"]\n";
-		}
+    inline void toc() const
+    {
+        auto now = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, DurationAccuracy> el_double = now - start_;
+        std::cout << "[Finished in " << el_double.count() << "]\n";
+    }
 
-		inline void toc(double& out) const
-		{
-			auto now = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, DurationAccuracy> el_double = now - start_;
-			out = el_double.count();
-		}
+    inline void toc(double& out) const
+    {
+        auto now = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, DurationAccuracy> el_double = now - start_;
+        out = el_double.count();
+    }
 
-	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> start_;
-	};
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_;
+};
 
-	template<typename Accuracy = std::micro>
-	class ScopedTimer
-	{
-	public:
-		ScopedTimer()
-		{
-			start_ = std::chrono::high_resolution_clock::now();
-		}
+template <typename Accuracy = std::micro>
+class ScopedTimer
+{
+public:
+    ScopedTimer()
+    {
+        start_ = std::chrono::high_resolution_clock::now();
+    }
 
-		~ScopedTimer()
-		{
-			auto now = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, Accuracy> el_double = now - start_;
-			std::cout << "[Finished in " << el_double.count() << "]\n";
-		}
+    ~ScopedTimer()
+    {
+        auto now = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, Accuracy> el_double = now - start_;
+        std::cout << "[Finished in " << el_double.count() << "]\n";
+    }
 
-	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> start_;
-	};
-
-
-
-
-}
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_;
+};
+} // namespace nf

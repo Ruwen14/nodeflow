@@ -37,48 +37,65 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace nf
 {
-	enum class FlowDirection
-	{
-		Before,
-		Next
-	};
+enum class FlowDirection
+{
+    Before,
+    Next
+};
 
-	class FlowNode : public Node
-	{
-	public:
-		NodeArchetype getArchetype() const override;
+class FlowNode : public Node
+{
+public:
+    NodeArchetype getArchetype() const override;
 
-		std::string nodeName() const override;
+    std::string nodeName() const override;
 
-		bool onEvent(FlowEvent* event) override;
+    bool onEvent(FlowEvent* event) override;
 
-		inline void setExecNext(FlowNode& next) { m_outExecPort.execLink.makeLink(&next); forceNextExec(next); }
+    inline void setExecNext(FlowNode& next)
+    {
+        m_outExecPort.execLink.makeLink(&next);
+        forceNextExec(next);
+    }
 
-		inline void setExecBefore(FlowNode& before) { m_inExecPort.execLink.makeLink(&before); }
+    inline void setExecBefore(FlowNode& before)
+    {
+        m_inExecPort.execLink.makeLink(&before);
+    }
 
-		inline void forceNextExec(FlowNode& next) { m_nextExec = &next; }
+    inline void forceNextExec(FlowNode& next)
+    {
+        m_nextExec = &next;
+    }
 
-		inline FlowNode* getExecNext() const noexcept { return m_outExecPort.execLink.targetNode; }
+    inline FlowNode* getExecNext() const noexcept
+    {
+        return m_outExecPort.execLink.targetNode;
+    }
 
-		inline FlowNode* getExecBefore() const noexcept { return m_inExecPort.execLink.targetNode; }
+    inline FlowNode* getExecBefore() const noexcept
+    {
+        return m_inExecPort.execLink.targetNode;
+    }
 
-		void breakFlow(FlowDirection dir);
+    void breakFlow(FlowDirection dir);
 
-	public:
-		FlowPort& defaultFlowPort(FlowDirection dir);
+public:
+    FlowPort& defaultFlowPort(FlowDirection dir);
 
-		bool hasAdditionalFlowPorts() const;
+    bool hasAdditionalFlowPorts() const;
 
-		virtual std::vector<FlowPort*> additionalFlowPorts() const;
+    virtual std::vector<FlowPort*> additionalFlowPorts() const;
 
-		virtual std::string flowPortName(FlowDirection dir, PortIndex index) const;
+    virtual std::string flowPortName(FlowDirection dir, PortIndex index) const;
 
-	private:
-		FlowPort m_inExecPort;
-		FlowPort m_outExecPort;
-		// Optional. Used when we have multiple Output-FlowLinks
-		// and need to change which node is executed next during execution (ex. Branches, Loops)
-		FlowNode* m_nextExec = nullptr;
-		// 		FlowLink m_nextExec;
-	};
-}
+private:
+    FlowPort m_inExecPort;
+    FlowPort m_outExecPort;
+    // Optional. Used when we have multiple Output-FlowLinks
+    // and need to change which node is executed next during execution (ex.
+    // Branches, Loops)
+    FlowNode* m_nextExec = nullptr;
+    // 		FlowLink m_nextExec;
+};
+} // namespace nf

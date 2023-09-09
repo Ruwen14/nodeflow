@@ -36,79 +36,81 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace nf::detail
 {
-	class DataHandle
-	{
-	public:
-		DataHandle() = default;
+class DataHandle
+{
+public:
+    DataHandle() = default;
 
-		template<typename T>
-		DataHandle(T& data, typeid_t typeID)
-			: m_typeid(typeID), m_dataptr(static_cast<void*>(&data))
-		{
-		}
+    template <typename T>
+    DataHandle(T& data, typeid_t typeID)
+        : m_typeid(typeID)
+        , m_dataptr(static_cast<void*>(&data))
+    {
+    }
 
-		template<typename Type>
-		Type* getMutable()
-		{
-			static constexpr typeid_t targetID = nf::type_id<Type>();
-			if (m_typeid != targetID)
-			{
-				return nullptr;
-			}
-			return static_cast<Type*>(m_dataptr);
-		}
+    template <typename Type>
+    Type* getMutable()
+    {
+        static constexpr typeid_t targetID = nf::type_id<Type>();
+        if (m_typeid != targetID)
+        {
+            return nullptr;
+        }
+        return static_cast<Type*>(m_dataptr);
+    }
 
-		template<typename Type>
-		const Type* get() const
-		{
-			static constexpr typeid_t targetID = nf::type_id<Type>();
-			if (m_typeid != targetID)
-			{
-				return nullptr;
-			}
-			return static_cast<const Type*>(m_dataptr);
-		}
+    template <typename Type>
+    const Type* get() const
+    {
+        static constexpr typeid_t targetID = nf::type_id<Type>();
+        if (m_typeid != targetID)
+        {
+            return nullptr;
+        }
+        return static_cast<const Type*>(m_dataptr);
+    }
 
-		template<typename T> void assign(T& data, typeid_t typeID)
-		{
-			m_typeid = typeID;
-			m_dataptr = static_cast<void*>(&data);
-		}
+    template <typename T>
+    void assign(T& data, typeid_t typeID)
+    {
+        m_typeid = typeID;
+        m_dataptr = static_cast<void*>(&data);
+    }
 
-		const void* data() const noexcept
-		{
-			return m_dataptr;
-		}
+    const void* data() const noexcept
+    {
+        return m_dataptr;
+    }
 
-		inline bool valid() const noexcept
-		{
-			return m_dataptr != nullptr && m_typeid != 0;
-		}
+    inline bool valid() const noexcept
+    {
+        return m_dataptr != nullptr && m_typeid != 0;
+    }
 
-		operator bool() const noexcept
-		{
-			return valid();
-		}
+    operator bool() const noexcept
+    {
+        return valid();
+    }
 
-		void reset()
-		{
-			m_typeid = 0;
-			m_dataptr = nullptr;
-		}
+    void reset()
+    {
+        m_typeid = 0;
+        m_dataptr = nullptr;
+    }
 
-		template<typename Type>
-		bool isType() const
-		{
-			return (valid() && m_typeid == nf::type_id<Type>());
-		}
+    template <typename Type>
+    bool isType() const
+    {
+        return (valid() && m_typeid == nf::type_id<Type>());
+    }
 
-		inline typeid_t typeID() const noexcept
-		{
-			return m_typeid;
-		}
+    inline typeid_t typeID() const noexcept
+    {
+        return m_typeid;
+    }
 
-	public:
-		typeid_t m_typeid = 0;
-		void* m_dataptr = nullptr;
-	};
-}
+public:
+    typeid_t m_typeid = 0;
+    void* m_dataptr = nullptr;
+};
+} // namespace nf::detail

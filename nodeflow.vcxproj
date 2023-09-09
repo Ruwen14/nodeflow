@@ -246,6 +246,9 @@
     <Natvis Include="3rdparty\entt\natvis\entt\signal.natvis" />
     <Natvis Include="3rdparty\entt\natvis\NatvisFile.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-format" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

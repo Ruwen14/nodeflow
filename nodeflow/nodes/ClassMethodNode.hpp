@@ -35,36 +35,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "nodes/FunctorNode.hpp"
 
-template<auto method>
+template <auto method>
 class ClassMethodNode : public FlowNode
 {
 public:
-	using MSig_t = nf::FuncSignature<std::function<decltype(method)>>;
-	using MClass_t = MSig_t::ClassType_t;
-	using MReturn_T = MSig_t::ReturnType_t;
-	using MArgument_ts = MSig_t::ParamTypes_t;
-
+    using MSig_t = nf::FuncSignature<std::function<decltype(method)>>;
+    using MClass_t = MSig_t::ClassType_t;
+    using MReturn_T = MSig_t::ReturnType_t;
+    using MArgument_ts = MSig_t::ParamTypes_t;
 
 public:
-	InputPort<MClass_t> m_thisPort;
+    InputPort<MClass_t> m_thisPort;
 };
 
-
-
-// 
-// 
+//
+//
 // template<auto method, class clazz>
 // class TestFunctor
 // {
 // public:
-// 
-// 
+//
+//
 // 	TestFunctor(const TestClass& clazz)
 // 		: c(clazz)
 // 	{
-// 
+//
 // 	}
-// 
+//
 // 	void process()
 // 	{
 // 		auto e = std::invoke(method, c);
@@ -73,31 +70,24 @@ public:
 // 	clazz c;
 // };
 
-
-
-
-
-
-
-
 // template<class class_>
 // class ClassNodeBuilder
 // {
 // public:
 // 	using classType = class_;
-// 
-// 
+//
+//
 // 	template<auto member>
 // 	auto& property(std::string_view name)
 // 	{
 // 		using memberType = nf::deduce_member_type<decltype(member)>::type;
 // 		return *this;
 // 	}
-// 
+//
 // 	template<auto func>
 // 	auto& method(std::string_view name)
 // 	{
 // 		return *this;
 // 	}
-// 
+//
 // };

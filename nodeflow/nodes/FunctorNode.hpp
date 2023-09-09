@@ -32,157 +32,156 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include <vector>
-#include <string>
 #include <format>
+#include <string>
+#include <vector>
 
-#include "nodeflow/typedefs.hpp"
 #include "nodeflow/core/Node.hpp"
-#include "nodeflow/nodes/FlowNode.hpp"
 #include "nodeflow/core/type_tricks.hpp"
+#include "nodeflow/nodes/FlowNode.hpp"
+#include "nodeflow/typedefs.hpp"
 
 namespace nf
 {
-	template<auto Func>
-	class FunctorNode : public FlowNode
-	{
-	public:
-		static std::string staticNodeName;
-		static std::string staticResultPortName;
-		static std::vector<std::string> staticArgPortNames;
+template <auto Func>
+class FunctorNode : public FlowNode
+{
+public:
+    using FSig_t = typename FuncSignature<decltype(std::function{ Func })>;
+    using FReturn_t = FSig_t::ReturnType_t;
+    using FArgument_ts = FSig_t::ParamTypes_t;
+    using InputPorts_t = ExpandInputPorts<FArgument_ts>::value;
 
-	public:
-		using FSig_t = typename FuncSignature<decltype(std::function{ Func }) > ;
-		using FReturn_t = FSig_t::ReturnType_t;
-		using FArgument_ts = FSig_t::ParamTypes_t;
-		using InputPorts_t = ExpandInputPorts<FArgument_ts>::value;
+    static constexpr bool hasInputs = std::tuple_size_v<InputPorts_t> != 0;
+    static constexpr bool hasOutput = !std::is_void_v<FReturn_t>;
 
-		static constexpr bool hasInputs = std::tuple_size_v<InputPorts_t> != 0;
-		static constexpr bool hasOutput = !std::is_void_v<FReturn_t>;
+    static std::string staticNodeName;
 
-	public:
+public:
+    std::string nodeName() const override
+    {
+        return staticNodeName;
+    }
 
-		std::string nodeName() const override
-		{
-			return staticNodeName;
-		}
+    typeid_t nodeType() const override
+    {
+        return type_id<FunctorNode<Func>>();
+    }
 
-		NodeArchetype getArchetype() const final
-		{
-			return NodeArchetype::Flow_FunctorNode;
-		}
+    NodeArchetype getArchetype() const final
+    {
+        return NodeArchetype::Flow_FunctorNode;
+    }
 
-		std::string portName(PortDirection dir, PortIndex index) const override
-		{
-			if (dir == PortDirection::Input)
-			{
-				NF_ASSERT(index < m_inputPorts.size(), "Port index out of range");
-				if (!(index < staticArgPortNames.size()))
-					return "";
-				return staticArgPortNames.at(index);
-			}
+    std::string portName(PortDirection dir, PortIndex index) const override
+    {
+        NF_ASSERT(index >= 0, "Invalid index");
 
-			if (dir == PortDirection::Output)
-			{
-				NF_ASSERT(index < m_outputPorts.size(), "Port index out of range");
-				return staticResultPortName;
-			}
-			return "";
-		}
+        switch (dir)
+        {
+        case nf::PortDirection::Input:
+            if (!(index < m_inputPorts.size()))
+                return "";
+            return "Input " + std::to_string(index);
+        case nf::PortDirection::Output:
+            if (!(index < m_outputPorts.size()))
+                return "";
+            return "Return Value";
+        default:
+            NF_ASSERT(false, "Unreachable Error");
+            break;
+        }
+        return "";
+    }
 
-		bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) override
-		{
-			if (index != 0)
-				return false;
+    bool setOutputDataFromString(PortIndex index, const std::string& val) override
+    {
+        if (index != 0)
+            return false;
 
-			if (flag == StreamFlag::WriteTo)
-				return m_resultPort.serialize(archive);
-			return m_resultPort.deserialize(archive);
-		}
+        return m_resultPort.setValueFromString(val);
+    }
 
-		ErrorOr<void> setup() override
-		{
-			if constexpr (hasInputs)
-				std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_argumentPorts);
+    std::optional<std::string> getOutputDataAsString(PortIndex index) override
+    {
+        if (index != 0)
+            return std::nullopt;
 
-			if constexpr (hasOutput)
-				addPort(m_resultPort);
+        return m_resultPort.getValueAsString();
+    }
 
-			return {};
-		}
+    bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) override
+    {
+        if (index != 0)
+            return false;
 
-		template<typename T>
-		auto getInputStuff(nf::InputPort<T>& port)
-		{
-			int d = 4;
-			int a = port.index() - +7 + d;
-			NF_UNUSED(port);
-			return a;
-		}
+        if (flag == StreamFlag::WriteTo)
+            return m_resultPort.serialize(archive);
+        return m_resultPort.deserialize(archive);
+    }
 
-		template <class Func, class Tuple, size_t... seq>
-		constexpr decltype(auto) applyPortsOnCallable_Impl(Func&& callable, Tuple&& tupl, std::index_sequence<seq...>)
-		{
-			return std::invoke(std::forward<Func>(callable),
-				*getInputData(std::get<seq>(std::forward<Tuple>(tupl)))...);
-		}
+    ErrorOr<void> setup() override
+    {
+        if constexpr (hasInputs)
+            std::apply([this](auto&... port) { (this->addPort(port), ...); }, m_argumentPorts);
 
-		template <class Func, class Tuple>
-		constexpr decltype(auto) applyPortsOnCallable(Func&& callable, Tuple&& tupl)
-		{
-			return applyPortsOnCallable_Impl(std::forward<Func>(callable), std::forward<Tuple>(tupl),
-				std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<Tuple>>>{});
-		}
+        if constexpr (hasOutput)
+            addPort(m_resultPort);
 
-		ErrorOr<void> onBuild() override
-		{
-			if constexpr (hasInputs)
-			{
-				for (const auto& iPort : m_inputPorts)
-				{
-					if (!iPort.link().valid())
-					{
-						return make_unexpected(
-							Error(std::format("Build failed for Node '{}': one or more InputPort(s) not connected ",
-								nodeName()), 120
-							)
-						);
-					}
-				}
-			}
-			return {};
-		}
+        return {};
+    }
 
-		void process() override
-		{
-			// Move to onCompile() / inBuild() override to save performance;
-			for (const auto& port : m_inputPorts)
-				NF_ASSERT(port.link().valid(), "InputPort not connected");
+    template <typename T>
+    auto getInputStuff(nf::InputPort<T>& port)
+    {
+        int d = 4;
+        int a = port.index() - +7 + d;
+        NF_UNUSED(port);
+        return a;
+    }
 
-			if constexpr (hasInputs && hasOutput)
-				m_resultPort.value = applyPortsOnCallable(Func, m_argumentPorts);
+    template <class Func, class Tuple, size_t... seq>
+    constexpr decltype(auto) applyPortsOnCallable_Impl(Func&& callable,
+                                                       Tuple&& tupl,
+                                                       std::index_sequence<seq...>)
+    {
+        return std::invoke(std::forward<Func>(callable),
+                           *getInputData(std::get<seq>(std::forward<Tuple>(tupl)))...);
+    }
 
-			else if constexpr (hasInputs && !hasOutput)
-				applyPortsOnCallable(Func, m_argumentPorts);
+    template <class Func, class Tuple>
+    constexpr decltype(auto) applyPortsOnCallable(Func&& callable, Tuple&& tupl)
+    {
+        return applyPortsOnCallable_Impl(
+            std::forward<Func>(callable),
+            std::forward<Tuple>(tupl),
+            std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<Tuple>>>{});
+    }
 
-			else if constexpr (!hasInputs && hasOutput)
-				m_resultPort.value = Func();
+    void process() override
+    {
+        // Move to onCompile() / inBuild() override to save performance;
+        for (const auto& port : m_inputPorts)
+            NF_ASSERT(port.link().valid(), "InputPort not connected");
 
-			else
-				Func();
-		}
+        if constexpr (hasInputs && hasOutput)
+            m_resultPort.value = applyPortsOnCallable(Func, m_argumentPorts);
 
-	public:
-		InputPorts_t m_argumentPorts;
-		OutputPort<FReturn_t> m_resultPort;
-	};
+        else if constexpr (hasInputs && !hasOutput)
+            applyPortsOnCallable(Func, m_argumentPorts);
 
-	template<auto Func>
-	std::string FunctorNode<Func>::staticNodeName = "FunctorNode";
+        else if constexpr (!hasInputs && hasOutput)
+            m_resultPort.value = Func();
 
-	template<auto Func>
-	std::string FunctorNode<Func>::staticResultPortName = "Result";
+        else
+            Func();
+    }
 
-	template<auto Func>
-	std::vector<std::string> FunctorNode<Func>::staticArgPortNames;
-}
+public:
+    InputPorts_t m_argumentPorts;
+    OutputPort<FReturn_t> m_resultPort;
+};
+
+template <auto Func>
+std::string FunctorNode<Func>::staticNodeName = "FunctorNode";
+} // namespace nf

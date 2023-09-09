@@ -37,56 +37,81 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "nodeflow/utility/Expected.hpp"
 
-namespace nf {
-	class Error {
-	public:
-		Error(int code)
-			: m_code(code)
-		{}
+namespace nf
+{
+class Error
+{
+public:
+    Error(int code)
+        : m_code(code)
+    {
+    }
 
-		Error(const std::string& msg)
-			: m_message(msg)
-		{}
+    Error(const std::string& msg)
+        : m_message(msg)
+    {
+    }
 
-		Error(const std::string& msg, int code)
-			: m_message(msg)
-			, m_code(code)
-		{}
+    Error(const std::string& msg, int code)
+        : m_message(msg)
+        , m_code(code)
+    {
+    }
 
-	public:
-		[[nodiscard]] static Error fromCode(int code) { return Error(code); }
+public:
+    [[nodiscard]] static Error fromCode(int code)
+    {
+        return Error(code);
+    }
 
-		[[nodiscard]] static Error fromMessage(const std::string& msg) { return Error(msg); }
+    [[nodiscard]] static Error fromMessage(const std::string& msg)
+    {
+        return Error(msg);
+    }
 
-		bool hasCode() const { return m_code != 0; }
+    bool hasCode() const
+    {
+        return m_code != 0;
+    }
 
-		bool hasMessage() const { return !m_message.empty(); }
+    bool hasMessage() const
+    {
+        return !m_message.empty();
+    }
 
-		int code() const { return m_code; }
+    int code() const
+    {
+        return m_code;
+    }
 
-		std::string message() const { return m_message; }
+    std::string message() const
+    {
+        return m_message;
+    }
 
-		bool operator ==(const Error& other) const
-		{
-			return ((m_code == other.m_code) && (m_message == other.m_message));
-		}
+    bool operator==(const Error& other) const
+    {
+        return ((m_code == other.m_code) && (m_message == other.m_message));
+    }
 
-	private:
-		std::string m_message;
-		int m_code = 0;
-	};
+private:
+    std::string m_message;
+    int m_code = 0;
+};
 
-	template<typename T>
-	using ErrorOr = nf::Expected<T, Error>;
-}
+template <typename T>
+using ErrorOr = nf::Expected<T, Error>;
+} // namespace nf
 
-template<class CharT>
-struct std::formatter<nf::Error, CharT> : std::formatter<CharT> {
-	// parse() is inherited from the base class
+template <class CharT>
+struct std::formatter<nf::Error, CharT> : std::formatter<CharT>
+{
+    // parse() is inherited from the base class
 
-	// Define format() by calling the base class implementation with the wrapped value
-	template<class FormatContext>
-	auto format(const nf::Error& error, FormatContext& fc) const {
-		return std::format_to(fc.out(), "Error[{}]: {}", error.code(), error.message());
-	}
+    // Define format() by calling the base class implementation with the wrapped value
+    template <class FormatContext>
+    auto format(const nf::Error& error, FormatContext& fc) const
+    {
+        return std::format_to(fc.out(), "Error[{}]: {}", error.code(), error.message());
+    }
 };

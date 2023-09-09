@@ -33,108 +33,112 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "nodeflow/typedefs.hpp"
 #include "nodeflow/nodes/FlowNode.hpp"
+#include "nodeflow/typedefs.hpp"
 
 namespace nf
 {
-	enum class ConversionPolicy
-	{
-		DontAddConversion,
-		AddConversionIfNeeded
-	};
+enum class ConversionPolicy
+{
+    DontAddConversion,
+    AddConversionIfNeeded
+};
 
-	class ConversionNode : public FlowNode
-	{
-	public:
-		std::string nodeName() const override;
+class ConversionNode : public FlowNode
+{
+public:
+    std::string nodeName() const override;
 
-		NodeArchetype getArchetype() const final;
+    NodeArchetype getArchetype() const final;
 
-		typeid_t from() const;
-		typeid_t to() const;
-	};
+    typeid_t from() const;
+    typeid_t to() const;
+};
 
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	class ConversionNodeImpl : public ConversionNode
-	{
-	public:
-		static std::string staticNodeName;
-		static std::string staticInputPortName;
-		static std::string staticOutputPortName;
+template <typename FromType, typename ToType, auto ConversionCallable>
+class ConversionNodeImpl : public ConversionNode
+{
+public:
+    static std::string staticNodeName;
+    static std::string staticInputPortName;
+    static std::string staticOutputPortName;
 
-	public:
-		ConversionNodeImpl();
+public:
+    ConversionNodeImpl();
 
-		std::string nodeName() const override;
+    std::string nodeName() const override;
 
-		std::string portName(PortDirection dir, PortIndex index) const override;
+    std::string portName(PortDirection dir, PortIndex index) const override;
 
-		ErrorOr<void> setup() override;
+    ErrorOr<void> setup() override;
 
-		bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) final;
+    bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) final;
 
-		void process() override
-		{
-			auto input = getInputData(m_fromPort);
-			NF_ASSERT(input, "ConversionNodeImpl has no input connection");
+    void process() override
+    {
+        auto input = getInputData(m_fromPort);
+        NF_ASSERT(input, "ConversionNodeImpl has no input connection");
 
-			if (input)
-				m_toPort.value = ConversionCallable(*input);
-		}
+        if (input)
+            m_toPort.value = ConversionCallable(*input);
+    }
 
-	private:
-		nf::InputPort<FromType> m_fromPort;
-		nf::OutputPort<ToType> m_toPort;
-	};
+private:
+    nf::InputPort<FromType> m_fromPort;
+    nf::OutputPort<ToType> m_toPort;
+};
 
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::staticNodeName = "ConversionNodeImpl";
+template <typename FromType, typename ToType, auto ConversionCallable>
+std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::staticNodeName =
+    "ConversionNodeImpl";
 
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::staticInputPortName = "Input";
+template <typename FromType, typename ToType, auto ConversionCallable>
+std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::staticInputPortName = "Input";
 
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::staticOutputPortName = "Output";
+template <typename FromType, typename ToType, auto ConversionCallable>
+std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::staticOutputPortName =
+    "Output";
 
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	ConversionNodeImpl<FromType, ToType, ConversionCallable>::ConversionNodeImpl()
-	{
-		allocateExpectedPortCount(PortDirection::Input, 1);
-		allocateExpectedPortCount(PortDirection::Output, 1);
-	}
-
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::nodeName() const
-	{
-		return staticNodeName;
-	}
-
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::portName(PortDirection dir, PortIndex index) const
-	{
-		NF_ASSERT(index == 0, "ConversionNodeImpl only has 1 input and 1 output");
-		if (dir == PortDirection::Input)
-			return staticInputPortName;
-		return staticOutputPortName;
-	}
-
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	ErrorOr<void> ConversionNodeImpl<FromType, ToType, ConversionCallable>::setup()
-	{
-		addPort(m_fromPort);
-		addPort(m_toPort);
-
-		return {};
-	}
-
-	template<typename FromType, typename ToType, auto ConversionCallable>
-	bool ConversionNodeImpl<FromType, ToType, ConversionCallable>::streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive)
-	{
-		if (index != 0)
-			return false;
-		if (flag == StreamFlag::WriteTo)
-			return m_toPort.serialize(archive);
-		return m_toPort.deserialize(archive);
-	}
+template <typename FromType, typename ToType, auto ConversionCallable>
+ConversionNodeImpl<FromType, ToType, ConversionCallable>::ConversionNodeImpl()
+{
+    allocateExpectedPortCount(PortDirection::Input, 1);
+    allocateExpectedPortCount(PortDirection::Output, 1);
 }
+
+template <typename FromType, typename ToType, auto ConversionCallable>
+std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::nodeName() const
+{
+    return staticNodeName;
+}
+
+template <typename FromType, typename ToType, auto ConversionCallable>
+std::string ConversionNodeImpl<FromType, ToType, ConversionCallable>::portName(
+    PortDirection dir, PortIndex index) const
+{
+    NF_ASSERT(index == 0, "ConversionNodeImpl only has 1 input and 1 output");
+    if (dir == PortDirection::Input)
+        return staticInputPortName;
+    return staticOutputPortName;
+}
+
+template <typename FromType, typename ToType, auto ConversionCallable>
+ErrorOr<void> ConversionNodeImpl<FromType, ToType, ConversionCallable>::setup()
+{
+    addPort(m_fromPort);
+    addPort(m_toPort);
+
+    return {};
+}
+
+template <typename FromType, typename ToType, auto ConversionCallable>
+bool ConversionNodeImpl<FromType, ToType, ConversionCallable>::streamOutput(
+    PortIndex index, StreamFlag flag, std::stringstream& archive)
+{
+    if (index != 0)
+        return false;
+    if (flag == StreamFlag::WriteTo)
+        return m_toPort.serialize(archive);
+    return m_toPort.deserialize(archive);
+}
+} // namespace nf

@@ -33,152 +33,149 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
+#include "../3rdparty/cpputils/stringutils.h"
 #include "../3rdparty/entt/single_include/entt/entt.hpp"
 #include "core/type_tricks.hpp"
-#include "../3rdparty/cpputils/stringutils.h"
 
-#include <tuple>
-#include <string_view>
-#include <type_traits>
 #include <format>
-
-
+#include <string_view>
+#include <tuple>
+#include <type_traits>
 
 namespace nf
 {
-	namespace internal
-	{
-		template< typename T >
-		struct type_names;
+namespace internal
+{
+template <typename T>
+struct type_names;
 
-		template< typename... Ts >
-		struct type_names< std::tuple< Ts... > >
-		{
-			static constexpr std::array<std::string_view, sizeof...(Ts)> value = { {entt::type_name<Ts>::value()...} };
-		};
+template <typename... Ts>
+struct type_names<std::tuple<Ts...>>
+{
+    static constexpr std::array<std::string_view, sizeof...(Ts)> value = {
+        { entt::type_name<Ts>::value()... }
+    };
+};
 
-		template<auto Func>
-		struct FreeFunctionReflection
-		{
-			using ReturnType_t = typename nf::FuncSignature<decltype(std::function{ Func }) > ::ReturnType_t;
-			using ArgumentTypes_t = typename nf::FuncSignature<decltype(std::function{ Func }) > ::ParamTypes_t;
-			static constexpr auto isMemberFunction = false;
+template <auto Func>
+struct FreeFunctionReflection
+{
+    using ReturnType_t = typename nf::FuncSignature<decltype(std::function{ Func })>::ReturnType_t;
+    using ArgumentTypes_t =
+        typename nf::FuncSignature<decltype(std::function{ Func })>::ParamTypes_t;
+    static constexpr auto isMemberFunction = false;
 
+    static constexpr auto FunctionName() noexcept
+    {
+        std::string_view pretty_function{ ENTT_PRETTY_FUNCTION };
+        auto first = pretty_function.find_first_not_of(
+            ' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
+        auto value = pretty_function.substr(
+            first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
+        auto valuebefore = value.substr(0, value.find_first_of('('));
+        auto valuelast = valuebefore.substr(valuebefore.find_last_of(' ') + 1);
+        return valuelast;
+    }
 
-			static constexpr auto FunctionName() noexcept
-			{
-				std::string_view pretty_function{ ENTT_PRETTY_FUNCTION };
-				auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
-				auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
-				auto valuebefore = value.substr(0, value.find_first_of('('));
-				auto valuelast = valuebefore.substr(valuebefore.find_last_of(' ') + 1);
-				return valuelast;
-			}
+    static constexpr auto ReturnTypeName() noexcept
+    {
+        return entt::type_name<ReturnType_t>::value();
+    }
 
-			static constexpr auto ReturnTypeName() noexcept
-			{
-				return entt::type_name<ReturnType_t>::value();
-			}
+    static constexpr auto ArgumentTypeNames() noexcept
+    {
+        return internal::type_names<ArgumentTypes_t>::value;
+    }
 
-			static constexpr auto ArgumentTypeNames() noexcept
-			{
-				return internal::type_names<ArgumentTypes_t>::value;
-			}
+    static constexpr auto ArgumentCount()
+    {
+        return std::tuple_size_v<ArgumentTypes_t>;
+    }
+};
 
-			static constexpr auto ArgumentCount()
-			{
-				return std::tuple_size_v<ArgumentTypes_t>;
-			}
+template <auto Func>
+struct MemberFunctionReflection
+{
+    using Signature_t = nf::FuncSignature<std::function<decltype(Func)>>;
+    using ReturnType_t = Signature_t::ReturnType_t;
+    using ArgumentTypes_t = Signature_t::ParamTypes_t;
+    using ClassType_t = Signature_t::ClassType_t;
 
-		};
+    static constexpr auto isMemberFunction = true;
 
-		template<auto Func>
-		struct MemberFunctionReflection
-		{
-			using Signature_t = nf::FuncSignature<std::function<decltype(Func)>>;
-			using ReturnType_t = Signature_t::ReturnType_t;
-			using ArgumentTypes_t = Signature_t::ParamTypes_t;
-			using ClassType_t = Signature_t::ClassType_t;
+    static constexpr auto FunctionName() noexcept
+    {
+        std::string_view pretty_function{ ENTT_PRETTY_FUNCTION };
+        auto first = pretty_function.find_first_not_of(
+            ' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
+        auto value = pretty_function.substr(
+            first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
+        auto valuebefore = value.substr(0, value.find_first_of('('));
+        auto valuelast = valuebefore.substr(valuebefore.find_last_of(' ') + 1);
+        return valuelast;
+    }
 
-			static constexpr auto isMemberFunction = true;
+    static constexpr auto ReturnTypeName() noexcept
+    {
+        return entt::type_name<ReturnType_t>::value();
+    }
 
-			static constexpr auto FunctionName() noexcept
-			{
-				std::string_view pretty_function{ ENTT_PRETTY_FUNCTION };
-				auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
-				auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
-				auto valuebefore = value.substr(0, value.find_first_of('('));
-				auto valuelast = valuebefore.substr(valuebefore.find_last_of(' ') + 1);
-				return valuelast;
-			}
+    static constexpr auto ArgumentTypeNames() noexcept
+    {
+        return internal::type_names<ArgumentTypes_t>::value;
+    }
 
-			static constexpr auto ReturnTypeName() noexcept
-			{
-				return entt::type_name<ReturnType_t>::value();
-			}
+    static constexpr auto ClassTypeName() noexcept
+    {
+        return entt::type_name<ClassType_t>::value();
+    }
 
-			static constexpr auto ArgumentTypeNames() noexcept
-			{
-				return internal::type_names<ArgumentTypes_t>::value;
-			}
+    static constexpr auto ArgumentCount()
+    {
+        return std::tuple_size_v<ArgumentTypes_t>;
+    }
+};
 
-			static constexpr auto ClassTypeName() noexcept
-			{
-				return entt::type_name<ClassType_t>::value();
-			}
+template <typename Class>
+struct ClassReflection
+{
+};
 
-			static constexpr auto ArgumentCount()
-			{
-				return std::tuple_size_v<ArgumentTypes_t>;
-			}
+template <typename Type>
+struct TypeReflection
+{
+    static constexpr auto Name() noexcept
+    {
+        return entt::type_name<Type>::value();
+    }
+};
+} // namespace internal
 
-		};
+struct Reflection
+{
+    template <auto Func>
+    using Function = std::conditional_t<std::is_member_function_pointer_v<decltype(Func)>,
+                                        internal::MemberFunctionReflection<Func>,
+                                        internal::FreeFunctionReflection<Func>>;
 
+    template <typename Class_>
+    using Class = Class_;
 
-		template<typename Class>
-		struct ClassReflection
-		{
+    template <typename Type_>
+    using Type = internal::TypeReflection<Type_>;
+};
 
-		};
+template <auto Func>
+std::string constructFunctionCall()
+{
+    using ReflectedFunction = nf::Reflection::Function<Func>;
 
-		template<typename Type>
-		struct TypeReflection
-		{
-			static constexpr auto Name() noexcept
-			{
-				return entt::type_name<Type>::value();
-			}
-		};
+    auto named_args = nf::Reflection::Function<Func>::ArgumentTypeNames();
 
-
-	}
-
-
-	struct Reflection
-	{
-		template<auto Func>
-		using Function = std::conditional_t<std::is_member_function_pointer_v<decltype(Func)>, internal::MemberFunctionReflection<Func>, internal::FreeFunctionReflection<Func>>;
-
-		template<typename Class_>
-		using Class = Class_;
-
-		template<typename Type_>
-		using Type = internal::TypeReflection<Type_>;
-	};
-
-
-	template<auto Func>
-	std::string constructFunctionCall()
-	{
-		using ReflectedFunction = nf::Reflection::Function<Func>;
-
-		auto named_args = nf::Reflection::Function<Func>::ArgumentTypeNames();
-
-		return std::format("{} __LocalVar__{} = {}({})",
-			ReflectedFunction::ReturnTypeName(),
-			__COUNTER__, ReflectedFunction::FunctionName(), cpputils::str_join(named_args.begin(), named_args.end(), ", "));
-
-
-	}
-
+    return std::format("{} __LocalVar__{} = {}({})",
+                       ReflectedFunction::ReturnTypeName(),
+                       __COUNTER__,
+                       ReflectedFunction::FunctionName(),
+                       cpputils::str_join(named_args.begin(), named_args.end(), ", "));
 }
+} // namespace nf

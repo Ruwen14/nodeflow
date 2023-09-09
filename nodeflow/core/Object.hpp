@@ -33,54 +33,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 #include <cstdint>
-#include <optional>
 #include <iostream>
+#include <optional>
 
-
-#include "typedefs.hpp"
-#include "core/UUID.hpp"
 #include "core/FlowEvent.hpp"
+#include "core/UUID.hpp"
+#include "typedefs.hpp"
 
-#define NF_REGISTER_Type(ObjType)								\
-public:															\
-	static constexpr auto staticType = nf::type_id<ObjType>();	\
-	nf::typeid_t type() const override							\
-	{															\
-		return staticType;										\
-	}		
+#define NF_REGISTER_Type(ObjType)                              \
+public:                                                        \
+    static constexpr auto staticType = nf::type_id<ObjType>(); \
+    nf::typeid_t type() const override                         \
+    {                                                          \
+        return staticType;                                     \
+    }
 
 namespace nf
 {
-	class Object
-	{
-	public:
-		Object() = default;
-		virtual ~Object() = default;
-	
-		typeid_t typeID() const noexcept
-		{
-			return m_typeID;
-		}
+class Object
+{
+public:
+    Object() = default;
+    virtual ~Object() = default;
 
-		inline UUID uuid() const noexcept
-		{
-			return m_uuid;
-		}
+    typeid_t typeID() const noexcept
+    {
+        return m_typeID;
+    }
 
-		inline void assignTypeID(typeid_t id) noexcept
-		{
-			m_typeID = id;
-		}
+    inline UUID uuid() const noexcept
+    {
+        return m_uuid;
+    }
 
-		inline void setUUID(UUID uuid) noexcept
-		{
-			m_uuid = uuid;
-		}
+    inline void assignTypeID(typeid_t id) noexcept
+    {
+        m_typeID = id;
+    }
 
-		virtual bool onEvent(FlowEvent* event) { NF_UNUSED(event); return false; }
-	
-	private:
-		typeid_t m_typeID = 0;
-		UUID m_uuid;
-	};
-}
+    inline void setUUID(UUID uuid) noexcept
+    {
+        m_uuid = uuid;
+    }
+
+    virtual bool onEvent(FlowEvent* event)
+    {
+        NF_UNUSED(event);
+        return false;
+    }
+
+private:
+    typeid_t m_typeID = 0;
+    UUID m_uuid;
+};
+} // namespace nf

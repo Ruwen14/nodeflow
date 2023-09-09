@@ -15,7 +15,6 @@
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -25,7 +24,6 @@
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -114,7 +112,6 @@
 
 // #include "macro.h"
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -157,7 +154,6 @@
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -167,7 +163,6 @@
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -266,7 +261,6 @@
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -276,7 +270,6 @@
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -368,9 +361,7 @@
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -379,14 +370,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -837,13 +825,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -912,7 +898,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -948,7 +933,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -1022,21 +1006,17 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -1092,7 +1072,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -1268,13 +1247,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -1293,7 +1270,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -1308,9 +1284,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -1414,7 +1388,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -1431,9 +1404,7 @@ private:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
  * @tparam Type Pointer type.
@@ -1592,7 +1563,6 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
  */
 
 namespace internal {
-
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
@@ -1644,7 +1614,6 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
     }
 };
-
 } // namespace internal
 
 /**
@@ -1706,7 +1675,6 @@ template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
     return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
-
 } // namespace entt
 
 #endif
@@ -1723,9 +1691,7 @@ constexpr Type *uninitialized_construct_using_allocator(Type *value, const Alloc
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -2176,13 +2142,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -2251,7 +2215,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -2287,7 +2250,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -2361,7 +2323,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -2374,7 +2335,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <memory>
 
 namespace entt {
-
 template<
     typename Key,
     typename Type,
@@ -2389,21 +2349,17 @@ template<
     typename = std::equal_to<Type>,
     typename = std::allocator<Type>>
 class dense_set;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Key, typename Type>
 struct dense_map_node final {
     using value_type = std::pair<Key, Type>;
@@ -2616,7 +2572,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const dense_map_local_iterator<ILhs> &lhs, const dense_map_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -3340,7 +3295,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold;
 };
-
 } // namespace entt
 
 /**
@@ -3349,11 +3303,9 @@ private:
  */
 
 namespace std {
-
 template<typename Key, typename Value, typename Allocator>
 struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     : std::true_type {};
-
 } // namespace std
 
 /**
@@ -3388,16 +3340,13 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename It>
 class dense_set_iterator final {
     template<typename>
@@ -3576,7 +3525,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -4188,7 +4136,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold;
 };
-
 } // namespace entt
 
 #endif
@@ -4224,7 +4171,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -4234,7 +4180,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -4308,9 +4253,7 @@ private:
 
 #endif
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -4400,14 +4343,11 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Function object to wrap `std::sort` in a class type.
  *
@@ -4529,7 +4469,6 @@ struct radix_sort {
         }
     }
 };
-
 } // namespace entt
 
 #endif
@@ -4566,7 +4505,6 @@ struct radix_sort {
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -4576,7 +4514,6 @@ struct radix_sort {
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -4650,9 +4587,7 @@ struct radix_sort {
 
 #endif
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -4742,7 +4677,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -4755,9 +4689,7 @@ private:
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -4766,7 +4698,6 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
@@ -4824,16 +4755,13 @@ using any = basic_any<>;
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename>
 struct fnv1a_traits;
 
@@ -4861,7 +4789,6 @@ struct basic_hashed_string {
     size_type length;
     hash_type hash;
 };
-
 } // namespace internal
 
 /**
@@ -5126,7 +5053,6 @@ using hashed_string = basic_hashed_string<char>;
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
 inline namespace literals {
-
 /**
  * @brief User defined literal for hashed strings.
  * @param str The literal without its suffix.
@@ -5144,23 +5070,18 @@ inline namespace literals {
 [[nodiscard]] constexpr hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return hashed_wstring{str};
 }
-
 } // namespace literals
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -5206,7 +5127,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -5411,7 +5331,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -5428,9 +5347,7 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -5881,13 +5798,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -5956,7 +5871,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -5992,7 +5906,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -6066,14 +5979,11 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
@@ -6545,7 +6455,6 @@ template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Le
 basic_any<Len, Align> forward_as_any(Type &&value) {
     return basic_any<Len, Align>{std::in_place_type<std::conditional_t<std::is_rvalue_reference_v<Type>, std::decay_t<Type>, Type>>, std::forward<Type>(value)};
 }
-
 } // namespace entt
 
 #endif
@@ -6594,16 +6503,13 @@ basic_any<Len, Align> forward_as_any(Type &&value) {
 
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -6659,7 +6565,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -6835,13 +6740,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -6860,7 +6763,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -6873,9 +6775,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Enable bitmask support for enum classes.
  * @tparam Type The enum type for which to enable bitmask support.
@@ -6893,7 +6793,6 @@ struct enum_as_bitmask<Type, std::void_t<decltype(Type::_entt_enum_as_bitmask)>>
  */
 template<typename Type>
 inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
-
 } // namespace entt
 
 /**
@@ -6975,9 +6874,7 @@ operator^=(Type &lhs, const Type rhs) ENTT_NOEXCEPT {
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Dynamic identifier generator.
  *
@@ -6998,7 +6895,6 @@ public:
     // at the time I'm writing, clang crashes during compilation if auto is used instead of family_type
     inline static const family_type type = identifier++;
 };
-
 } // namespace entt
 
 #endif
@@ -7013,16 +6909,13 @@ public:
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename>
 struct fnv1a_traits;
 
@@ -7050,7 +6943,6 @@ struct basic_hashed_string {
     size_type length;
     hash_type hash;
 };
-
 } // namespace internal
 
 /**
@@ -7315,7 +7207,6 @@ using hashed_string = basic_hashed_string<char>;
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
 inline namespace literals {
-
 /**
  * @brief User defined literal for hashed strings.
  * @param str The literal without its suffix.
@@ -7333,9 +7224,7 @@ inline namespace literals {
 [[nodiscard]] constexpr hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return hashed_wstring{str};
 }
-
 } // namespace literals
-
 } // namespace entt
 
 #endif
@@ -7353,9 +7242,7 @@ inline namespace literals {
 
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Types identifiers.
  *
@@ -7399,7 +7286,6 @@ public:
     template<typename Type>
     static constexpr identifier_type type = get<std::decay_t<Type>>(std::index_sequence_for<Types...>{});
 };
-
 } // namespace entt
 
 #endif
@@ -7413,9 +7299,7 @@ public:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -7519,7 +7403,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -7536,9 +7419,7 @@ private:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
  * @tparam Type Pointer type.
@@ -7697,7 +7578,6 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
  */
 
 namespace internal {
-
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
@@ -7749,7 +7629,6 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
     }
 };
-
 } // namespace internal
 
 /**
@@ -7811,7 +7690,6 @@ template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
     return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
-
 } // namespace entt
 
 #endif
@@ -7824,9 +7702,7 @@ constexpr Type *uninitialized_construct_using_allocator(Type *value, const Alloc
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Minimal implementation of the monostate pattern.
  *
@@ -7871,7 +7747,6 @@ private:
  */
 template<id_type Value>
 inline monostate<Value> monostate_v = {};
-
 } // namespace entt
 
 #endif
@@ -7885,9 +7760,7 @@ inline monostate<Value> monostate_v = {};
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Utility function to unwrap tuples of a single element.
  * @tparam Type Tuple type of any sizes.
@@ -7903,7 +7776,6 @@ constexpr decltype(auto) unwrap_tuple(Type &&value) ENTT_NOEXCEPT {
         return std::forward<Type>(value);
     }
 }
-
 } // namespace entt
 
 #endif
@@ -7923,16 +7795,13 @@ constexpr decltype(auto) unwrap_tuple(Type &&value) ENTT_NOEXCEPT {
 
 // #include "hashed_string.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -7978,7 +7847,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -8183,7 +8051,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -8200,9 +8067,7 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -8653,13 +8518,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -8728,7 +8591,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -8764,7 +8626,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -8838,7 +8699,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -8850,9 +8710,7 @@ using member_class_t = typename member_class<Member>::type;
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -8942,7 +8800,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -8970,7 +8827,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -8980,7 +8836,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -9054,16 +8909,13 @@ private:
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct in_place_delete: std::false_type {};
 
@@ -9077,7 +8929,6 @@ struct page_size: std::integral_constant<std::size_t, (ENTT_IGNORE_IF_EMPTY && s
 template<typename Type>
 struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::page_size), std::size_t>>>
     : std::integral_constant<std::size_t, Type::page_size> {};
-
 } // namespace internal
 
 /**
@@ -9105,7 +8956,6 @@ struct component_traits {
  */
 template<class Type>
 inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 0u);
-
 } // namespace entt
 
 #endif
@@ -9147,7 +8997,6 @@ inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -9157,7 +9006,6 @@ inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -9231,9 +9079,7 @@ inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 
 
 #endif
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -9242,7 +9088,6 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
@@ -9269,9 +9114,7 @@ using any = basic_any<>;
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -9280,14 +9123,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -9738,13 +9578,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -9813,7 +9651,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -9849,7 +9686,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -9923,14 +9759,11 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Alias for exclusion lists.
  * @tparam Type List of types.
@@ -9972,14 +9805,11 @@ struct owned_t: type_list<Type...> {};
  */
 template<typename... Type>
 inline constexpr owned_t<Type...> owned{};
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 template<typename Entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
@@ -10084,21 +9914,17 @@ using runtime_view = basic_runtime_view<sparse_set>;
  */
 template<typename... Args>
 using group = basic_group<entity, Args...>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct entt_traits;
 
@@ -10129,7 +9955,6 @@ struct entt_traits<std::uint64_t> {
     static constexpr entity_type version_mask = 0xFFFFFFFF;
     static constexpr std::size_t entity_shift = 32u;
 };
-
 } // namespace internal
 
 /**
@@ -10416,7 +10241,6 @@ inline constexpr null_t null{};
  * tombstone entity and any other identifier.
  */
 inline constexpr tombstone_t tombstone{};
-
 } // namespace entt
 
 #endif
@@ -10439,9 +10263,7 @@ inline constexpr tombstone_t tombstone{};
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -10545,7 +10367,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -10560,16 +10381,13 @@ private:
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct in_place_delete: std::false_type {};
 
@@ -10583,7 +10401,6 @@ struct page_size: std::integral_constant<std::size_t, (ENTT_IGNORE_IF_EMPTY && s
 template<typename Type>
 struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::page_size), std::size_t>>>
     : std::integral_constant<std::size_t, Type::page_size> {};
-
 } // namespace internal
 
 /**
@@ -10611,7 +10428,6 @@ struct component_traits {
  */
 template<class Type>
 inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 0u);
-
 } // namespace entt
 
 #endif
@@ -10627,16 +10443,13 @@ inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct entt_traits;
 
@@ -10667,7 +10480,6 @@ struct entt_traits<std::uint64_t> {
     static constexpr entity_type version_mask = 0xFFFFFFFF;
     static constexpr std::size_t entity_shift = 32u;
 };
-
 } // namespace internal
 
 /**
@@ -10954,7 +10766,6 @@ inline constexpr null_t null{};
  * tombstone entity and any other identifier.
  */
 inline constexpr tombstone_t tombstone{};
-
 } // namespace entt
 
 #endif
@@ -10989,9 +10800,7 @@ inline constexpr tombstone_t tombstone{};
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -11081,14 +10890,11 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Function object to wrap `std::sort` in a class type.
  *
@@ -11210,7 +11016,6 @@ struct radix_sort {
         }
     }
 };
-
 } // namespace entt
 
 #endif
@@ -11247,7 +11052,6 @@ struct radix_sort {
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -11257,7 +11061,6 @@ struct radix_sort {
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -11331,9 +11134,7 @@ struct radix_sort {
 
 #endif
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -11423,7 +11224,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -11483,16 +11283,13 @@ private:
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename>
 struct fnv1a_traits;
 
@@ -11520,7 +11317,6 @@ struct basic_hashed_string {
     size_type length;
     hash_type hash;
 };
-
 } // namespace internal
 
 /**
@@ -11785,7 +11581,6 @@ using hashed_string = basic_hashed_string<char>;
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
 inline namespace literals {
-
 /**
  * @brief User defined literal for hashed strings.
  * @param str The literal without its suffix.
@@ -11803,23 +11598,18 @@ inline namespace literals {
 [[nodiscard]] constexpr hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return hashed_wstring{str};
 }
-
 } // namespace literals
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -11865,7 +11655,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -12070,7 +11859,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -12087,9 +11875,7 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -12540,13 +12326,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -12615,7 +12399,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -12651,7 +12434,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -12725,14 +12507,11 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
@@ -13204,7 +12983,6 @@ template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Le
 basic_any<Len, Align> forward_as_any(Type &&value) {
     return basic_any<Len, Align>{std::in_place_type<std::conditional_t<std::is_rvalue_reference_v<Type>, std::decay_t<Type>, Type>>, std::forward<Type>(value)};
 }
-
 } // namespace entt
 
 #endif
@@ -13221,9 +12999,7 @@ basic_any<Len, Align> forward_as_any(Type &&value) {
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
  * @tparam Type Pointer type.
@@ -13382,7 +13158,6 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
  */
 
 namespace internal {
-
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
@@ -13434,7 +13209,6 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
     }
 };
-
 } // namespace internal
 
 /**
@@ -13496,7 +13270,6 @@ template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
     return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
-
 } // namespace entt
 
 #endif
@@ -13516,16 +13289,13 @@ constexpr Type *uninitialized_construct_using_allocator(Type *value, const Alloc
 
 // #include "hashed_string.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -13571,7 +13341,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -13776,7 +13545,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -13785,16 +13553,13 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Container>
 struct sparse_set_iterator final {
     using value_type = typename Container::value_type;
@@ -13902,7 +13667,6 @@ template<typename Type, typename Other>
 [[nodiscard]] bool operator>=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return !(lhs < rhs);
 }
-
 } // namespace internal
 
 /**
@@ -14724,7 +14488,6 @@ private:
     entity_type free_list;
     deletion_policy mode;
 };
-
 } // namespace entt
 
 #endif
@@ -14754,16 +14517,13 @@ private:
 
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -14819,7 +14579,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -14995,13 +14754,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -15020,7 +14777,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -15073,7 +14829,6 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -15083,7 +14838,6 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -15193,7 +14947,6 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -15203,7 +14956,6 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -15285,9 +15037,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -15296,14 +15046,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -15754,13 +15501,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -15829,7 +15574,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -15865,7 +15609,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -15939,7 +15682,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -15951,7 +15693,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <memory>
 
 namespace entt {
-
 template<typename>
 class delegate;
 
@@ -15973,21 +15714,17 @@ class sigh;
 
 /*! @brief Alias declaration for the most common use case. */
 using dispatcher = basic_dispatcher<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Ret, typename... Args>
 auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
 
@@ -16010,7 +15747,6 @@ template<typename... Class, typename Ret, typename... Args>
 [[nodiscard]] constexpr auto index_sequence_for(Ret (*)(Args...)) {
     return std::index_sequence_for<Class..., Args...>{};
 }
-
 } // namespace internal
 
 /**
@@ -16303,16 +16039,13 @@ delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<in
  */
 template<typename Ret, typename... Args>
 delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
-
 } // namespace entt
 
 #endif
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Sink class.
  *
@@ -16903,16 +16636,13 @@ private:
  */
 template<typename Ret, typename... Args, typename Allocator>
 sink(sigh<Ret(Args...), Allocator> &) -> sink<sigh<Ret(Args...), Allocator>>;
-
 } // namespace entt
 
 #endif
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Mixin type used to add signal support to storage types.
  *
@@ -17075,23 +16805,19 @@ private:
     sigh<void(basic_registry<entity_type> &, const entity_type)> update{};
     basic_registry<entity_type> *owner{};
 };
-
 } // namespace entt
 
 #endif
 
 // #include "sparse_set.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Container>
 class storage_iterator final {
     friend storage_iterator<const Container>;
@@ -17271,7 +16997,6 @@ template<typename... CLhs, typename... CRhs>
 [[nodiscard]] bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -17968,16 +17693,13 @@ struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
     using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
-
 } // namespace entt
 
 #endif
 
 // #include "utility.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Group.
  *
@@ -18861,7 +18583,6 @@ private:
     const std::tuple<storage_type<Owned> *..., storage_type<Get> *...> pools;
     const size_type *const length;
 };
-
 } // namespace entt
 
 #endif
@@ -18925,7 +18646,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -18935,7 +18655,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -19034,7 +18753,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -19044,7 +18762,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -19136,9 +18853,7 @@ private:
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -19147,14 +18862,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -19605,13 +19317,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -19680,7 +19390,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -19716,7 +19425,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -19790,21 +19498,17 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -19860,7 +19564,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -20036,13 +19739,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -20061,7 +19762,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -20076,9 +19776,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -20182,7 +19880,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -20199,9 +19896,7 @@ private:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
  * @tparam Type Pointer type.
@@ -20360,7 +20055,6 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
  */
 
 namespace internal {
-
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
@@ -20412,7 +20106,6 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
     }
 };
-
 } // namespace internal
 
 /**
@@ -20474,7 +20167,6 @@ template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
     return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
-
 } // namespace entt
 
 #endif
@@ -20491,9 +20183,7 @@ constexpr Type *uninitialized_construct_using_allocator(Type *value, const Alloc
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -20944,13 +20634,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -21019,7 +20707,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -21055,7 +20742,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -21129,7 +20815,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -21142,7 +20827,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <memory>
 
 namespace entt {
-
 template<
     typename Key,
     typename Type,
@@ -21157,21 +20841,17 @@ template<
     typename = std::equal_to<Type>,
     typename = std::allocator<Type>>
 class dense_set;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Key, typename Type>
 struct dense_map_node final {
     using value_type = std::pair<Key, Type>;
@@ -21384,7 +21064,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const dense_map_local_iterator<ILhs> &lhs, const dense_map_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -22108,7 +21787,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold;
 };
-
 } // namespace entt
 
 /**
@@ -22117,11 +21795,9 @@ private:
  */
 
 namespace std {
-
 template<typename Key, typename Value, typename Allocator>
 struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     : std::true_type {};
-
 } // namespace std
 
 /**
@@ -22150,9 +21826,7 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -22242,7 +21916,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -22278,9 +21951,7 @@ private:
 
 // #include "utility.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Group.
  *
@@ -23164,7 +22835,6 @@ private:
     const std::tuple<storage_type<Owned> *..., storage_type<Get> *...> pools;
     const size_type *const length;
 };
-
 } // namespace entt
 
 #endif
@@ -23186,16 +22856,13 @@ private:
 
 // #include "sparse_set.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Set>
 class runtime_view_iterator final {
     using iterator_type = typename Set::iterator;
@@ -23271,7 +22938,6 @@ private:
     iterator_type it;
     bool tombstone_check;
 };
-
 } // namespace internal
 
 /**
@@ -23442,7 +23108,6 @@ private:
     std::vector<const base_type *> pools;
     std::vector<const base_type *> filter;
 };
-
 } // namespace entt
 
 #endif
@@ -23481,16 +23146,13 @@ private:
 
 // #include "utility.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
     using iterator_type = typename Type::const_iterator;
@@ -23606,7 +23268,6 @@ template<typename... Lhs, typename... Rhs>
 [[nodiscard]] bool operator!=(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -24300,21 +23961,17 @@ private:
  */
 template<typename... Storage>
 basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storage::entity_type...>, get_t<constness_as_t<typename Storage::value_type, Storage>...>, exclude_t<>>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename It>
 class storage_proxy_iterator final {
     template<typename Other>
@@ -24483,7 +24140,6 @@ struct registry_context {
 private:
     dense_map<id_type, basic_any<0u>, identity> data;
 };
-
 } // namespace internal
 
 /**
@@ -25767,14 +25423,11 @@ private:
     entity_type free_list;
     context vars;
 };
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Non-owning handle to an entity.
  *
@@ -26098,7 +25751,6 @@ basic_handle(basic_registry<Entity> &, Entity) -> basic_handle<Entity>;
  */
 template<typename Entity>
 basic_handle(const basic_registry<Entity> &, Entity) -> basic_handle<const Entity>;
-
 } // namespace entt
 
 #endif
@@ -26129,16 +25781,13 @@ basic_handle(const basic_registry<Entity> &, Entity) -> basic_handle<const Entit
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Ret, typename... Args>
 auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
 
@@ -26161,7 +25810,6 @@ template<typename... Class, typename Ret, typename... Args>
 [[nodiscard]] constexpr auto index_sequence_for(Ret (*)(Args...)) {
     return std::index_sequence_for<Class..., Args...>{};
 }
-
 } // namespace internal
 
 /**
@@ -26454,7 +26102,6 @@ delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<in
  */
 template<typename Ret, typename... Args>
 delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
-
 } // namespace entt
 
 #endif
@@ -26463,9 +26110,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 // #include "registry.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Converts a registry to a view.
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -26605,7 +26250,6 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
 
     return null;
 }
-
 } // namespace entt
 
 #endif
@@ -26635,9 +26279,7 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
 
 // #include "utility.hpp"
 
-
 namespace entt {
-
 /*! @brief Grouping matcher. */
 template<typename...>
 struct matcher {};
@@ -27051,7 +26693,6 @@ private:
     delegate<void(basic_observer &)> release;
     basic_storage<entity_type, payload_type> storage;
 };
-
 } // namespace entt
 
 #endif
@@ -27092,9 +26733,7 @@ private:
 
 // #include "registry.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Converts a registry to a view.
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -27234,21 +26873,17 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
 
     return null;
 }
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename>
 struct is_view: std::false_type {};
 
@@ -27312,7 +26947,6 @@ resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> 
 
 template<typename... Req, typename Ret, typename Class, typename... Args>
 resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...) const);
-
 } // namespace internal
 
 /**
@@ -27705,7 +27339,6 @@ private:
     dense_map<id_type, std::vector<std::pair<std::size_t, bool>>, identity> dependencies;
     std::vector<vertex_data> vertices;
 };
-
 } // namespace entt
 
 #endif
@@ -27758,16 +27391,13 @@ private:
 
 // #include "view.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename It>
 class storage_proxy_iterator final {
     template<typename Other>
@@ -27936,7 +27566,6 @@ struct registry_context {
 private:
     dense_map<id_type, basic_any<0u>, identity> data;
 };
-
 } // namespace internal
 
 /**
@@ -29220,7 +28849,6 @@ private:
     entity_type free_list;
     context vars;
 };
-
 } // namespace entt
 
 #endif
@@ -29242,16 +28870,13 @@ private:
 
 // #include "sparse_set.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Set>
 class runtime_view_iterator final {
     using iterator_type = typename Set::iterator;
@@ -29327,7 +28952,6 @@ private:
     iterator_type it;
     bool tombstone_check;
 };
-
 } // namespace internal
 
 /**
@@ -29498,7 +29122,6 @@ private:
     std::vector<const base_type *> pools;
     std::vector<const base_type *> filter;
 };
-
 } // namespace entt
 
 #endif
@@ -29516,9 +29139,7 @@ private:
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Mixin type used to add signal support to storage types.
  *
@@ -29681,7 +29302,6 @@ private:
     sigh<void(basic_registry<entity_type> &, const entity_type)> update{};
     basic_registry<entity_type> *owner{};
 };
-
 } // namespace entt
 
 #endif
@@ -29711,9 +29331,7 @@ private:
 
 // #include "registry.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to create snapshots from a registry.
  *
@@ -30251,7 +29869,6 @@ private:
     dense_map<entity_type, std::pair<entity_type, bool>> remloc;
     basic_registry<entity_type> *reg;
 };
-
 } // namespace entt
 
 #endif
@@ -30280,16 +29897,13 @@ private:
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Container>
 struct sparse_set_iterator final {
     using value_type = typename Container::value_type;
@@ -30397,7 +30011,6 @@ template<typename Type, typename Other>
 [[nodiscard]] bool operator>=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return !(lhs < rhs);
 }
-
 } // namespace internal
 
 /**
@@ -31219,7 +30832,6 @@ private:
     entity_type free_list;
     deletion_policy mode;
 };
-
 } // namespace entt
 
 #endif
@@ -31255,16 +30867,13 @@ private:
 
 // #include "sparse_set.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Container>
 class storage_iterator final {
     friend storage_iterator<const Container>;
@@ -31444,7 +31053,6 @@ template<typename... CLhs, typename... CRhs>
 [[nodiscard]] bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -32141,7 +31749,6 @@ struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
     using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
-
 } // namespace entt
 
 #endif
@@ -32152,9 +31759,7 @@ struct storage_traits {
 
 // #include "../core/type_traits.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Alias for exclusion lists.
  * @tparam Type List of types.
@@ -32196,7 +31801,6 @@ struct owned_t: type_list<Type...> {};
  */
 template<typename... Type>
 inline constexpr owned_t<Type...> owned{};
-
 } // namespace entt
 
 #endif
@@ -32229,16 +31833,13 @@ inline constexpr owned_t<Type...> owned{};
 
 // #include "utility.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
     using iterator_type = typename Type::const_iterator;
@@ -32354,7 +31955,6 @@ template<typename... Lhs, typename... Rhs>
 [[nodiscard]] bool operator!=(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -33048,7 +32648,6 @@ private:
  */
 template<typename... Storage>
 basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storage::entity_type...>, get_t<constness_as_t<typename Storage::value_type, Storage>...>, exclude_t<>>;
-
 } // namespace entt
 
 #endif
@@ -33076,7 +32675,6 @@ basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storag
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -33086,7 +32684,6 @@ basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storag
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -33160,9 +32757,7 @@ basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storag
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Service locator, nothing more.
  *
@@ -33264,7 +32859,6 @@ private:
     // std::shared_ptr because of its type erased allocator which is pretty useful here
     inline static std::shared_ptr<Service> service = nullptr;
 };
-
 } // namespace entt
 
 #endif
@@ -33274,7 +32868,6 @@ private:
 #define ENTT_META_ADL_POINTER_HPP
 
 namespace entt {
-
 /**
  * @brief ADL based lookup function for dereferencing meta pointer-like types.
  * @tparam Type Element type.
@@ -33301,7 +32894,6 @@ struct adl_meta_pointer_like {
         return dereference_meta_pointer_like(value);
     }
 };
-
 } // namespace entt
 
 #endif
@@ -33349,7 +32941,6 @@ struct adl_meta_pointer_like {
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -33359,7 +32950,6 @@ struct adl_meta_pointer_like {
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -33458,7 +33048,6 @@ struct adl_meta_pointer_like {
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -33468,7 +33057,6 @@ struct adl_meta_pointer_like {
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -33560,9 +33148,7 @@ struct adl_meta_pointer_like {
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -33571,14 +33157,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -34029,13 +33612,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -34104,7 +33685,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -34140,7 +33720,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -34214,21 +33793,17 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -34284,7 +33859,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -34460,13 +34034,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -34485,7 +34057,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -34500,9 +34071,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -34606,7 +34175,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -34623,9 +34191,7 @@ private:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
  * @tparam Type Pointer type.
@@ -34784,7 +34350,6 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
  */
 
 namespace internal {
-
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
@@ -34836,7 +34401,6 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
     }
 };
-
 } // namespace internal
 
 /**
@@ -34898,7 +34462,6 @@ template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
     return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
-
 } // namespace entt
 
 #endif
@@ -34915,9 +34478,7 @@ constexpr Type *uninitialized_construct_using_allocator(Type *value, const Alloc
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -35368,13 +34929,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -35443,7 +35002,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -35479,7 +35037,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -35553,7 +35110,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -35566,7 +35122,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <memory>
 
 namespace entt {
-
 template<
     typename Key,
     typename Type,
@@ -35581,21 +35136,17 @@ template<
     typename = std::equal_to<Type>,
     typename = std::allocator<Type>>
 class dense_set;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Key, typename Type>
 struct dense_map_node final {
     using value_type = std::pair<Key, Type>;
@@ -35808,7 +35359,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const dense_map_local_iterator<ILhs> &lhs, const dense_map_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -36532,7 +36082,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold;
 };
-
 } // namespace entt
 
 /**
@@ -36541,11 +36090,9 @@ private:
  */
 
 namespace std {
-
 template<typename Key, typename Value, typename Allocator>
 struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     : std::true_type {};
-
 } // namespace std
 
 /**
@@ -36580,16 +36127,13 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename It>
 class dense_set_iterator final {
     template<typename>
@@ -36768,7 +36312,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -37380,7 +36923,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold;
 };
-
 } // namespace entt
 
 #endif
@@ -37411,7 +36953,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -37421,7 +36962,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -37520,7 +37060,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -37530,7 +37069,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -37626,7 +37164,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -37636,7 +37173,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -37710,9 +37246,7 @@ private:
 
 #endif
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -37802,7 +37336,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -37815,9 +37348,7 @@ private:
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -37826,7 +37357,6 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
@@ -37884,16 +37414,13 @@ using any = basic_any<>;
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename>
 struct fnv1a_traits;
 
@@ -37921,7 +37448,6 @@ struct basic_hashed_string {
     size_type length;
     hash_type hash;
 };
-
 } // namespace internal
 
 /**
@@ -38186,7 +37712,6 @@ using hashed_string = basic_hashed_string<char>;
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
 inline namespace literals {
-
 /**
  * @brief User defined literal for hashed strings.
  * @param str The literal without its suffix.
@@ -38204,23 +37729,18 @@ inline namespace literals {
 [[nodiscard]] constexpr hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return hashed_wstring{str};
 }
-
 } // namespace literals
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -38266,7 +37786,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -38471,7 +37990,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -38488,9 +38006,7 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -38941,13 +38457,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -39016,7 +38530,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -39052,7 +38565,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -39126,14 +38638,11 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
@@ -39605,7 +39114,6 @@ template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Le
 basic_any<Len, Align> forward_as_any(Type &&value) {
     return basic_any<Len, Align>{std::in_place_type<std::conditional_t<std::is_rvalue_reference_v<Type>, std::decay_t<Type>, Type>>, std::forward<Type>(value)};
 }
-
 } // namespace entt
 
 #endif
@@ -39618,9 +39126,7 @@ basic_any<Len, Align> forward_as_any(Type &&value) {
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -39629,7 +39135,6 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
@@ -39643,9 +39148,7 @@ using any = basic_any<>;
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -39749,7 +39252,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -39769,16 +39271,13 @@ private:
 
 // #include "hashed_string.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -39824,7 +39323,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -40029,7 +39527,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -40046,9 +39543,7 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -40499,13 +39994,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -40574,7 +40067,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -40610,7 +40102,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -40684,7 +40175,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -40696,9 +40186,7 @@ using member_class_t = typename member_class<Member>::type;
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -40788,7 +40276,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -40798,7 +40285,6 @@ private:
 #define ENTT_META_ADL_POINTER_HPP
 
 namespace entt {
-
 /**
  * @brief ADL based lookup function for dereferencing meta pointer-like types.
  * @tparam Type Element type.
@@ -40825,7 +40311,6 @@ struct adl_meta_pointer_like {
         return dereference_meta_pointer_like(value);
     }
 };
-
 } // namespace entt
 
 #endif
@@ -40868,16 +40353,13 @@ struct adl_meta_pointer_like {
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct meta_type_node;
 
 struct ENTT_API meta_context {
@@ -40895,7 +40377,6 @@ struct ENTT_API meta_context {
         return chain;
     }
 };
-
 } // namespace internal
 
 /**
@@ -40916,7 +40397,6 @@ struct meta_ctx {
 private:
     internal::meta_type_node **ctx{&internal::meta_context::local()};
 };
-
 } // namespace entt
 
 #endif
@@ -40926,7 +40406,6 @@ private:
 #define ENTT_META_FWD_HPP
 
 namespace entt {
-
 class meta_sequence_container;
 
 class meta_associative_container;
@@ -40942,7 +40421,6 @@ struct meta_data;
 struct meta_func;
 
 class meta_type;
-
 } // namespace entt
 
 #endif
@@ -40965,9 +40443,7 @@ class meta_type;
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Enable bitmask support for enum classes.
  * @tparam Type The enum type for which to enable bitmask support.
@@ -40985,7 +40461,6 @@ struct enum_as_bitmask<Type, std::void_t<decltype(Type::_entt_enum_as_bitmask)>>
  */
 template<typename Type>
 inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
-
 } // namespace entt
 
 /**
@@ -41073,7 +40548,6 @@ operator^=(Type &lhs, const Type rhs) ENTT_NOEXCEPT {
 #include <utility>
 
 namespace entt {
-
 /**
  * @brief Traits class template to be specialized to enable support for meta
  * template information.
@@ -41117,14 +40591,11 @@ struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
  */
 template<typename Type>
 inline constexpr auto is_meta_pointer_like_v = is_meta_pointer_like<Type>::value;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 class meta_any;
 class meta_type;
 struct meta_handle;
@@ -41135,7 +40606,6 @@ struct meta_handle;
  */
 
 namespace internal {
-
 enum class meta_traits : std::uint32_t {
     is_none = 0x0000,
     is_const = 0x0001,
@@ -41333,14 +40803,12 @@ template<auto Member, typename Type>
 
     return nullptr;
 }
-
 } // namespace internal
 
 /**
  * Internal details not to be documented.
  * @endcond
  */
-
 } // namespace entt
 
 #endif
@@ -41353,16 +40821,13 @@ template<auto Member, typename Type>
 #include <iterator>
 // #include "../core/iterator.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, typename Node>
 struct meta_range_iterator final {
     using difference_type = std::ptrdiff_t;
@@ -41406,7 +40871,6 @@ struct meta_range_iterator final {
 private:
     node_type *it;
 };
-
 } // namespace internal
 
 /**
@@ -41468,16 +40932,13 @@ struct meta_range final {
 private:
     node_type *node{nullptr};
 };
-
 } // namespace entt
 
 #endif
 
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 class meta_any;
 class meta_type;
 
@@ -43228,23 +42689,19 @@ inline bool meta_associative_container::erase(meta_any key) {
 [[nodiscard]] inline meta_associative_container::operator bool() const ENTT_NOEXCEPT {
     return static_cast<bool>(storage);
 }
-
 } // namespace entt
 
 #endif
 
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct is_dynamic_sequence_container: std::false_type {};
 
@@ -43379,7 +42836,6 @@ struct basic_meta_associative_container_traits {
         return {};
     }
 };
-
 } // namespace internal
 
 /**
@@ -43463,7 +42919,6 @@ struct meta_associative_container_traits<dense_map<Key, Type, Args...>>
 template<typename Type, typename... Args>
 struct meta_associative_container_traits<dense_set<Type, Args...>>
     : internal::basic_meta_associative_container_traits<dense_set<Type, Args...>> {};
-
 } // namespace entt
 
 #endif
@@ -43476,16 +42931,13 @@ struct meta_associative_container_traits<dense_set<Type, Args...>>
 
 // #include "../core/attribute.h"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct meta_type_node;
 
 struct ENTT_API meta_context {
@@ -43503,7 +42955,6 @@ struct ENTT_API meta_context {
         return chain;
     }
 };
-
 } // namespace internal
 
 /**
@@ -43524,7 +42975,6 @@ struct meta_ctx {
 private:
     internal::meta_type_node **ctx{&internal::meta_context::local()};
 };
-
 } // namespace entt
 
 #endif
@@ -43558,7 +43008,6 @@ private:
 #include <type_traits>
 
 namespace entt {
-
 /*! @brief Empty class type used to request the _as ref_ policy. */
 struct as_ref_t {
     /**
@@ -43614,7 +43063,6 @@ struct as_void_t {
      * @endcond
      */
 };
-
 } // namespace entt
 
 #endif
@@ -43639,9 +43087,7 @@ struct as_void_t {
 
 // #include "policy.hpp"
 
-
 namespace entt {
-
 /*! @brief Primary template isn't defined on purpose. */
 template<typename, typename>
 struct meta_function_descriptor;
@@ -43900,7 +43346,6 @@ template<typename Type, auto Data, typename Policy = as_is_t>
  */
 
 namespace internal {
-
 template<typename Type, typename Policy, typename Candidate, typename... Args>
 [[nodiscard]] meta_any meta_invoke_with_args(Candidate &&candidate, Args &&...args) {
     if constexpr(std::is_same_v<std::invoke_result_t<decltype(candidate), Args...>, void>) {
@@ -43940,7 +43385,6 @@ template<typename Type, typename... Args, std::size_t... Index>
 
     return meta_any{};
 }
-
 } // namespace internal
 
 /**
@@ -44019,14 +43463,11 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
 [[nodiscard]] meta_any meta_construct(meta_any *const args) {
     return meta_construct<Type, Policy>(Candidate, args);
 }
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Meta factory to be used for reflection purposes.
  *
@@ -44652,7 +44093,6 @@ inline void meta_reset() ENTT_NOEXCEPT {
         meta_reset((*internal::meta_context::global())->id);
     }
 }
-
 } // namespace entt
 
 #endif
@@ -44692,9 +44132,7 @@ inline void meta_reset() ENTT_NOEXCEPT {
 
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 class meta_any;
 class meta_type;
 
@@ -46445,7 +45883,6 @@ inline bool meta_associative_container::erase(meta_any key) {
 [[nodiscard]] inline meta_associative_container::operator bool() const ENTT_NOEXCEPT {
     return static_cast<bool>(storage);
 }
-
 } // namespace entt
 
 #endif
@@ -46471,9 +45908,7 @@ inline bool meta_associative_container::erase(meta_any key) {
 
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 class meta_any;
 class meta_type;
 struct meta_handle;
@@ -46484,7 +45919,6 @@ struct meta_handle;
  */
 
 namespace internal {
-
 enum class meta_traits : std::uint32_t {
     is_none = 0x0000,
     is_const = 0x0001,
@@ -46682,14 +46116,12 @@ template<auto Member, typename Type>
 
     return nullptr;
 }
-
 } // namespace internal
 
 /**
  * Internal details not to be documented.
  * @endcond
  */
-
 } // namespace entt
 
 #endif
@@ -46702,9 +46134,7 @@ template<auto Member, typename Type>
 #include <type_traits>
 // #include "type_traits.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Makes plain pointers pointer-like types for the meta system.
  * @tparam Type Element type.
@@ -46740,7 +46170,6 @@ struct is_meta_pointer_like<std::shared_ptr<Type>>
 template<typename Type, typename... Args>
 struct is_meta_pointer_like<std::unique_ptr<Type, Args...>>
     : std::true_type {};
-
 } // namespace entt
 
 #endif
@@ -46752,7 +46181,6 @@ struct is_meta_pointer_like<std::unique_ptr<Type, Args...>>
 #include <type_traits>
 
 namespace entt {
-
 /*! @brief Empty class type used to request the _as ref_ policy. */
 struct as_ref_t {
     /**
@@ -46808,7 +46236,6 @@ struct as_void_t {
      * @endcond
      */
 };
-
 } // namespace entt
 
 #endif
@@ -46821,16 +46248,13 @@ struct as_void_t {
 #include <iterator>
 // #include "../core/iterator.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, typename Node>
 struct meta_range_iterator final {
     using difference_type = std::ptrdiff_t;
@@ -46874,7 +46298,6 @@ struct meta_range_iterator final {
 private:
     node_type *it;
 };
-
 } // namespace internal
 
 /**
@@ -46936,7 +46359,6 @@ struct meta_range final {
 private:
     node_type *node{nullptr};
 };
-
 } // namespace entt
 
 #endif
@@ -46956,9 +46378,7 @@ private:
 
 // #include "range.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Returns the meta type associated with a given type.
  * @tparam Type Type to use to search for a meta type.
@@ -47006,7 +46426,6 @@ template<typename Type>
 
     return {};
 }
-
 } // namespace entt
 
 #endif
@@ -47017,9 +46436,7 @@ template<typename Type>
 
 // #include "../core/type_traits.hpp"
 
-
 namespace entt {
-
 /*! @brief Utility class to disambiguate class templates. */
 template<template<typename...> class>
 struct meta_class_template_tag {};
@@ -47036,7 +46453,6 @@ struct meta_template_traits<Clazz<Args...>> {
     /*! @brief List of template arguments. */
     using args_type = type_list<Args...>;
 };
-
 } // namespace entt
 
 #endif
@@ -47049,7 +46465,6 @@ struct meta_template_traits<Clazz<Args...>> {
 #include <utility>
 
 namespace entt {
-
 /**
  * @brief Traits class template to be specialized to enable support for meta
  * template information.
@@ -47093,7 +46508,6 @@ struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
  */
 template<typename Type>
 inline constexpr auto is_meta_pointer_like_v = is_meta_pointer_like<Type>::value;
-
 } // namespace entt
 
 #endif
@@ -47116,9 +46530,7 @@ inline constexpr auto is_meta_pointer_like_v = is_meta_pointer_like<Type>::value
 
 // #include "policy.hpp"
 
-
 namespace entt {
-
 /*! @brief Primary template isn't defined on purpose. */
 template<typename, typename>
 struct meta_function_descriptor;
@@ -47377,7 +46789,6 @@ template<typename Type, auto Data, typename Policy = as_is_t>
  */
 
 namespace internal {
-
 template<typename Type, typename Policy, typename Candidate, typename... Args>
 [[nodiscard]] meta_any meta_invoke_with_args(Candidate &&candidate, Args &&...args) {
     if constexpr(std::is_same_v<std::invoke_result_t<decltype(candidate), Args...>, void>) {
@@ -47417,7 +46828,6 @@ template<typename Type, typename... Args, std::size_t... Index>
 
     return meta_any{};
 }
-
 } // namespace internal
 
 /**
@@ -47496,7 +46906,6 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
 [[nodiscard]] meta_any meta_construct(meta_any *const args) {
     return meta_construct<Type, Policy>(Candidate, args);
 }
-
 } // namespace entt
 
 #endif
@@ -47519,9 +46928,7 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
 #        include <utility>
 
 namespace std {
-
 namespace internal {
-
 template<typename Func, typename... Args>
 constexpr auto is_invocable(int) -> decltype(std::invoke(std::declval<Func>(), std::declval<Args>()...), std::true_type{});
 
@@ -47532,10 +46939,8 @@ template<typename Ret, typename Func, typename... Args>
 constexpr auto is_invocable_r(int)
 -> std::enable_if_t<decltype(std::is_convertible_v<decltype(std::invoke(std::declval<Func>(), std::declval<Args>()...)), Ret>, std::true_type>;
 
-
 template<typename, typename, typename...>
 constexpr std::false_type is_invocable_r(...);
-
 } // namespace internal
 
 template<typename Func, typename... Args>
@@ -47557,7 +46962,6 @@ struct invoke_result {
 
 template<typename Func, typename... Args>
 using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
-
 } // namespace std
 
 #    endif
@@ -47596,7 +47000,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -47606,7 +47009,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -47705,7 +47107,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -47715,7 +47116,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -47811,7 +47211,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -47821,7 +47220,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -47895,9 +47293,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #endif
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -47987,7 +47383,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -48000,9 +47395,7 @@ private:
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -48011,7 +47404,6 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
@@ -48069,16 +47461,13 @@ using any = basic_any<>;
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename>
 struct fnv1a_traits;
 
@@ -48106,7 +47495,6 @@ struct basic_hashed_string {
     size_type length;
     hash_type hash;
 };
-
 } // namespace internal
 
 /**
@@ -48371,7 +47759,6 @@ using hashed_string = basic_hashed_string<char>;
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
 inline namespace literals {
-
 /**
  * @brief User defined literal for hashed strings.
  * @param str The literal without its suffix.
@@ -48389,23 +47776,18 @@ inline namespace literals {
 [[nodiscard]] constexpr hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return hashed_wstring{str};
 }
-
 } // namespace literals
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -48451,7 +47833,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -48656,7 +48037,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -48673,9 +48053,7 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -49126,13 +48504,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -49201,7 +48577,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -49237,7 +48612,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -49311,14 +48685,11 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
@@ -49790,7 +49161,6 @@ template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Le
 basic_any<Len, Align> forward_as_any(Type &&value) {
     return basic_any<Len, Align>{std::in_place_type<std::conditional_t<std::is_rvalue_reference_v<Type>, std::decay_t<Type>, Type>>, std::forward<Type>(value)};
 }
-
 } // namespace entt
 
 #endif
@@ -49810,16 +49180,13 @@ basic_any<Len, Align> forward_as_any(Type &&value) {
 
 // #include "hashed_string.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -49865,7 +49232,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -50070,7 +49436,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -50087,9 +49452,7 @@ template<typename Type>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -50540,13 +49903,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -50615,7 +49976,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -50651,7 +50011,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -50725,7 +50084,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -50738,7 +50096,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <type_traits>
 
 namespace entt {
-
 template<typename, std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_poly;
 
@@ -50748,14 +50105,11 @@ class basic_poly;
  */
 template<typename Concept>
 using poly = basic_poly<Concept>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /*! @brief Inspector class used to infer the type of the virtual table. */
 struct poly_inspector {
     /**
@@ -51050,7 +50404,6 @@ private:
     basic_any<Len, Align> storage;
     vtable_type vtable;
 };
-
 } // namespace entt
 
 #endif
@@ -51079,7 +50432,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -51089,7 +50441,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -51163,9 +50514,7 @@ private:
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Base class for processes.
  *
@@ -51484,7 +50833,6 @@ struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Fu
             [this]() { this->fail(); });
     }
 };
-
 } // namespace entt
 
 #endif
@@ -51510,9 +50858,7 @@ struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Fu
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Base class for processes.
  *
@@ -51831,14 +51177,11 @@ struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Fu
             [this]() { this->fail(); });
     }
 };
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Cooperative scheduler for processes.
  *
@@ -52104,7 +51447,6 @@ public:
 private:
     std::vector<process_handler> handlers{};
 };
-
 } // namespace entt
 
 #endif
@@ -52137,7 +51479,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -52147,7 +51488,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -52253,7 +51593,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -52263,7 +51602,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -52362,7 +51700,6 @@ private:
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -52372,7 +51709,6 @@ private:
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -52464,9 +51800,7 @@ private:
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -52475,14 +51809,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -52933,13 +52264,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -53008,7 +52337,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -53044,7 +52372,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -53118,21 +52445,17 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -53188,7 +52511,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -53364,13 +52686,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -53389,7 +52709,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -53404,9 +52723,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -53510,7 +52827,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -53527,9 +52843,7 @@ private:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
  * @tparam Type Pointer type.
@@ -53688,7 +53002,6 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
  */
 
 namespace internal {
-
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
@@ -53740,7 +53053,6 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
     }
 };
-
 } // namespace internal
 
 /**
@@ -53802,7 +53114,6 @@ template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
     return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
-
 } // namespace entt
 
 #endif
@@ -53819,9 +53130,7 @@ constexpr Type *uninitialized_construct_using_allocator(Type *value, const Alloc
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -54272,13 +53581,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -54347,7 +53654,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -54383,7 +53689,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -54457,7 +53762,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -54470,7 +53774,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <memory>
 
 namespace entt {
-
 template<
     typename Key,
     typename Type,
@@ -54485,21 +53788,17 @@ template<
     typename = std::equal_to<Type>,
     typename = std::allocator<Type>>
 class dense_set;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Key, typename Type>
 struct dense_map_node final {
     using value_type = std::pair<Key, Type>;
@@ -54712,7 +54011,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const dense_map_local_iterator<ILhs> &lhs, const dense_map_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -55436,7 +54734,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold;
 };
-
 } // namespace entt
 
 /**
@@ -55445,11 +54742,9 @@ private:
  */
 
 namespace std {
-
 template<typename Key, typename Value, typename Allocator>
 struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     : std::true_type {};
-
 } // namespace std
 
 /**
@@ -55484,7 +54779,6 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -55494,7 +54788,6 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -55586,9 +54879,7 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -55597,14 +54888,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -56055,13 +55343,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -56130,7 +55416,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -56166,7 +55451,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -56240,21 +55524,17 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -56310,7 +55590,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -56486,13 +55765,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -56511,7 +55788,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -56525,9 +55801,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -56536,7 +55810,6 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
@@ -56550,9 +55823,7 @@ using any = basic_any<>;
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -56656,7 +55927,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -56668,9 +55938,7 @@ private:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -56760,7 +56028,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -56772,7 +56039,6 @@ private:
 #include <memory>
 
 namespace entt {
-
 template<typename>
 struct resource_loader;
 
@@ -56781,7 +56047,6 @@ class resource_cache;
 
 template<typename>
 class resource;
-
 } // namespace entt
 
 #endif
@@ -56794,9 +56059,7 @@ class resource;
 #include <utility>
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Transparent loader for shared resources.
  * @tparam Type Type of resources created by the loader.
@@ -56817,7 +56080,6 @@ struct resource_loader {
         return std::make_shared<Type>(std::forward<Args>(args)...);
     }
 };
-
 } // namespace entt
 
 #endif
@@ -56833,9 +56095,7 @@ struct resource_loader {
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Basic resource handle.
  *
@@ -57009,21 +56269,17 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const resource<ILhs> &lhs, const resource<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, typename It>
 class resource_cache_iterator final {
     template<typename, typename>
@@ -57140,7 +56396,6 @@ template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
 [[nodiscard]] bool operator>=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs < rhs);
 }
-
 } // namespace internal
 
 /**
@@ -57415,7 +56670,6 @@ public:
 private:
     compressed_pair<container_type, loader_type> pool;
 };
-
 } // namespace entt
 
 #endif
@@ -57428,9 +56682,7 @@ private:
 #include <utility>
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Transparent loader for shared resources.
  * @tparam Type Type of resources created by the loader.
@@ -57451,7 +56703,6 @@ struct resource_loader {
         return std::make_shared<Type>(std::forward<Args>(args)...);
     }
 };
-
 } // namespace entt
 
 #endif
@@ -57467,9 +56718,7 @@ struct resource_loader {
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Basic resource handle.
  *
@@ -57643,7 +56892,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const resource<ILhs> &lhs, const resource<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace entt
 
 #endif
@@ -57674,7 +56922,6 @@ template<typename ILhs, typename IRhs>
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -57684,7 +56931,6 @@ template<typename ILhs, typename IRhs>
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -57783,7 +57029,6 @@ template<typename ILhs, typename IRhs>
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -57793,7 +57038,6 @@ template<typename ILhs, typename IRhs>
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -57875,9 +57119,7 @@ template<typename ILhs, typename IRhs>
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -57886,14 +57128,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -58344,13 +57583,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -58419,7 +57656,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -58455,7 +57691,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -58529,7 +57764,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -58541,7 +57775,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <memory>
 
 namespace entt {
-
 template<typename>
 class delegate;
 
@@ -58563,21 +57796,17 @@ class sigh;
 
 /*! @brief Alias declaration for the most common use case. */
 using dispatcher = basic_dispatcher<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Ret, typename... Args>
 auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
 
@@ -58600,7 +57829,6 @@ template<typename... Class, typename Ret, typename... Args>
 [[nodiscard]] constexpr auto index_sequence_for(Ret (*)(Args...)) {
     return std::index_sequence_for<Class..., Args...>{};
 }
-
 } // namespace internal
 
 /**
@@ -58893,7 +58121,6 @@ delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<in
  */
 template<typename Ret, typename... Args>
 delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
-
 } // namespace entt
 
 #endif
@@ -58942,7 +58169,6 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -58952,7 +58178,6 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -59051,7 +58276,6 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #endif
 
-
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
 #define ENTT_VERSION_PATCH 0
@@ -59061,7 +58285,6 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
 #endif
-
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
@@ -59153,9 +58376,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -59164,14 +58385,11 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -59622,13 +58840,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -59697,7 +58913,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -59733,7 +58948,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -59807,21 +59021,17 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -59877,7 +59087,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -60053,13 +59262,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -60078,7 +59285,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -60093,9 +59299,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Helper type to use as pointer with input iterators.
  * @tparam Type of wrapped value.
@@ -60199,7 +59403,6 @@ private:
     It first;
     Sentinel last;
 };
-
 } // namespace entt
 
 #endif
@@ -60216,9 +59419,7 @@ private:
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
  * @tparam Type Pointer type.
@@ -60377,7 +59578,6 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
  */
 
 namespace internal {
-
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
@@ -60429,7 +59629,6 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
     }
 };
-
 } // namespace internal
 
 /**
@@ -60491,7 +59690,6 @@ template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
     return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
-
 } // namespace entt
 
 #endif
@@ -60508,9 +59706,7 @@ constexpr Type *uninitialized_construct_using_allocator(Type *value, const Alloc
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -60961,13 +60157,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -61036,7 +60230,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -61072,7 +60265,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -61146,7 +60338,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
@@ -61159,7 +60350,6 @@ using member_class_t = typename member_class<Member>::type;
 #include <memory>
 
 namespace entt {
-
 template<
     typename Key,
     typename Type,
@@ -61174,21 +60364,17 @@ template<
     typename = std::equal_to<Type>,
     typename = std::allocator<Type>>
 class dense_set;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Key, typename Type>
 struct dense_map_node final {
     using value_type = std::pair<Key, Type>;
@@ -61401,7 +60587,6 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const dense_map_local_iterator<ILhs> &lhs, const dense_map_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
-
 } // namespace internal
 
 /**
@@ -62125,7 +61310,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold;
 };
-
 } // namespace entt
 
 /**
@@ -62134,11 +61318,9 @@ private:
  */
 
 namespace std {
-
 template<typename Key, typename Value, typename Allocator>
 struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     : std::true_type {};
-
 } // namespace std
 
 /**
@@ -62170,9 +61352,7 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
@@ -62623,13 +61803,11 @@ struct is_iterator: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
 } // namespace internal
 
 /**
@@ -62698,7 +61876,6 @@ struct is_equality_comparable: std::false_type {};
  */
 
 namespace internal {
-
 template<typename, typename = void>
 struct has_tuple_size_value: std::false_type {};
 
@@ -62734,7 +61911,6 @@ template<typename Type>
         return maybe_equality_comparable<Type>(choice<1>);
     }
 }
-
 } // namespace internal
 
 /**
@@ -62808,21 +61984,17 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
     using reference = Type &;
@@ -62878,7 +62050,6 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
         return *this;
     }
 };
-
 } // namespace internal
 
 /**
@@ -63054,13 +62225,11 @@ template<typename First, typename Second>
 inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
-
 } // namespace entt
 
 // disable structured binding support for clang 6, it messes when specializing tuple_size
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
-
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.
  * @tparam First The type of the first element that the pair stores.
@@ -63079,7 +62248,6 @@ template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
 };
-
 } // namespace std
 #endif
 
@@ -63093,9 +62261,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 #include <type_traits>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
@@ -63104,7 +62270,6 @@ using id_type = ENTT_ID_TYPE;
 
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
-
 } // namespace entt
 
 #endif
@@ -63162,16 +62327,13 @@ using any = basic_any<>;
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename>
 struct fnv1a_traits;
 
@@ -63199,7 +62361,6 @@ struct basic_hashed_string {
     size_type length;
     hash_type hash;
 };
-
 } // namespace internal
 
 /**
@@ -63464,7 +62625,6 @@ using hashed_string = basic_hashed_string<char>;
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
 inline namespace literals {
-
 /**
  * @brief User defined literal for hashed strings.
  * @param str The literal without its suffix.
@@ -63482,23 +62642,18 @@ inline namespace literals {
 [[nodiscard]] constexpr hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return hashed_wstring{str};
 }
-
 } // namespace literals
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
@@ -63544,7 +62699,6 @@ template<typename Type>
     }(stripped_type_name<Type>());
     return value;
 }
-
 } // namespace internal
 
 /**
@@ -63749,7 +62903,6 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
-
 } // namespace entt
 
 #endif
@@ -63761,9 +62914,7 @@ template<typename Type>
 #include <utility>
 // #include "../config/config.h"
 
-
 namespace entt {
-
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
     /*! @brief Indicates that this is a transparent function object. */
@@ -63853,7 +63004,6 @@ struct y_combinator {
 private:
     Func func;
 };
-
 } // namespace entt
 
 #endif
@@ -63886,16 +63036,13 @@ private:
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 template<typename Ret, typename... Args>
 auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
 
@@ -63918,7 +63065,6 @@ template<typename... Class, typename Ret, typename... Args>
 [[nodiscard]] constexpr auto index_sequence_for(Ret (*)(Args...)) {
     return std::index_sequence_for<Class..., Args...>{};
 }
-
 } // namespace internal
 
 /**
@@ -64211,16 +63357,13 @@ delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<in
  */
 template<typename Ret, typename... Args>
 delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
-
 } // namespace entt
 
 #endif
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Sink class.
  *
@@ -64811,21 +63954,17 @@ private:
  */
 template<typename Ret, typename... Args, typename Allocator>
 sink(sigh<Ret(Args...), Allocator> &) -> sink<sigh<Ret(Args...), Allocator>>;
-
 } // namespace entt
 
 #endif
 
-
 namespace entt {
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 namespace internal {
-
 struct basic_dispatcher_handler {
     virtual ~basic_dispatcher_handler() = default;
     virtual void publish() = 0;
@@ -64893,7 +64032,6 @@ private:
     signal_type signal;
     container_type events;
 };
-
 } // namespace internal
 
 /**
@@ -65185,7 +64323,6 @@ public:
 private:
     compressed_pair<container_type, allocator_type> pools;
 };
-
 } // namespace entt
 
 #endif
@@ -65213,9 +64350,7 @@ private:
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief General purpose event emitter.
  *
@@ -65510,7 +64645,6 @@ public:
 private:
     dense_map<id_type, std::unique_ptr<basic_pool>, identity> pools{};
 };
-
 } // namespace entt
 
 #endif
@@ -65530,9 +64664,7 @@ private:
 
 // #include "fwd.hpp"
 
-
 namespace entt {
-
 /**
  * @brief Sink class.
  *
@@ -66123,8 +65255,6 @@ private:
  */
 template<typename Ret, typename... Args, typename Allocator>
 sink(sigh<Ret(Args...), Allocator> &) -> sink<sigh<Ret(Args...), Allocator>>;
-
 } // namespace entt
 
 #endif
-

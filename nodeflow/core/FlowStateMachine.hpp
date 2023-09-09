@@ -33,35 +33,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <vector>
 #include <unordered_map>
-
+#include <vector>
 
 namespace nf
 {
+class Node;
 
-	class Node;
+class Node;
 
-	class Node;
+class ExecutionStack
+{
+private:
+};
 
-	class ExecutionStack
-	{
-	private:
-	};
+class FlowStateMachine
+{
+    using InstrPtr = Node*;
 
+    using ExecutionFrame = std::vector<Node*>;
 
-	class FlowStateMachine
-	{
-		using InstrPtr = Node*;
+    const ExecutionFrame& nextExecutionFrame() const noexcept;
 
-		using ExecutionFrame = std::vector<Node*>;
-
-		const ExecutionFrame& nextExecutionFrame() const noexcept;
-
-
-	private:
-
-		std::unordered_map<InstrPtr, ExecutionFrame> executionStack;
-	};
-
-}
+private:
+    std::unordered_map<InstrPtr, ExecutionFrame> executionStack;
+};
+} // namespace nf

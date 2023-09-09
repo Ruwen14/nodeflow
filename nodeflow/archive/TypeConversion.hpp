@@ -32,63 +32,78 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include <type_traits>
 #include <functional>
+#include <type_traits>
 
-class TypeInfo {};
-class NodeSignal {};
+class TypeInfo
+{
+};
+class NodeSignal
+{
+};
 
 namespace detail
 {
-	template<typename, typename, typename = void>
-	struct is_func_signature : std::false_type {};
+template <typename, typename, typename = void>
+struct is_func_signature : std::false_type
+{
+};
 
-	template<typename TFunc, typename Ret, typename... Args>
-	struct is_func_signature<TFunc, Ret(Args...),
-		typename std::enable_if<
-		std::is_convertible<
-		TFunc,
-		std::function<Ret(Args...)>
-		>::value
-		>::type
-	> : public std::true_type
-	{};
+template <typename TFunc, typename Ret, typename... Args>
+struct is_func_signature<
+    TFunc,
+    Ret(Args...),
+    typename std::enable_if<std::is_convertible<TFunc, std::function<Ret(Args...)>>::value>::type>
+    : public std::true_type
+{
+};
 
+class TypeConversionBase
+{
+public:
+    TypeConversionBase(TypeInfo from, TypeInfo to)
+        : from_(std::move(from))
+        , to_(std::move(to))
+    {
+    }
 
-	class TypeConversionBase
-	{
-	public:
-		TypeConversionBase(TypeInfo from, TypeInfo to)
-			: from_(std::move(from)), to_(std::move(to)) {}
+    virtual ~TypeConversionBase() = default;
 
-		virtual ~TypeConversionBase() = default;
+    const TypeInfo& to() const noexcept
+    {
+        return to_;
+    }
+    const TypeInfo& from() const noexcept
+    {
+        return from_;
+    }
 
-		const TypeInfo& to() const noexcept { return to_; }
-		const TypeInfo& from() const noexcept { return from_; }
+    virtual bool convert(const NodeSignal& from, NodeSignal& out) const = 0;
 
-		virtual bool convert(const NodeSignal& from, NodeSignal& out) const = 0;
-	private:
-		TypeInfo from_;
-		TypeInfo to_;
-	};
+private:
+    TypeInfo from_;
+    TypeInfo to_;
+};
 
-	template<typename FromType, typename ToType, typename Callable>
-	class TypeConversionImpl : public TypeConversionBase
-	{
-	public:
-		TypeConversionImpl(TypeInfo from, TypeInfo to)
-			: TypeConversionBase(from, to) {}
+template <typename FromType, typename ToType, typename Callable>
+class TypeConversionImpl : public TypeConversionBase
+{
+public:
+    TypeConversionImpl(TypeInfo from, TypeInfo to)
+        : TypeConversionBase(from, to)
+    {
+    }
 
-		bool convert(const NodeSignal& from, NodeSignal& out) const override
-		{
-			// 				FromType from = sig.getValue<FromType>();
-			// 				ToType to = this->fun_(from);
-			// 				NodeSignal out;
-			// 				out.setValue<ToType>(to);
-			// 				return out
-		}
+    bool convert(const NodeSignal& from, NodeSignal& out) const override
+    {
+        // 				FromType from = sig.getValue<FromType>();
+        // 				ToType to = this->fun_(from);
+        // 				NodeSignal out;
+        // 				out.setValue<ToType>(to);
+        // 				return out
+    }
 
-	private:
-		Callable fun_;
-	};
-}
+private:
+    Callable fun_;
+};
+} // namespace detail

@@ -34,39 +34,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
-#include "typedefs.hpp"
 #include "core/NodePort.hpp"
-
-
+#include "typedefs.hpp"
 
 namespace nf
 {
-	class NodeMetaContext
-	{
-	public:
-		void setNodeName(const std::string& name);
+class NodeMetaContext
+{
+public:
+    void setNodeName(const std::string& name);
 
-		template<typename T>
-		void setPortName(const InputPort<T>& p, const std::string& name)
-		{
-			NF_ASSERT(p.assigned(), "Port has not yet been assigned. Call Node::addPort(...) first");
+    template <typename T>
+    void setPortName(const InputPort<T>& p, const std::string& name)
+    {
+        NF_ASSERT(p.assigned(), "Port has not yet been assigned. Call Node::addPort(...) first");
+    }
 
-		}
-
-
-
-
-
-
-	private:
-		std::string nodeName;
-		std::vector<std::string> inputPortNames;
-		std::vector<std::string> outputPortNames;
-
-	};
-
-}
-
+private:
+    std::string nodeName;
+    std::vector<std::string> inputPortNames;
+    std::vector<std::string> outputPortNames;
+};
+} // namespace nf

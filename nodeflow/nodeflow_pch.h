@@ -1,11 +1,11 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <memory>
-#include <utility>
 #include <algorithm>
 #include <functional>
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
-#include "nodeflow/utility/dbgln.hpp"
 #include "nodeflow/reflection/type_reflection.hpp"
+#include "nodeflow/utility/dbgln.hpp"

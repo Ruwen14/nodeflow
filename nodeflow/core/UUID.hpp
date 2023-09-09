@@ -32,42 +32,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include <random>
 #include "nodeflow/typedefs.hpp"
+#include <random>
 
 namespace nf
 {
-	class UUID
-	{
-	public:
-		UUID();
-		explicit UUID(std::uint64_t uuid);
+class UUID
+{
+public:
+    UUID();
+    explicit UUID(std::uint64_t uuid);
 
-		[[nodiscard]] static UUID create() { return UUID{}; }
-		[[nodiscard]] static UUID createFrom(std::uint64_t uuid) { return UUID{ uuid }; }
+    [[nodiscard]] static UUID create()
+    {
+        return UUID{};
+    }
+    [[nodiscard]] static UUID createFrom(std::uint64_t uuid)
+    {
+        return UUID{ uuid };
+    }
 
-		inline operator std::uint64_t() const { return m_uuid; }
+    inline operator std::uint64_t() const
+    {
+        return m_uuid;
+    }
 
-	private:
-		std::uint64_t m_uuid;
+private:
+    std::uint64_t m_uuid;
 
-	private:
-		static std::random_device s_seeder;
-		static std::mt19937_64 s_engine;
-		static std::uniform_int_distribution<std::uint64_t> s_dist;
-	};
-}
+private:
+    static std::random_device s_seeder;
+    static std::mt19937_64 s_engine;
+    static std::uniform_int_distribution<std::uint64_t> s_dist;
+};
+} // namespace nf
 
 namespace std
 {
-	template <typename T> struct hash;
+template <typename T>
+struct hash;
 
-	template<>
-	struct hash<nf::UUID>
-	{
-		std::size_t operator()(const nf::UUID& uuid) const
-		{
-			return (uint64_t)uuid;
-		}
-	};
-}
+template <>
+struct hash<nf::UUID>
+{
+    std::size_t operator()(const nf::UUID& uuid) const
+    {
+        return (uint64_t)uuid;
+    }
+};
+} // namespace std

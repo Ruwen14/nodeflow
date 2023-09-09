@@ -32,126 +32,121 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
-#include <type_traits>
-#include <iostream>
-#include <ostream>
-#include <istream>
 #include <functional>
-
+#include <iostream>
+#include <istream>
+#include <ostream>
+#include <type_traits>
 
 namespace nf
 {
-	template <class T, class... Types>
-	inline constexpr bool is_any_of_v = std::disjunction<std::is_same<T, Types>...>{};
+template <class T, class... Types>
+inline constexpr bool is_any_of_v = std::disjunction<std::is_same<T, Types>...>{};
 
-	template< size_t I, typename T, typename Tuple_t>
-	constexpr size_t index_in_tuple_fn() {
-		static_assert(I < std::tuple_size<Tuple_t>::value, "The element is not in the tuple");
+template <size_t I, typename T, typename Tuple_t>
+constexpr size_t index_in_tuple_fn()
+{
+    static_assert(I < std::tuple_size<Tuple_t>::value, "The element is not in the tuple");
 
-		using el = typename std::tuple_element<I, Tuple_t>::type;
-		if constexpr (std::is_same<T, el>::value) {
-			return I;
-		}
-		else {
-			return index_in_tuple_fn<I + 1, T, Tuple_t>();
-		}
-	}
-
-	template<typename T, typename Tuple_t>
-	struct index_in_tuple {
-		static constexpr size_t value = index_in_tuple_fn<0, T, Tuple_t>();
-	};
-
-	template<typename T, typename Tuple_t>
-	struct extract_type
-	{
-		static constexpr size_t value = index_in_tuple_fn<0, T, Tuple_t>();
-		using type = std::tuple_element_t<value, Tuple_t>;
-	};
-
-
-	template<class... Tuples >
-	struct tuple_concat
-	{
-		using value = decltype(std::tuple_cat(std::declval<Tuples>() ...));
-	};
-
-	template<typename S, typename T>
-	struct is_streamable
-	{
-		template<typename SS, typename TT>
-		static auto test(int)
-			-> decltype(std::declval<SS&>() << std::declval<TT>(), std::true_type());
-
-		template<typename, typename>
-		static auto test(...)->std::false_type;
-
-		static constexpr auto value = decltype(test<S, T>(0))::value;
-	};
-
-	template<typename T>
-	static constexpr auto has_ostream_operator_v = is_streamable<std::ostream, T>::value;
-
-	template<typename S, typename T>
-	struct is_istreamable
-	{
-		template<typename SS, typename TT>
-		static auto test(int)
-			-> decltype(std::declval<SS&>() >> std::declval<TT&>(), std::true_type());
-
-		template<typename, typename>
-		static auto test(...) -> std::false_type;
-
-		static constexpr auto value = decltype(test<S, T>(0))::value;
-	};
-
-	template<typename T>
-	static constexpr auto has_istream_operator_v = is_istreamable<std::istream, T>::value;
-
-
-
-	template<typename T>
-	struct deduce_class_type;
-
-	template<typename Class, typename Value>
-	struct deduce_class_type<Value Class::*>
-	{
-		using type = Class;
-	};
-
-	template<typename T>
-	struct deduce_member_type;
-
-	template<typename Class, typename Value>
-	struct deduce_member_type<Value Class::*>
-	{
-		using type = Value;
-	};
-
-	template<typename Class>
-	using deduce_member_type_t = typename deduce_member_type<Class>::type;
-
-
-
-	template<typename Ret, class... Params>
-	struct FuncSignature
-	{
-	};
-
-	template<typename Ret, class... Params>
-	struct FuncSignature<std::function<Ret(Params...)>>
-	{
-		using ReturnType_t = Ret;
-		using ParamTypes_t = std::tuple<Params...>;
-	};
-
-// 
-	template<typename Ret, typename Cls, class... Params >
-	struct FuncSignature<std::function<Ret (Cls::*)(Params...)>>
-	{
-		using ReturnType_t = Ret;
-		using ParamTypes_t = std::tuple<Params...>;
-		using ClassType_t = Cls;
-	};
-
+    using el = typename std::tuple_element<I, Tuple_t>::type;
+    if constexpr (std::is_same<T, el>::value)
+    {
+        return I;
+    }
+    else
+    {
+        return index_in_tuple_fn<I + 1, T, Tuple_t>();
+    }
 }
+
+template <typename T, typename Tuple_t>
+struct index_in_tuple
+{
+    static constexpr size_t value = index_in_tuple_fn<0, T, Tuple_t>();
+};
+
+template <typename T, typename Tuple_t>
+struct extract_type
+{
+    static constexpr size_t value = index_in_tuple_fn<0, T, Tuple_t>();
+    using type = std::tuple_element_t<value, Tuple_t>;
+};
+
+template <class... Tuples>
+struct tuple_concat
+{
+    using value = decltype(std::tuple_cat(std::declval<Tuples>()...));
+};
+
+template <typename S, typename T>
+struct is_streamable
+{
+    template <typename SS, typename TT>
+    static auto test(int) -> decltype(std::declval<SS&>() << std::declval<TT>(), std::true_type());
+
+    template <typename, typename>
+    static auto test(...) -> std::false_type;
+
+    static constexpr auto value = decltype(test<S, T>(0))::value;
+};
+
+template <typename T>
+static constexpr auto has_ostream_operator_v = is_streamable<std::ostream, T>::value;
+
+template <typename S, typename T>
+struct is_istreamable
+{
+    template <typename SS, typename TT>
+    static auto test(int) -> decltype(std::declval<SS&>() >> std::declval<TT&>(), std::true_type());
+
+    template <typename, typename>
+    static auto test(...) -> std::false_type;
+
+    static constexpr auto value = decltype(test<S, T>(0))::value;
+};
+
+template <typename T>
+static constexpr auto has_istream_operator_v = is_istreamable<std::istream, T>::value;
+
+template <typename T>
+struct deduce_class_type;
+
+template <typename Class, typename Value>
+struct deduce_class_type<Value Class::*>
+{
+    using type = Class;
+};
+
+template <typename T>
+struct deduce_member_type;
+
+template <typename Class, typename Value>
+struct deduce_member_type<Value Class::*>
+{
+    using type = Value;
+};
+
+template <typename Class>
+using deduce_member_type_t = typename deduce_member_type<Class>::type;
+
+template <typename Ret, class... Params>
+struct FuncSignature
+{
+};
+
+template <typename Ret, class... Params>
+struct FuncSignature<std::function<Ret(Params...)>>
+{
+    using ReturnType_t = Ret;
+    using ParamTypes_t = std::tuple<Params...>;
+};
+
+//
+template <typename Ret, typename Cls, class... Params>
+struct FuncSignature<std::function<Ret (Cls::*)(Params...)>>
+{
+    using ReturnType_t = Ret;
+    using ParamTypes_t = std::tuple<Params...>;
+    using ClassType_t = Cls;
+};
+} // namespace nf
