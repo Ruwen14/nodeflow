@@ -66,7 +66,8 @@ public:
     }
 
     // Visitor Pattern
-    // Or Make template<Event> class BaseEventNode with virtual template<typename Event> parseEvent
+    // Or Make template<Event> class BaseEventNode with virtual
+    // template<typename Event> parseEvent
     bool constructFromEvent(const Event& event /*We need a callback function here*/)
     {
         return false;

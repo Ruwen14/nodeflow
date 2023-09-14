@@ -5,30 +5,37 @@ BSD 3-Clause License
 Copyright (c) 2022, Ruwen Kohm
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the
+following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+1. Redistributions of source code must retain the above
+copyright notice, this list of conditions and the following
+disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+2. Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials
+provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
+3. Neither the name of the copyright holder nor the names of
+its contributors may be used to endorse or promote products
+derived from this software without specific prior written
+permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
@@ -39,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodeflow/core/FlowModule.hpp"
 #include "nodeflow/nodes/EventNode.hpp"
 #include "nodeflow/typedefs.hpp"
+#include "nodeflow/utility/dbgln.hpp"
 
 namespace nf
 {
@@ -61,8 +69,9 @@ public:
     // 		Node* variables() const;
 
     /**
-     * @brief Broadcasts custom event to all nodes within script.
-     Nodes can react on event by overriding onEvent method.
+     * @brief Broadcasts custom event to all nodes within
+     script. Nodes can react on event by overriding onEvent
+     method.
      * @tparam EventType
      * @tparam ...EventArgs
      * @param ...eventArgs
@@ -97,6 +106,14 @@ public:
 
     ErrorOr<NodeHandle> spawnNode(const std::string& namePath);
 
+    ErrorOr<DataNode*> spawnVariable(const std::string_view name);
+
+    template <typename T>
+    ErrorOr<DataNode*> spawnVariable(std::string_view name, T&& defVal)
+    {
+        return nullptr;
+    }
+
     bool removeNode(NodeHandle node);
 
     Expected<void, ConnectionError> connectPorts(
@@ -126,16 +143,20 @@ public:
     void run();
 
     /*
-    ExpectedRef<FlowNode, Error> spawnNode(const std::string& namePath);
+    ExpectedRef<FlowNode, Error> spawnNode(const
+    std::string& namePath);
 
-    ExpectedRef<DataNode, Error> spawnType(const std::string& namePath);
+    ExpectedRef<DataNode, Error> spawnType(const
+    std::string& namePath);
     */
 
     /*
-    Expected<void, ConnectionError> connectNodes(Node& outNode, PortIndex outPort,
-                                            Node& inNode, PortIndex inPort);
+    Expected<void, ConnectionError> connectNodes(Node&
+    outNode, PortIndex outPort, Node& inNode, PortIndex
+    inPort);
 
-    bool disconnectNodes(Node& outNode, PortIndex outPort, Node& inNode, PortIndex inPort);
+    bool disconnectNodes(Node& outNode, PortIndex outPort,
+    Node& inNode, PortIndex inPort);
     */
 private:
     Node* findNode(NodeHandle uuid, std::pair<int, size_t>& pos) const;
@@ -171,7 +192,8 @@ ToNode* explicit_node_cast(Node* from)
         NF_ASSERT(dynamic_cast<ToNode*>(from) != nullptr, "This bad, as it should have worked.");
         return static_cast<ToNode*>(from);
     }
-    // When the Archetype is of FlowNode when can safely cast down to it.
+    // When the Archetype is of FlowNode when can safely
+    // cast down to it.
     if (std::is_same_v<ToNode, nf::FlowNode> && from->getArchetype() == NodeArchetype::FlowNode)
     {
         dbgln("Archetype cast");

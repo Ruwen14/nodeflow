@@ -46,10 +46,10 @@ namespace nf
 {
 class TypenameAtlas : public Singleton<TypenameAtlas>
 {
-  public:
+public:
     using atlas_t = std::unordered_map<typeid_t, std::string>;
 
-  public:
+public:
     TypenameAtlas() = default;
 
     template <typename Type>
@@ -60,7 +60,8 @@ class TypenameAtlas : public Singleton<TypenameAtlas>
         if (m_atlas.contains(id))
         {
             NF_ASSERT(m_atlas.at(id) == typeName,
-                      "Hash collision of function: type_name<T>() detected. Please fix affected type name");
+                      "Hash collision of function: type_name<T>() detected. "
+                      "Please fix affected type name");
             return false;
         }
         m_atlas[id] = typeName;
@@ -68,12 +69,12 @@ class TypenameAtlas : public Singleton<TypenameAtlas>
     }
 
     template <typename Type>
-    inline const std::string &get() const
+    inline const std::string& get() const
     {
         return m_atlas.at(type_id<Type>());
     }
 
-    inline const std::string &get(typeid_t id) const
+    inline const std::string& get(typeid_t id) const
     {
         return m_atlas.at(id);
     }
@@ -83,7 +84,7 @@ class TypenameAtlas : public Singleton<TypenameAtlas>
         return m_atlas.contains(id);
     }
 
-    inline const atlas_t &atlas() const
+    inline const atlas_t& atlas() const
     {
         return m_atlas;
     }
@@ -92,7 +93,7 @@ class TypenameAtlas : public Singleton<TypenameAtlas>
 
     bool hasDuplicates() const;
 
-  private:
+private:
     atlas_t m_atlas{};
 };
 } // namespace nf

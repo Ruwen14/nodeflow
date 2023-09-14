@@ -108,7 +108,8 @@ struct std::formatter<nf::Error, CharT> : std::formatter<CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const nf::Error& error, FormatContext& fc) const
     {

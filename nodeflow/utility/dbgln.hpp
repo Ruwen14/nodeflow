@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utility>
 #include <vector>
 
-#include "../3rdparty/cpputils/magic_enum.h"
+#include "3rdparty/cpputils/magic_enum.h"
 
 template <typename... Args>
 void dbgln(std::string_view fmt, Args&&... args)
@@ -77,7 +77,8 @@ struct std::formatter<std::vector<T>, CharT> : std::formatter<T, CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const std::vector<T>& cont, FormatContext& fc) const
     {
@@ -97,7 +98,8 @@ struct std::formatter<std::list<T>, CharT> : std::formatter<T, CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const std::list<T>& cont, FormatContext& fc) const
     {
@@ -117,7 +119,8 @@ struct std::formatter<std::set<T>, CharT> : std::formatter<T, CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const std::set<T>& cont, FormatContext& fc) const
     {
@@ -140,7 +143,8 @@ struct std::formatter<Enum, CharT> : std::formatter<CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const Enum enum_value, FormatContext& fc) const
     {
@@ -159,7 +163,8 @@ struct std::formatter<T*, CharT> : std::formatter<CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(T* ptr, FormatContext& fc) const
     {
@@ -177,7 +182,8 @@ struct std::formatter<const T*, CharT> : std::formatter<CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const T* ptr, FormatContext& fc) const
     {
@@ -195,7 +201,8 @@ struct std::formatter<std::optional<T>, CharT> : std::formatter<T, CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const std::optional<T>& opt, FormatContext& fc) const
     {
@@ -210,7 +217,8 @@ struct std::formatter<std::pair<T, T2>, CharT> : std::formatter<CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const std::pair<T, T2>& pr, FormatContext& fc) const
     {
@@ -223,7 +231,8 @@ struct std::formatter<std::map<T, T2>, CharT> : std::formatter<CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const std::map<T, T2>& m, FormatContext& fc) const
     {
@@ -242,7 +251,8 @@ struct std::formatter<std::unordered_map<T, T2>, CharT> : std::formatter<CharT>
 {
     // parse() is inherited from the base class
 
-    // Define format() by calling the base class implementation with the wrapped value
+    // Define format() by calling the base class implementation with the wrapped
+    // value
     template <class FormatContext>
     auto format(const std::unordered_map<T, T2>& m, FormatContext& fc) const
     {

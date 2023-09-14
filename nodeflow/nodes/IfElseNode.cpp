@@ -35,9 +35,11 @@ void IfElseNode::process()
 
 void IfElseNode::setExecFlowIf(FlowNode& node)
 {
+    NF_UNUSED(node);
 }
 
 void IfElseNode::setExecFlowElse(FlowNode& node)
 {
+    NF_UNUSED(node);
 }
 } // namespace nf

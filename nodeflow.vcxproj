@@ -78,9 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -146,9 +150,9 @@
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>nodeflow_pch.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>nodeflow_pch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,11 +163,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="nodeflow-gui\imgui\ImGuiNodeWidget.hpp" />
-    <ClInclude Include="nodeflow-gui\NodeGeometry.hpp" />
-    <ClInclude Include="nodeflow-gui\NodeStyle.hpp" />
-    <ClInclude Include="nodeflow-gui\qt\NodeWidget.hpp" />
-    <ClInclude Include="nodeflow\archive\CodeGen.hpp" />
     <ClInclude Include="nodeflow\core\DataHandle.hpp" />
     <ClInclude Include="nodeflow\core\Error.hpp" />
     <ClInclude Include="nodeflow\core\FlowEvent.hpp" />
@@ -187,29 +186,18 @@
     <ClInclude Include="nodeflow\nodes\EventNode.hpp" />
     <ClInclude Include="nodeflow\nodes\EventNodeV1.hpp" />
     <ClInclude Include="nodeflow\nodes\FlowNode.hpp" />
-    <ClInclude Include="nodeflow\archive\FreeFunctionNode.hpp" />
-    <ClInclude Include="nodeflow\archive\NFPainter.hpp" />
-    <ClInclude Include="nodeflow\archive\NFTypeInfo.hpp" />
     <ClInclude Include="nodeflow\nodes\FunctorNode.hpp" />
-    <ClInclude Include="nodeflow\archive\NodeStyle.hpp" />
-    <ClInclude Include="nodeflow\archive\NumericConversion.hpp" />
-    <ClInclude Include="nodeflow\archive\Reflection.hpp" />
-    <ClInclude Include="nodeflow\archive\TypeConversion.hpp" />
     <ClInclude Include="nodeflow\typedefs.hpp" />
     <ClInclude Include="nodeflow\reflection\function_reflection.hpp" />
     <ClInclude Include="nodeflow\reflection\type_reflection.hpp" />
     <ClInclude Include="nodeflow\utility\any.h" />
-    <ClInclude Include="nodeflow\utility\dbgln.hpp" />
     <ClInclude Include="nodeflow\utility\Expected.hpp" />
-    <ClInclude Include="nodeflow\archive\nfutils.h" />
     <ClInclude Include="nodeflow\utility\ppmagic.h" />
     <ClInclude Include="nodeflow\utility\print.h" />
     <ClInclude Include="nodeflow\utility\Singleton.hpp" />
     <ClInclude Include="nodeflow\utility\timer.h" />
     <ClInclude Include="nodeflow\utility\Timer.hpp" />
     <ClInclude Include="nodeflow\utility\tmp.h" />
-    <ClInclude Include="3rdparty\entt\single_include\entt\entt.hpp" />
-    <ClInclude Include="3rdparty\nameof\include\nameof.hpp" />
     <ClInclude Include="nodeflow\utility\TypenameAtlas.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -231,23 +219,6 @@
     <ClCompile Include="nodeflow\nodes\IfElseNode.cpp" />
     <ClCompile Include="nodeflow\nodes\FlowNode.cpp" />
     <ClCompile Include="nodeflow\utility\TypenameAtlas.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="3rdparty\entt\natvis\entt\config.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\container.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\core.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\entity.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\locator.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\meta.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\platform.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\poly.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\process.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\resource.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\entt\signal.natvis" />
-    <Natvis Include="3rdparty\entt\natvis\NatvisFile.natvis" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".clang-format" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

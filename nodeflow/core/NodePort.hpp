@@ -153,7 +153,8 @@ public:
             stream >> value;
             auto success = !(stream.bad() || stream.fail());
             NF_ASSERT(success,
-                      "In [OutputPort<T>::setFromString] -> Fail or bad state encountered during "
+                      "In [OutputPort<T>::setFromString] -> Fail or bad state "
+                      "encountered during "
                       "stream operator >>");
             return success;
         }

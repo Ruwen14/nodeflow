@@ -1,5 +1,5 @@
 // #include "core/NFAbstractNodeModel.hpp"
-
+#pragma once
 #include "nodeflow/core/FlowModule.hpp"
 #include "nodeflow/core/FlowScript.hpp"
 #include "nodeflow/nodes/FlowNode.hpp"
@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <string>
+#include <type_traits>
+#include <unordered_set>
 
 // #ifdef _WIN32
 // #pragma comment(lib, "liblua54.a")
@@ -67,8 +69,8 @@
 // GenCallInstruction_FreeFunction()
 // 	{
 // 		using codeContext =
-// nf::FunctionCodeContext<func>; 		using retType =
-// codeContext::ReturnType;
+// nf::FunctionCodeContext<func>; 		using
+// retType = codeContext::ReturnType;
 //
 // 		CPPCodeInstruction ci;
 // 		ci.instructionType =
@@ -151,8 +153,8 @@
 // override
 // 		{
 // 			addPort(inputPort1,
-// "MyInputPort1"); 			addPort(resultPort,
-// "MyResultPort"); 			addPort(inputPort2,
+// "MyInputPort1"); addPort(resultPort,
+// "MyResultPort"); addPort(inputPort2,
 // "MyInputPort2");
 //
 // 			return {};
@@ -161,9 +163,10 @@
 // 		void process() override
 // 		{
 // 			auto input1 =
-// getInputData(inputPort1); 			auto input2 =
-// getInputData(inputPort2); 			if (input1 &&
-// input2); 			setOutputData(resultPort,
+// getInputData(inputPort1); 			auto
+// input2 = getInputData(inputPort2); 			if
+// (input1
+// && input2); 			setOutputData(resultPort,
 // std::sin<int>(fib(*input1
 // + *input2)));
 // 		}
@@ -182,7 +185,7 @@
 // override
 // 		{
 // 			addPort(sourcePort1,
-// "MySourcePort1"); 			addPort(sourcePort2,
+// "MySourcePort1"); addPort(sourcePort2,
 // "MySourcePort2");
 //
 // 			return {};
@@ -519,55 +522,115 @@
 // dbgln(*node->getOutputPort(0).dataHandle().get<int>());
 // }
 
-int doStuff(int a, const float b, std::unique_ptr<std::vector<int>> c, const float k)
+int doStuff(int a)
 {
-    return 6;
+    return 18;
 }
 
-class Test
+template <typename T>
+std::set<T> findDuplicates(std::vector<T> vec) // no-ref, no-const
 {
+    std::set<nf::typeid_t> duplicates;
+    std::sort(vec.begin(), vec.end());
+    std::set<nf::typeid_t> distinct(vec.begin(), vec.end());
+    std::set_difference(vec.begin(),
+                        vec.end(),
+                        distinct.begin(),
+                        distinct.end(),
+                        std::inserter(duplicates, duplicates.end()));
+    return duplicates;
+}
+
+class GenericConverter
+{
+    using Converter = bool (*)(const void* from, void* to);
+
 public:
-    Test(int e, int c, int w)
-        : a(e)
-        , b(c)
-        , c(w)
+    template <typename Conversion>
+    GenericConverter()
+        : converter([](const void* from, void* to) -> bool { return Converter(from, to); })
     {
+    }
+    ~GenericConverter() = default;
+
+    bool convert()
+    {
+        return converter(nullptr, nullptr);
     }
 
 private:
-    int a;
-    int b;
-    int c;
+    Converter converter = nullptr;
 };
 
-void doVeryLongFunctionName(const std::unique_ptr<std::vector<int>>,
-                            const std::unique_ptr<std::vector<int>>,
-                            const std::unique_ptr<std::vector<int>>)
+bool hey(const void* from, int* to)
 {
-    if (std::unique_ptr<std::vector<int>>{} == nullptr
-        || std::unique_ptr<std::vector<int>>{} != nullptr && true == false)
-    {
-    }
+    return false;
 }
+//
+//  static bool convert(const AbstractConverterFunction* _this, const void* in, void* out)
+// {
+//     const From* f = static_cast<const From*>(in);
+//     To* t = static_cast<To*>(out);
+//     const ConverterFunctor* _typedThis = static_cast<const ConverterFunctor*>(_this);
+//     *t = _typedThis->m_function(*f);
+//     return true;
+// }
+
+// template <typename From, typename To, typename Callable>
+// Type_Conversion type_conversion(const Callable& t_function)
+// {
+//     auto func = [t_function](const Boxed_Value& t_bv) -> Boxed_Value {
+//         // not even attempting to call boxed_cast so that we don't get caught
+//         in some call recursion return chaiscript::Boxed_Value(
+//             t_function(detail::Cast_Helper<const From&>::cast(t_bv,
+//             nullptr)));
+//     };
+// namespace nf
+// {
+// template <typename From, typename To, typename Conversion>
+// decltype(auto) type_conversion(Conversion&& conversion)
+// {
+//     auto wrappedConversion = [conversion = std::forward<Conversion>(conversion)](const void*
+//     from,
+//                                                                                  void* to) ->
+//                                                                                  bool {
+//         const From* f = static_cast<const From*>(from);
+//
+//         return conversion(nullptr, nullptr);
+//     };
+//     return wrappedConversion;
+// }
+// } // namespace nf
 
 int main()
 {
+    //     auto lambda = [](const void* from, int* to) -> bool { return
+    //     hey(from, to); };
+
+    //     nf::dev::GenericConverter converter(hey);
+    //     dbgln(converter.convert());
+
+    //     std::set<nf::typeid_t> duplicates = findDuplicates(types);
+
+    //     const auto& instance = TypenameAtlas::instance();
+
     auto module = std::make_shared<nf::FlowModule>("myModule");
-    module->registerFunction<doStuff>("Functions/doStuff");
-
-    std::vector<int> k = { 1, 2, 3 };
-
-    for (const auto& a : k)
-    {
-    }
+    module->registerFunction<doStuff>("Functions/doStwuff");
 
     // #ToDo: set typeID virtual support;
 
     nf::FlowScript script(module);
     auto maybeNode =
-        script.spawnNode("Functions/doStuff").or_else([](auto Error) { NF_ASSERT(false, ""); });
+        script.spawnNode("Functions/doStwuff").or_else([](auto Error) { NF_ASSERT(false, ""); });
 
     auto doStuffNode = script.findNode(*maybeNode);
+
+    script.spawnVariable("Hi", 30);
+
+    //     if (doStuffNode)
+    //     {
+    //         dbgln(doStuffNode->getArchetype());
+    //     }
 
     // 	doStuffNode->setOutputDataFromString();
 
@@ -668,11 +731,11 @@ int main()
     //
     // 	pprint(doubleIntegerSourceNode_.getArchetype());
     // 	script.connectNodes(doubleIntegerSourceNode_,
-    // 0, addNumbersNode, 0).or_else([](auto Error)
-    // {pprint(Error); });
+    // 0, addNumbersNode, 0).or_else([](auto
+    // Error) {pprint(Error); });
     // 	script.connectNodes(doubleIntegerSourceNode_,
-    // 1, addNumbersNode, 1).or_else([](auto Error)
-    // {pprint(Error); });
+    // 1, addNumbersNode, 1).or_else([](auto
+    // Error) {pprint(Error); });
 
     // 	script.connectNodes(doubleIntegerSourceNode_,
     // 0, integerToStringNode, 0).or_else([](auto
@@ -682,20 +745,20 @@ int main()
     return 0;
 
     // 	script.connectNodes(doubleIntegerSourceNode_,
-    // 0, addNumbersNode, 0).or_else([](auto Error)
-    // {pprint(Error); });
+    // 0, addNumbersNode, 0).or_else([](auto
+    // Error) {pprint(Error); });
     // 	script.connectNodes(doubleIntegerSourceNode_,
-    // 1, addNumbersNode, 1).or_else([](auto Error)
-    // {pprint(Error); });;
+    // 1, addNumbersNode, 1).or_else([](auto
+    // Error) {pprint(Error); });;
 
     // 	addNumbersNode.process();
     // 	script.connectNodes(doubleIntegerSourceNode_.uuid(),
-    // 0, integerAddNode_.uuid(), 0).or_else([](auto
-    // Error) {pprint(Error);
+    // 0, integerAddNode_.uuid(),
+    // 0).or_else([](auto Error) {pprint(Error);
     // });
     // script.connectNodes(doubleIntegerSourceNode_.uuid(),
-    // 1, integerAddNode_.uuid(), 1).or_else([](auto
-    // Error) {pprint(Error);
+    // 1, integerAddNode_.uuid(),
+    // 1).or_else([](auto Error) {pprint(Error);
     // });
 
     return 0;
@@ -718,8 +781,9 @@ int main()
     // static_assert(std::is_base_of_v<nf::Node,
     // FlowModule>
     // ==false,
-    // "<Type> not allowed to be of type <nf::Node>.
-    // Use 'importNode(...)' instead");
+    // "<Type> not allowed to be of type
+    // <nf::Node>. Use 'importNode(...)'
+    // instead");
     //
     // // 	auto& createFunctor =
     // nodeModule.m_nodeCreators["Basics/TestNode"];

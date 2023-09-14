@@ -6,6 +6,7 @@ std::string Node::portName(PortDirection dir, PortIndex index) const
 {
     NF_UNUSED(dir);
     NF_UNUSED(index);
+
     return "";
 }
 

@@ -151,7 +151,6 @@ Expected<void, RegisterError> FlowModule::registerType(const std::string& namePa
     DataNodeImpl<T>::staticNodeName = baseName;
     auto makerLambda = []() {
         std::unique_ptr<nf::DataNode> uptr = std::make_unique<DataNodeImpl<T>>();
-        uptr->assignTypeID(type_id<DataNodeImpl<T>>());
         return uptr;
     };
 
@@ -173,7 +172,6 @@ Expected<void, RegisterError> FlowModule::registerCustomNode(const std::string& 
 
     auto makerLambda = []() {
         std::unique_ptr<nf::FlowNode> uptr = std::make_unique<Node>();
-        uptr->assignTypeID(type_id<Node>());
         return uptr;
     };
 
@@ -231,7 +229,6 @@ Expected<void, RegisterError> FlowModule::registerConversion(
     auto makerLambda = []() {
         std::unique_ptr<nf::FlowNode> uptr =
             std::make_unique<ConversionNodeImpl<From_t, To_t, Callable>>();
-        uptr->assignTypeID(type_id<ConversionNodeImpl<From_t, To_t, Callable>>());
         return uptr;
     };
 

@@ -4,9 +4,10 @@ namespace nf
 {
 Node* FlowScript::findNode(NodeHandle uuid) const
 {
-    // FIXME: A data structure like unordered_map would definitely make more sense here.
-    //        But I'm not sure yet how to execute the nodes later. Vectors might be more performant
-    //        then.
+    // FIXME: A data structure like unordered_map would definitely make more
+    // sense here.
+    //        But I'm not sure yet how to execute the nodes later. Vectors might
+    //        be more performant then.
     for (auto& node : m_callablesNodes)
     {
         if (node->uuid() == uuid)
@@ -70,6 +71,11 @@ ErrorOr<NodeHandle> FlowScript::spawnNode(const std::string& namePath)
         return createVariable(namePath);
 
     return make_unexpected(Error("Unknown namePath during 'FlowScript::spawnNode'"));
+}
+
+ErrorOr<DataNode*> FlowScript::spawnVariable(const std::string_view name)
+{
+    return nullptr;
 }
 
 bool FlowScript::removeNode(NodeHandle node)
@@ -208,7 +214,8 @@ bool FlowScript::connectFlow(NodeHandle outNodeUUID, NodeHandle inNodeUUID)
 }
 
 /*
-nf::ExpectedRef<DataNode, Error> FlowScript::spawnType(const std::string& namePath)
+nf::ExpectedRef<DataNode, Error> FlowScript::spawnType(const std::string&
+namePath)
 {
     auto& creators = m_scriptModule->dataCreators();
 
@@ -219,8 +226,8 @@ nf::ExpectedRef<DataNode, Error> FlowScript::spawnType(const std::string& namePa
     auto instance = creator();
 
     // Checks uniqueness of instance UUID. In the very unlikely event that a
-    // collision has occurred, a new UUID is generated and assigned to the instance.
-    while (!isUUIDUnique(instance->uuid()))
+    // collision has occurred, a new UUID is generated and assigned to the
+instance. while (!isUUIDUnique(instance->uuid()))
     {
         NF_ASSERT(false, "UUID collision found!");
         instance->setUUID(UUID::create());
@@ -236,16 +243,18 @@ nf::ExpectedRef<DataNode, Error> FlowScript::spawnType(const std::string& namePa
 */
 
 /*
-Expected<void, ConnectionError> FlowScript::connectNodes(Node& outNode, PortIndex outPort,
-                                                    Node& inNode, PortIndex inPort)
+Expected<void, ConnectionError> FlowScript::connectNodes(Node& outNode,
+PortIndex outPort, Node& inNode, PortIndex inPort)
 {
-    return outNode.makeConnection(ConnectionPolicy::OutputToInput, outPort, inNode, inPort);
+    return outNode.makeConnection(ConnectionPolicy::OutputToInput, outPort,
+inNode, inPort);
 }
 
 bool FlowScript::disconnectNodes(Node& outNode, PortIndex outPort,
                             Node& inNode, PortIndex inPort)
 {
-    return outNode.breakConnection(ConnectionPolicy::OutputToInput, outPort, inNode, inPort);
+    return outNode.breakConnection(ConnectionPolicy::OutputToInput, outPort,
+inNode, inPort);
 }
 */
 
