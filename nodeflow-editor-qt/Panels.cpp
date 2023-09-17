@@ -94,10 +94,7 @@ CollapsableSection::CollapsableSection(const QString& title,
     font.setPointSize(8);
     font.setBold(true);
     collapseButton->setFont(font);
-    connect(collapseButton,
-            &QToolButton::toggled,
-            this,
-            &CollapsableSection::toggle);
+    connect(collapseButton, &QToolButton::toggled, this, &CollapsableSection::toggle);
 
     collapseAnimation = new QParallelAnimationGroup(this);
     contentArea = new QScrollArea(this);
@@ -117,12 +114,9 @@ CollapsableSection::CollapsableSection(const QString& title,
     sectionLayout->addWidget(hline);
     sectionLayout->addWidget(contentArea);
 
-    collapseAnimation->addAnimation(
-        new QPropertyAnimation(this, "minimumHeight"));
-    collapseAnimation->addAnimation(
-        new QPropertyAnimation(this, "maximumHeight"));
-    collapseAnimation->addAnimation(
-        new QPropertyAnimation(contentArea, "maximumHeight"));
+    collapseAnimation->addAnimation(new QPropertyAnimation(this, "minimumHeight"));
+    collapseAnimation->addAnimation(new QPropertyAnimation(this, "maximumHeight"));
+    collapseAnimation->addAnimation(new QPropertyAnimation(contentArea, "maximumHeight"));
 
     contentArea->setLayout(contentLayout);
     auto collapsedHeight = sizeHint().height() - contentArea->maximumHeight();
@@ -130,16 +124,14 @@ CollapsableSection::CollapsableSection(const QString& title,
 
     for (int i = 0; i < collapseAnimation->animationCount(); ++i)
     {
-        auto animation =
-            static_cast<QPropertyAnimation*>(collapseAnimation->animationAt(i));
+        auto animation = static_cast<QPropertyAnimation*>(collapseAnimation->animationAt(i));
         animation->setDuration(0);
         animation->setStartValue(collapsedHeight);
         animation->setEndValue(collapsedHeight + contentHeight);
     }
 
-    auto contentAnimation =
-        static_cast<QPropertyAnimation*>(collapseAnimation->animationAt(
-            collapseAnimation->animationCount() - 1));
+    auto contentAnimation = static_cast<QPropertyAnimation*>(
+        collapseAnimation->animationAt(collapseAnimation->animationCount() - 1));
 
     contentAnimation->setDuration(0);
     contentAnimation->setStartValue(0);
@@ -161,15 +153,14 @@ void CollapsableSection::collapse()
 
 void CollapsableSection::toggle(bool checked)
 {
-    collapseButton->setArrowType(checked ? Qt::ArrowType::DownArrow
-                                         : Qt::ArrowType::RightArrow);
+    collapseButton->setArrowType(checked ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
     collapseAnimation->setDirection(checked ? QAbstractAnimation::Forward
                                             : QAbstractAnimation::Backward);
     collapseAnimation->start();
 }
 
-VariableAddConfigurator::VariableAddConfigurator(
-    const QList<QString>& availabelVarTypes, QWidget* parent /*= nullptr*/)
+VariableAddConfigurator::VariableAddConfigurator(const QList<QString>& availabelVarTypes,
+                                                 QWidget* parent /*= nullptr*/)
     : QWidget(parent)
     , m_varNameEdit(new QLineEdit)
     , m_varTypeSelector(new QComboBox)
@@ -224,8 +215,8 @@ VariableAddConfigurator::VariableAddConfigurator(
     setFont(font);
 }
 
-AddVariableConfigPopup::AddVariableConfigPopup(
-    const QList<QString>& availabelVarTypes, QWidget* parent /*= nullptr*/)
+AddVariableConfigPopup::AddVariableConfigPopup(const QList<QString>& availabelVarTypes,
+                                               QWidget* parent /*= nullptr*/)
     : QDialog(parent)
     , m_varNameEdit(new QLineEdit)
     , m_varTypeSelector(new QComboBox)
@@ -287,16 +278,15 @@ void AddVariableConfigPopup::resetVarConfig()
     m_varTypeSelector->setCurrentIndex(0);
 }
 
-AddVariableConfigPopup::Config AddVariableConfigPopup::getCurrentVarConfig()
-    const
+AddVariableConfigPopup::Config AddVariableConfigPopup::getCurrentVarConfig() const
 {
     return { m_varNameEdit->text(),
              m_varTypeSelector->currentText(),
              m_varDefaultValueEdit->text() };
 }
 
-ScriptVariablesTable::ScriptVariablesTable(
-    const QList<QString>& availabelVarTypes, QWidget* parent /*= nullptr*/)
+ScriptVariablesTable::ScriptVariablesTable(const QList<QString>& availabelVarTypes,
+                                           QWidget* parent /*= nullptr*/)
     : QWidget(parent)
     , m_sceneVarTable(new QTableWidget(0, 2))
     , m_addVarButton(new QPushButton)
@@ -317,8 +307,7 @@ ScriptVariablesTable::ScriptVariablesTable(
 
     m_sceneVarTable->setShowGrid(false);
     m_sceneVarTable->horizontalHeader()->hide();
-    m_sceneVarTable->horizontalHeader()->setSectionResizeMode(
-        QHeaderView::Stretch);
+    m_sceneVarTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_sceneVarTable->verticalHeader()->hide();
     m_sceneVarTable->setSelectionMode(QAbstractItemView::SingleSelection);
     m_sceneVarTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -342,8 +331,7 @@ bool ScriptVariablesTable::addNewVariable(const QString& varName,
                                           const QColor& color)
 {
     // varType not registered
-    if (std::find(m_availVarTypes.begin(), m_availVarTypes.end(), varType)
-        == m_availVarTypes.end())
+    if (std::find(m_availVarTypes.begin(), m_availVarTypes.end(), varType) == m_availVarTypes.end())
         return false;
 
     auto row = m_sceneVarTable->rowCount();
@@ -351,8 +339,7 @@ bool ScriptVariablesTable::addNewVariable(const QString& varName,
 
     auto varNameItem = new QTableWidgetItem(varName);
     m_sceneVarTable->setItem(row, 0, varNameItem);
-    auto varTypeItem =
-        new QTableWidgetItem(createVariableTicTacIcon(color), varType);
+    auto varTypeItem = new QTableWidgetItem(createVariableTicTacIcon(color), varType);
 
     m_sceneVarTable->setItem(row, 1, varTypeItem);
 
@@ -363,8 +350,8 @@ bool ScriptVariablesTable::addNewVariable(const QString& varName,
 void ScriptVariablesTable::spawnAddVariableOptionDialog()
 {
     m_addVarPopup->resetVarConfig();
-    m_addVarPopup->move(m_addVarButton->mapToGlobal(
-        QPoint(m_addVarButton->width(), m_addVarButton->height())));
+    m_addVarPopup->move(
+        m_addVarButton->mapToGlobal(QPoint(m_addVarButton->width(), m_addVarButton->height())));
     m_addVarPopup->exec();
 
     qDebug() << m_addVarPopup->getCurrentVarConfig().varName << "\n"
@@ -395,8 +382,8 @@ void ScriptVariablesTable::spawnAddVariableOptionDialog()
     // 		menu->exec(QCursor::pos());
 }
 
-ScriptVariablesSection::ScriptVariablesSection(
-    const QList<QString>& availabelVarTypes, QWidget* parent)
+ScriptVariablesSection::ScriptVariablesSection(const QList<QString>& availabelVarTypes,
+                                               QWidget* parent)
     : QWidget(parent)
     , m_varNameEdit(new QLineEdit)
     , m_varTypeSelector(new QComboBox)
@@ -410,8 +397,8 @@ ScriptVariablesSection::ScriptVariablesSection(
     setupNewVariableCreator(availabelVarTypes, lay);
 }
 
-void ScriptVariablesSection::setupNewVariableCreator(
-    const QList<QString>& availabelVarTypes, QVBoxLayout* mainLay)
+void ScriptVariablesSection::setupNewVariableCreator(const QList<QString>& availabelVarTypes,
+                                                     QVBoxLayout* mainLay)
 {
     auto box = new QGroupBox("Create New");
     box->setStyleSheet(R"""(
@@ -498,14 +485,8 @@ ScriptContentPanel::ScriptContentPanel(QWidget* parent)
     layout()->setContentsMargins(0, 0, 0, 0);
 
     auto scriptVarablesSectionLayout = new QVBoxLayout();
-    scriptVariablesTable = new ScriptVariablesTable({ "Boolean",
-                                                      "Byte",
-                                                      "Integer",
-                                                      "Float",
-                                                      "String",
-                                                      "Vector",
-                                                      "Rotator",
-                                                      "Transform" });
+    scriptVariablesTable = new ScriptVariablesTable(
+        { "Boolean", "Byte", "Integer", "Float", "String", "Vector", "Rotator", "Transform" });
     scriptVarablesSectionLayout->setContentsMargins(9, 0, 0, 9);
     scriptVarablesSectionLayout->addWidget(scriptVariablesTable);
     auto scriptVariablesSection =
@@ -515,18 +496,11 @@ ScriptContentPanel::ScriptContentPanel(QWidget* parent)
     auto scriptRealVariablesSectionLayout = new QVBoxLayout();
     scriptRealVariablesSectionLayout->setContentsMargins(0, 0, 0, 0);
     scriptRealVariablesSectionLayout->setSpacing(0);
-    auto scriptRealVariableSection =
-        new ScriptVariablesSection({ "Boolean",
-                                     "Byte",
-                                     "Integer",
-                                     "Float",
-                                     "String",
-                                     "Vector",
-                                     "Rotator",
-                                     "Transform" });
+    auto scriptRealVariableSection = new ScriptVariablesSection(
+        { "Boolean", "Byte", "Integer", "Float", "String", "Vector", "Rotator", "Transform" });
     scriptRealVariablesSectionLayout->addWidget(scriptRealVariableSection);
-    auto scriptVariablesSectionBox = new nf::CollapsableSection(
-        "REAL VARIABLES", scriptRealVariablesSectionLayout);
+    auto scriptVariablesSectionBox =
+        new nf::CollapsableSection("REAL VARIABLES", scriptRealVariablesSectionLayout);
 
     scriptVariablesSectionBox->setMinimumWidth(300);
 

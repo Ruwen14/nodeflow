@@ -66,20 +66,14 @@ protected:
 
             for (auto xi = int(left); xi <= int(right); ++xi)
             {
-                QLineF line(xi * gridStep,
-                            bottom * gridStep,
-                            xi * gridStep,
-                            top * gridStep);
+                QLineF line(xi * gridStep, bottom * gridStep, xi * gridStep, top * gridStep);
 
                 painter->drawLine(line);
             }
 
             for (auto yi = int(bottom); yi <= int(top); ++yi)
             {
-                QLineF line(left * gridStep,
-                            yi * gridStep,
-                            right * gridStep,
-                            yi * gridStep);
+                QLineF line(left * gridStep, yi * gridStep, right * gridStep, yi * gridStep);
                 painter->drawLine(line);
             }
         };
@@ -148,8 +142,7 @@ protected:
 
     void mouseMoveEvent(QMouseEvent* event) override
     {
-        if (scene()->mouseGrabberItem() == nullptr
-            && event->buttons() == Qt::LeftButton)
+        if (scene()->mouseGrabberItem() == nullptr && event->buttons() == Qt::LeftButton)
         {
             if (event->modifiers() != Qt::ShiftModifier)
             {
@@ -172,8 +165,7 @@ FlowEditor::FlowEditor(QWidget* parent)
     setWindowTitle("Flow Editor");
 
     auto leftSideDock = new QDockWidget("Script Content");
-    leftSideDock->setFeatures(QDockWidget::DockWidgetFloatable
-                              | QDockWidget::DockWidgetMovable);
+    leftSideDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     scriptContentPanel = new nf::ScriptContentPanel();
     leftSideDock->setWidget(scriptContentPanel);
 

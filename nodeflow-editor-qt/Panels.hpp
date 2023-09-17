@@ -23,9 +23,7 @@ class CollapsableSection : public QWidget
 {
     Q_OBJECT
 public:
-    CollapsableSection(const QString& title,
-                       QLayout* contentLayout,
-                       QWidget* parent = nullptr);
+    CollapsableSection(const QString& title, QLayout* contentLayout, QWidget* parent = nullptr);
 
     void expand();
     void collapse();
@@ -50,8 +48,7 @@ public:
         QString defaultVal;
     };
 
-    VariableAddConfigurator(const QList<QString>& availabelVarTypes,
-                            QWidget* parent = nullptr);
+    VariableAddConfigurator(const QList<QString>& availabelVarTypes, QWidget* parent = nullptr);
 
 private:
     QLineEdit* m_varNameEdit;
@@ -70,8 +67,7 @@ public:
         QString defaultVal;
     };
 
-    AddVariableConfigPopup(const QList<QString>& availabelVarTypes,
-                           QWidget* parent = nullptr);
+    AddVariableConfigPopup(const QList<QString>& availabelVarTypes, QWidget* parent = nullptr);
 
     void resetVarConfig();
 
@@ -87,12 +83,9 @@ class ScriptVariablesTable : public QWidget
 {
     Q_OBJECT
 public:
-    ScriptVariablesTable(const QList<QString>& varTypes,
-                         QWidget* parent = nullptr);
+    ScriptVariablesTable(const QList<QString>& varTypes, QWidget* parent = nullptr);
 
-    bool addNewVariable(const QString& varName,
-                        const QString& varType,
-                        const QColor& color);
+    bool addNewVariable(const QString& varName, const QString& varType, const QColor& color);
 
 private:
     void spawnAddVariableOptionDialog();
@@ -107,12 +100,10 @@ class ScriptVariablesSection : public QWidget
 {
     Q_OBJECT
 public:
-    ScriptVariablesSection(const QList<QString>& availabelVarTypes,
-                           QWidget* parent = nullptr);
+    ScriptVariablesSection(const QList<QString>& availabelVarTypes, QWidget* parent = nullptr);
 
 private:
-    void setupNewVariableCreator(const QList<QString>& availabelVarTypes,
-                                 QVBoxLayout* mainLay);
+    void setupNewVariableCreator(const QList<QString>& availabelVarTypes, QVBoxLayout* mainLay);
 
 private:
     QLineEdit* m_varNameEdit;
