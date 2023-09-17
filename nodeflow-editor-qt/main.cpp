@@ -3,6 +3,8 @@
 
 #include "FlowEditor.hpp"
 #include "Panels.hpp"
+#include "nodeflow/utility/dbgln.hpp"
+#include "nodeflow/reflection/type_reflection.hpp"
 
 void setStyleMode(const QString& mode)
 {
@@ -23,8 +25,7 @@ void setStyleMode(const QString& mode)
         palette.setColor(QPalette::Link, QColor(42, 130, 218));
         palette.setColor(QPalette::Highlight, QColor(6, 100, 195));
         palette.setColor(QPalette::HighlightedText, Qt::white);
-        palette.setColor(
-            QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
     }
 
     QApplication::setPalette(palette);
@@ -48,19 +49,15 @@ public:
 
 protected:
     // see https://forum.qt.io/topic/65733/qtreeview-filtering-search/4
-    bool filterAcceptsRow(int source_row,
-                          const QModelIndex& source_parent) const override
+    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
     {
         // check the current item
-        bool result =
-            QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
-        QModelIndex currntIndex =
-            sourceModel()->index(source_row, 0, source_parent);
+        bool result = QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+        QModelIndex currntIndex = sourceModel()->index(source_row, 0, source_parent);
         if (sourceModel()->hasChildren(currntIndex))
         {
             // if it has sub items
-            for (int i = 0; i < sourceModel()->rowCount(currntIndex) && !result;
-                 ++i)
+            for (int i = 0; i < sourceModel()->rowCount(currntIndex) && !result; ++i)
             {
                 // keep the parent if a children is shown
                 result = result || filterAcceptsRow(i, currntIndex);
@@ -108,8 +105,7 @@ QIcon generateCursiveFIcon(int width, int height)
 
     painter.setPen(QPen(Qt::white, 1));
     painter.setFont(font);
-    painter.drawText(
-        0, -2, icon.rect().width(), icon.rect().height(), Qt::AlignCenter, "f");
+    painter.drawText(0, -2, icon.rect().width(), icon.rect().height(), Qt::AlignCenter, "f");
 
     return QIcon(icon);
 }
@@ -209,8 +205,7 @@ public:
             auto item = rootItem->child(i);
             //
             for (size_t i = 0; i < 1000; i++)
-                item->appendRow(
-                    new QStandardItem(cursiveFIcon, QString("item %0").arg(i)));
+                item->appendRow(new QStandardItem(cursiveFIcon, QString("item %0").arg(i)));
         }
 
         proxyModel->setSourceModel(model);
@@ -225,18 +220,14 @@ public:
         searchFinishedTimer->setSingleShot(true);
         searchEdit->setClearButtonEnabled(true);
         searchEdit->setPlaceholderText("Search Node");
-        searchEdit->addAction(QIcon("C:/Users/ruwen/OneDrive/Desktop/nodeflow/"
-                                    "nodeflow-editor/icons/find.svg"),
-                              QLineEdit::LeadingPosition);
+        searchEdit->addAction(
+            QIcon("C:/Users/ruwen/OneDrive/Desktop/nodeflow/nodeflow-editor/icons/find.svg"),
+            QLineEdit::LeadingPosition);
 
         // 		connect(searchEdit, &QLineEdit::textChanged, this,
-        // &SearchTreeWidget::waitForEditFinished);
-        // connect(searchFinishedTimer, &QTimer::timeout, this,
-        // &SearchTreeWidget::filterSearchResults);
-        connect(searchEdit,
-                &QLineEdit::textChanged,
-                this,
-                &SearchTreeWidget::filterSearchResults);
+        // &SearchTreeWidget::waitForEditFinished); 		connect(searchFinishedTimer,
+        // &QTimer::timeout, this, &SearchTreeWidget::filterSearchResults);
+        connect(searchEdit, &QLineEdit::textChanged, this, &SearchTreeWidget::filterSearchResults);
 
         auto headerTitle = new QLabel("All Possible Actions");
         auto font = QApplication::font();
@@ -247,16 +238,11 @@ public:
         caseSensitivityCB->setText("Case Sensitive");
         font.setPointSizeF(10.5);
         caseSensitivityCB->setFont(font);
-        connect(caseSensitivityCB,
-                &QCheckBox::stateChanged,
-                this,
-                [this](int state) {
-                    proxyModel->setFilterCaseSensitivity(
-                        state == Qt::Checked ? Qt::CaseSensitive
-                                             : Qt::CaseInsensitive);
-                    view->expandAll(); // Current Sort might collapse matches,
-                                       // so update it.
-                });
+        connect(caseSensitivityCB, &QCheckBox::stateChanged, this, [this](int state) {
+            proxyModel->setFilterCaseSensitivity(state == Qt::Checked ? Qt::CaseSensitive
+                                                                      : Qt::CaseInsensitive);
+            view->expandAll(); // Current Sort might collapse matches, so update it.
+        });
 
         auto headerLay = new QHBoxLayout();
         headerLay->addWidget(headerTitle);
@@ -299,8 +285,8 @@ public:
             return;
         }
         qDebug() << proxyModel->filterCaseSensitivity();
-        proxyModel->setFilterRegExp(QRegExp(
-            search, proxyModel->filterCaseSensitivity(), QRegExp::FixedString));
+        proxyModel->setFilterRegExp(
+            QRegExp(search, proxyModel->filterCaseSensitivity(), QRegExp::FixedString));
         view->expandAll();
     }
 
@@ -316,16 +302,17 @@ public:
 
 int main(int argc, char* argv[])
 {
+    constexpr auto a = 3;
+    constexpr auto k = nf::type_id<int>();
+
     qsrand(QDateTime::currentDateTime().toTime_t());
 
     QApplication app(argc, argv);
-
     app.setStyle("Fusion");
     //
     setStyleMode("darkmode");
     setAppFont("Roboto");
 
-    int a = 10;
     // 	QPixmap c;
     // 	c.load("C:/Users/ruwen/OneDrive/Desktop/nodeflow/nodeflow-editor/icons/icon_BluePrintEditor_Function_16px_png.png");
     // 	c.save("C:/Users/ruwen/OneDrive/Desktop/nodeflow/nodeflow-editor/icons/icon_BluePrintEditor_Function_16px_png.png");

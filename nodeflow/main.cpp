@@ -3,7 +3,7 @@
 #include "nodeflow/core/FlowModule.hpp"
 #include "nodeflow/core/FlowScript.hpp"
 #include "nodeflow/nodes/FlowNode.hpp"
-#include "utility/dbgln.hpp"
+#include "nodeflow/utility/dbgln.hpp"
 
 #include <algorithm>
 #include <string>
@@ -604,7 +604,17 @@ bool hey(const void* from, int* to)
 
 int main()
 {
-    //     auto lambda = [](const void* from, int* to) -> bool { return
+    //     SPDLOG_INFO("hi");
+    //     SPDLOG_ERROR("ERRO");
+    //     spdlog::set_level(spdlog::level::trace);
+    //     //  [2023-09-15 22:20:16.235] [info] [main.cpp:609] hi
+    //     spdlog::set_pattern("[%T] [%^%l%$] [%s:%#]: %v");
+    //
+    //     //     [source %s] [function %!] [line %#] %v"
+    //     SPDLOG_ERROR("ERRwwddwO");
+    //     SPDLOG_TRACE("hiwSAdwddwdw");
+
+    //     -> bool { return
     //     hey(from, to); };
 
     //     nf::dev::GenericConverter converter(hey);
@@ -614,7 +624,7 @@ int main()
 
     //     const auto& instance = TypenameAtlas::instance();
 
-    auto module = std::make_shared<nf::FlowModule>("myModule");
+    auto module = std::make_shared<nf::FlowModule>("wdadwwwdwdadwadwds");
     module->registerFunction<doStuff>("Functions/doStwuff");
 
     // #ToDo: set typeID virtual support;
@@ -624,8 +634,9 @@ int main()
         script.spawnNode("Functions/doStwuff").or_else([](auto Error) { NF_ASSERT(false, ""); });
 
     auto doStuffNode = script.findNode(*maybeNode);
+    //     NF_NODE_LOG(doStuffNode->uuid(), "ewdrrowdwdr");
 
-    script.spawnVariable("Hi", 30);
+    script.spawnVariable("Hello", 140);
 
     //     if (doStuffNode)
     //     {
