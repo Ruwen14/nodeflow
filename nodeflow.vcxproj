@@ -86,6 +86,16 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>true</VcpkgEnabled>
+    <VcpkgEnableManifest>false</VcpkgEnableManifest>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgUseStatic>false</VcpkgUseStatic>
+    <VcpkgUseMD>false</VcpkgUseMD>
+    <VcpkgTriplet>
+    </VcpkgTriplet>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -131,6 +141,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>nodeflow_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>nodeflow_pch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,9 +161,9 @@
       <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>nodeflow_pch.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>nodeflow_pch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -192,6 +203,10 @@
     <ClInclude Include="nodeflow\reflection\type_reflection.hpp" />
     <ClInclude Include="nodeflow\utility\any.h" />
     <ClInclude Include="nodeflow\utility\Expected.hpp" />
+    <ClInclude Include="nodeflow\utility\Logger.hpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="nodeflow\utility\ppmagic.h" />
     <ClInclude Include="nodeflow\utility\print.h" />
     <ClInclude Include="nodeflow\utility\Singleton.hpp" />
