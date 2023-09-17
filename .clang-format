@@ -8,7 +8,7 @@ TabWidth: 4
 BreakStringLiterals: true
 AlignOperands: true
 AlignEscapedNewlines: Left
-SortIncludes: true
+SortIncludes: false
 IndentCaseLabels: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 FixNamespaceComments: true
