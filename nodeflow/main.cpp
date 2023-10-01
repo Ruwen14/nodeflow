@@ -567,13 +567,13 @@ bool hey(const void* from, int* to)
     return false;
 }
 //
-//  static bool convert(const AbstractConverterFunction* _this, const void* in, void* out)
+//  static bool convert(const AbstractConverterFunction* _this, const void* in,
+//  void* out)
 // {
 //     const From* f = static_cast<const From*>(in);
 //     To* t = static_cast<To*>(out);
-//     const ConverterFunctor* _typedThis = static_cast<const ConverterFunctor*>(_this);
-//     *t = _typedThis->m_function(*f);
-//     return true;
+//     const ConverterFunctor* _typedThis = static_cast<const
+//     ConverterFunctor*>(_this); *t = _typedThis->m_function(*f); return true;
 // }
 
 // template <typename From, typename To, typename Callable>
@@ -590,8 +590,8 @@ bool hey(const void* from, int* to)
 // template <typename From, typename To, typename Conversion>
 // decltype(auto) type_conversion(Conversion&& conversion)
 // {
-//     auto wrappedConversion = [conversion = std::forward<Conversion>(conversion)](const void*
-//     from,
+//     auto wrappedConversion = [conversion =
+//     std::forward<Conversion>(conversion)](const void* from,
 //                                                                                  void* to) ->
 //                                                                                  bool {
 //         const From* f = static_cast<const From*>(from);
@@ -602,8 +602,150 @@ bool hey(const void* from, int* to)
 // }
 // } // namespace nf
 
+namespace nf
+{
+template <std::size_t N>
+struct StringLiteral
+{
+    consteval StringLiteral(const char (&str)[N]) noexcept
+    {
+        for (int i = 0; i < N; i++)
+        {
+            value[i] = str[i];
+        }
+    }
+
+    char value[N];
+};
+} // namespace nf
+
+#include <string_view>
+template <typename T, nf::StringLiteral pname>
+struct InputPin
+{
+    static auto name()
+    {
+        return std::string_view{ pname.value };
+    }
+
+    nf::PortIndex index() const
+    {
+        return m_index;
+    }
+
+    T value{};
+    nf::PortIndex m_index = -1;
+};
+
+template <typename... Ports>
+decltype(auto) helperExpandPortNames(Ports&&... p)
+{
+    return std::array<std::string_view, sizeof...(Ports)>{ { p.name()... } };
+}
+
+template <typename... Ports>
+decltype(auto) helperSerializePorts(nf::PortIndex index, Ports&&... p)
+{
+    std::optional<std::string> result = std::nullopt;
+    (..., (result = (index == p.index() ? p.getValueAsString() : result)));
+    return result;
+}
+template <typename... Ports>
+decltype(auto) helperDeserializePorts(nf::PortIndex index, const std::string& val, Ports&&... p)
+{
+    bool success = false;
+    (..., (success = (index == p.index() ? p.setValueFromString(val) : success)));
+    return success;
+}
+
+template <typename... Ports>
+decltype(auto) helperPortNames(nf::PortIndex index, Ports&&... p)
+{
+    std::string result{ "Invalid Port" };
+    (..., (result = (index == p.index() ? p.name() : result)));
+    return result;
+}
+
+// Make as static constexpr member of Node
+#define NF_REGISTER_INPUTS(...)                                                             \
+public:                                                                                     \
+    std::string portNameDontUse(nf::PortDirection dir, nf::PortIndex index) const           \
+    {                                                                                       \
+        static auto inPortNames{ helperExpandPortNames(__VA_ARGS__) };                      \
+        NF_ASSERT(!(index == -1 || !(index < inPortNames.size())), "Port does not exist."); \
+        if (index == -1 || !(index < inPortNames.size()))                                   \
+            return "";                                                                      \
+        return std::string(inPortNames[index]);                                             \
+    }                                                                                       \
+                                                                                            \
+    std::string inPortName(nf::PortIndex index) const                                       \
+    {                                                                                       \
+        return helperPortNames(index, __VA_ARGS__);                                         \
+    }
+
+// std::string serializeOutput(nf::PortIndex index)
+// {
+// }
+
+class TestNode
+{
+public:
+    NF_REGISTER_INPUTS(p0, p1, p2)
+
+    TestNode()
+    {
+        p0.m_index = 0;
+        p1.m_index = 1;
+        p2.m_index = 2;
+    }
+
+private:
+    InputPin<double, "Input 1"> p0;
+    InputPin<double, "Input 2"> p1;
+    InputPin<double, "Input 3"> p2;
+};
+
 int main()
 {
+    TestNode n;
+
+    dbgln(n.inPortName(3));
+
+    // InputPin<double, "Input 1"> p0;
+    // InputPin<double, "Input 2"> p1;
+    // InputPin<double, "Input 3"> p2;
+    //
+    // p0.index = 0;
+    // p1.index = 1;
+    // p2.index = 2;
+
+    nf::OutputPort<int> p0{ 30 };
+    nf::OutputPort<double> p1{ 10.4 };
+    nf::OutputPort<bool> p2{ true };
+
+    p0.m_portIndex = 0;
+    p1.m_portIndex = 1;
+    p2.m_portIndex = 2;
+
+    double k = 3.14151512313;
+    std::cout << k;
+
+    dbgln(helperDeserializePorts(1, "3.14151512313", p0, p1, p2));
+    dbgln(helperSerializePorts(1, p0, p1, p2));
+
+    //     TestNode n;
+    //     dbgln(n.portName(nf::PortDirection::Input, 3));
+    //     //     NF_INFO(n.portName(nf::PortDirection::Input, 1));
+
+    //     auto k = expand_port_names(InputPin<double, "Input"> p0,
+    //                                InputPin<double, "Input 1"> p1,
+    //                                InputPin<double, "Input 2"> p2);
+
+    //     auto k = NF_INPUT(p0, p1, p2);
+
+    //     using c = decltype(d.inputs);
+    //     NF_INFO(nf::type_name<c>());
+
     //     SPDLOG_INFO("hi");
     //     SPDLOG_ERROR("ERRO");
     //     spdlog::set_level(spdlog::level::trace);
@@ -624,7 +766,7 @@ int main()
 
     //     const auto& instance = TypenameAtlas::instance();
 
-    auto module = std::make_shared<nf::FlowModule>("wdadwwwdwdadwadwds");
+    auto module = std::make_shared<nf::FlowModule>("wdadwdwwwwdwdwdadwadwds");
     module->registerFunction<doStuff>("Functions/doStwuff");
 
     // #ToDo: set typeID virtual support;
