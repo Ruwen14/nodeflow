@@ -56,7 +56,7 @@ enum class CreateNodeError
     NodeNameFalseCategory
 };
 
-using NodeHandle = UUID;
+using NodeID = UUID;
 
 class FlowScript
 {
@@ -84,15 +84,17 @@ public:
             node->onEvent(&event);
     }
 
-    Node* findNode(NodeHandle node) const;
+    Node* findNode(NodeID node) const;
 
-    bool hasNode(NodeHandle uuid) const;
+    std::vector<Node*> findNodeByType(typeid_t type) const;
+
+    bool hasNode(NodeID uuid) const;
 
     std::vector<Node*> nodes() const;
 
     size_t nodeCount() const noexcept;
 
-    std::vector<NodeHandle> nodeHandles() const;
+    std::vector<NodeID> nodeHandles() const;
 
     template <typename NodeType, class Callable>
     void forEach(Callable callable)
@@ -104,33 +106,27 @@ public:
                       [](std::unique_ptr<FlowNode>& node) {});
     }
 
-    ErrorOr<NodeHandle> spawnNode(const std::string& namePath);
+    ErrorOr<Node*> spawnNode(const std::string& namePath);
 
-    ErrorOr<DataNode*> spawnVariable(const std::string_view name);
+    ErrorOr<DataNode*> spawnVariable(const std::string& typeName);
 
-    template <typename T>
-    ErrorOr<DataNode*> spawnVariable(std::string_view name, T&& defVal)
-    {
-        return nullptr;
-    }
+    bool removeNode(NodeID node);
 
-    bool removeNode(NodeHandle node);
+    Expected<void, ConnectionError> connectPorts(Node& fromNode,
+                                                 PortIndex fromPort,
+                                                 Node& toNode,
+                                                 PortIndex toPort);
 
-    Expected<void, ConnectionError> connectPorts(
-        NodeHandle outNodeUUID,
-        PortIndex outPort,
-        NodeHandle inNodeUUID,
-        PortIndex inPort,
-        ConversionPolicy conv = ConversionPolicy::DontAddConversion);
+    Expected<void, ConnectionError> connectPorts(NodeID fromNode,
+                                                 PortIndex fromPort,
+                                                 NodeID toNode,
+                                                 PortIndex toPort);
 
-    bool disconnectPorts(NodeHandle outNodeUUID,
-                         PortIndex outPort,
-                         NodeHandle inNodeUUID,
-                         PortIndex inPort);
+    bool disconnectPorts(NodeID fromNode, PortIndex fromPort, NodeID toNode, PortIndex toPort);
 
-    bool connectFlow(NodeHandle outNodeUUID, NodeHandle inNodeUUID);
+    bool connectFlow(NodeID fromNode, NodeID toNode);
 
-    bool disconnectFlow(NodeHandle outNode, NodeHandle inNode);
+    bool disconnectFlow(NodeID fromNode, NodeID toNode);
 
     void setStartEvent();
 
@@ -159,15 +155,15 @@ public:
     Node& inNode, PortIndex inPort);
     */
 private:
-    Node* findNode(NodeHandle uuid, std::pair<int, size_t>& pos) const;
+    Node* findNode(NodeID uuid, std::pair<int, size_t>& pos) const;
 
     Node* findPortConversionNode(typeid_t fromType, typeid_t toType) const;
 
     bool isUUIDUnique(UUID uuid) const;
 
-    ErrorOr<NodeHandle> createNode(const std::string& namePath);
+    ErrorOr<Node*> createNode(const std::string& namePath);
 
-    ErrorOr<NodeHandle> createVariable(const std::string& namePath);
+    ErrorOr<Node*> createVariable(const std::string& namePath);
 
     bool debugAllConnectionsRemovedTo(Node* node) const;
 

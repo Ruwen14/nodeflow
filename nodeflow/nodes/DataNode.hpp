@@ -39,7 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace nf
 {
-#pragma region DataNode
+template <typename Type>
+class DataNodeImpl;
 
 class DataNode : public Node
 {
@@ -50,45 +51,67 @@ public:
 
     NodeArchetype getArchetype() const final;
 
-    virtual std::unique_ptr<FlowNode> constructSetterNode() const = 0;
+    virtual std::unique_ptr<FlowNode> spawnSetter() const = 0;
 
-    virtual typeid_t underlyingDataTypeID() const = 0;
-
-    // 		virtual bool trySetDataFrom(std::any data);
-
-    // virtual std::unique_ptr<FlowNode> constructGetter() const = 0;
-
+public:
     template <typename T>
-    static bool setData(DataNode& node, T&& data);
-
-    template <typename T>
-    static const std::optional<T> getData(DataNode& node);
+    bool setValue(T&& data)
+    {
+        // ToDo: Maybe change to static cast on release
+        if (auto impl = dynamic_cast<DataNodeImpl<T>*>(this))
+        {
+            impl->m_data.value = std::forward<T>(data);
+            return true;
+        }
+        NF_ASSERT(false,
+                  "Node does not hold data of type 'T' explicitly. Try calling setValue<T>(...) "
+                  "for implicit conversion.");
+        return false;
+    }
 };
-
-#pragma endregion DataNode
-
-#pragma region DataSetterNode
 
 template <typename Type>
 class DataSetterNode : public FlowNode
 {
 public:
-    DataSetterNode();
+    DataSetterNode()
+    {
+        // Reserve exact amount of memory we need in port vector
+        allocateExpectedPortCount(PortDirection::Input, 2);
+        allocateExpectedPortCount(PortDirection::Output, 0);
+    }
 
-    std::string nodeName() const override;
+    std::string nodeName() const override
+    {
+        return std::string(type_name<DataSetterNode<Type>>());
+    }
 
-    ErrorOr<void> setup() override;
+    ErrorOr<void> setup() override
+    {
+        addPort(m_dataNodeData);
+        addPort(m_setValue);
+
+        return {};
+    }
+
+    typeid_t nodeType() const override
+    {
+        return type_id<DataSetterNode<Type>>();
+    }
 
     void process() override
     {
-        auto dataNodeData = getInputDataMutable(m_dataNodeData);
-        auto setValue = getInputData(m_setValue);
+        auto dataNodeData = getInputMutable(m_dataNodeData);
+        auto setValue = getInput(m_setValue);
 
         if (dataNodeData && setValue)
             *dataNodeData = *setValue;
     }
 
-    NodeArchetype getArchetype() const override;
+    NodeArchetype getArchetype() const override
+    {
+        return NodeArchetype::FlowNode;
+    }
 
 private:
     InputPort<Type> m_dataNodeData;
@@ -96,155 +119,92 @@ private:
 };
 
 template <typename Type>
-std::string nf::DataSetterNode<Type>::nodeName() const
-{
-    return "DataSetterNode";
-}
-
-template <typename Type>
-ErrorOr<void> DataSetterNode<Type>::setup()
-{
-    addPort(m_dataNodeData);
-    addPort(m_setValue);
-
-    return {};
-}
-
-template <typename Type>
-DataSetterNode<Type>::DataSetterNode()
-{
-    // Reserve exact amount of memory we need in port vector
-    allocateExpectedPortCount(PortDirection::Input, 2);
-    allocateExpectedPortCount(PortDirection::Output, 0);
-}
-
-template <typename Type>
-NodeArchetype DataSetterNode<Type>::getArchetype() const
-{
-    return NodeArchetype::FlowNode;
-}
-
-#pragma endregion DataSetterNode
-
-#pragma region DataNodeImpl
-
-template <typename Type>
 class DataNodeImpl : public DataNode
 {
+    friend class DataNode;
+
 public:
     static std::string staticNodeName;
 
 public:
-    DataNodeImpl();
-    DataNodeImpl(Type&& value);
-
-    ErrorOr<void> setup() override;
-
-    std::string nodeName() const override;
-
-    bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) final;
-
-    std::unique_ptr<FlowNode> constructSetterNode() const final;
-
-    typeid_t underlyingDataTypeID() const final;
-
-    inline const Type& data() const noexcept
+    DataNodeImpl()
     {
-        return m_data.value;
+        // Reserve exact amount of memory we need in port vector
+        allocateExpectedPortCount(PortDirection::Input, 0);
+        allocateExpectedPortCount(PortDirection::Output, 1);
+    }
+    DataNodeImpl(Type&& value)
+    {
+        m_data.setValue(std::forward<Type>(value));
+        // Reserve exact amount of memory we need in port vector
+        allocateExpectedPortCount(PortDirection::Input, 0);
+        allocateExpectedPortCount(PortDirection::Output, 1);
     }
 
-    inline void setData(Type&& data) noexcept
+    ErrorOr<void> setup() override
     {
-        m_data.value = std::forward<Type>(data);
+        addPort(m_data);
+        return {};
+    }
+
+    std::string nodeName() const override
+    {
+        return std::string(type_name<DataNodeImpl<Type>>());
+    }
+
+    typeid_t nodeType() const override
+    {
+        return type_id<DataNodeImpl<Type>>();
+    }
+
+    bool streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive) final
+    {
+        if (index != 0)
+            return false;
+        if (flag == StreamFlag::WriteTo)
+            return m_data.serialize(archive);
+        return m_data.deserialize(archive);
+    }
+
+    std::optional<std::string> getOutputAsString(PortIndex index) override
+    {
+        if (index != 0)
+            return std::nullopt;
+
+        return m_data.getValueAsString();
+    }
+
+    bool setOutputFromString(PortIndex index, const std::string& val) override
+    {
+        if (index != 0)
+            return false;
+
+        return m_data.setValueFromString(val);
+    }
+
+    std::unique_ptr<FlowNode> spawnSetter() const final
+    {
+        return std::make_unique<DataSetterNode<Type>>();
     }
 
 private:
     OutputPort<Type> m_data;
 };
 
-template <typename Type>
-std::string DataNodeImpl<Type>::staticNodeName = "DataNode";
+//     template <typename T>
+//     static const std::optional<T> getData(DataNode& node);
 
-template <typename Type>
-DataNodeImpl<Type>::DataNodeImpl(Type&& value)
-{
-    m_data.setValue(std::forward<Type>(value));
-    // Reserve exact amount of memory we need in port vector
-    allocateExpectedPortCount(PortDirection::Input, 0);
-    allocateExpectedPortCount(PortDirection::Output, 1);
-}
-
-template <typename Type>
-DataNodeImpl<Type>::DataNodeImpl()
-{
-    // Reserve exact amount of memory we need in port vector
-    allocateExpectedPortCount(PortDirection::Input, 0);
-    allocateExpectedPortCount(PortDirection::Output, 1);
-}
-
-template <typename Type>
-ErrorOr<void> DataNodeImpl<Type>::setup()
-{
-    addPort(m_data);
-    return {};
-}
-
-template <typename Type>
-std::string DataNodeImpl<Type>::nodeName() const
-{
-    return staticNodeName;
-}
-
-template <typename Type>
-bool DataNodeImpl<Type>::streamOutput(PortIndex index, StreamFlag flag, std::stringstream& archive)
-{
-    if (index != 0)
-        return false;
-    if (flag == StreamFlag::WriteTo)
-        return m_data.serialize(archive);
-    return m_data.deserialize(archive);
-}
-
-template <typename Type>
-std::unique_ptr<FlowNode> DataNodeImpl<Type>::constructSetterNode() const
-{
-    return std::make_unique<DataSetterNode<Type>>();
-}
-
-template <typename Type>
-typeid_t DataNodeImpl<Type>::underlyingDataTypeID() const
-{
-    return m_data.typeID;
-}
-
-#pragma endregion DataNodeImpl
-
-template <typename T>
-bool DataNode::setData(DataNode& node, T&& data)
-{
-    static constexpr typeid_t setDataTypeID = type_id<T>();
-    if (node.underlyingDataTypeID() != setDataTypeID)
-        return false;
-
-    NF_ASSERT(dynamic_cast<DataNodeImpl<T>*>(&node) != nullptr,
-              "Oops, this shoudln't happen. type_id<T>() might have a hash "
-              "collision?");
-    auto& actualNode = static_cast<DataNodeImpl<T>&>(node);
-    actualNode.setData(std::forward<T>(data));
-    return true;
-}
-
-template <typename T>
-const std::optional<T> DataNode::getData(DataNode& node)
-{
-    static constexpr typeid_t getDataTypeID = type_id<T>();
-    if (node.underlyingDataTypeID() != getDataTypeID)
-        return std::nullopt;
-
-    NF_ASSERT(dynamic_cast<DataNodeImpl<T>*>(&node) != nullptr,
-              "Oops, this shoudln't happen. type_id<T>() might have a hash "
-              "collision?");
-    auto& actualNode = static_cast<DataNodeImpl<T>&>(node);
-    return actualNode.data();
-}
+// template <typename T>
+// const std::optional<T> DataNode::getData(DataNode& node)
+// {
+//     static constexpr typeid_t getDataTypeID = type_id<T>();
+//     if (node.underlyingDataTypeID() != getDataTypeID)
+//         return std::nullopt;
+//
+//     NF_ASSERT(dynamic_cast<VariableNodeImpl<T>*>(&node) != nullptr,
+//               "Oops, this shoudln't happen. type_id<T>() might have a hash "
+//               "collision?");
+//     auto& actualNode = static_cast<VariableNodeImpl<T>&>(node);
+//     return actualNode.data();
+// }
 } // namespace nf

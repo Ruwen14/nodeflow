@@ -64,9 +64,6 @@ class FlowNode;
 
 using VariableNode = DataNode;
 
-template <typename T>
-using VariableNodeImpl = DataNodeImpl<T>;
-
 enum class RegisterError
 {
     EmptyNamePath,
@@ -122,9 +119,9 @@ public:
 
     std::set<std::string> registered() const;
 
-    const FlowNodeRegistry& nodeCreators() const;
+    const FlowNodeRegistry& nodeRegistry() const;
 
-    const DataNodeRegistry& dataCreators() const;
+    const DataNodeRegistry& variableRegistry() const;
 
 private:
     Expected<std::pair<std::string, std::string>, RegisterError> helperParseNamePath(
@@ -132,29 +129,28 @@ private:
 
 public:
     std::string m_moduleName;
-    FlowNodeRegistry m_flowNodeCreators; // might use map for reduced memory consumption
-    DataNodeRegistry m_dataNodeCreators;
+    FlowNodeRegistry m_flowNodeRegistry; // might use map for reduced memory consumption
+    DataNodeRegistry m_dataNodeRegistry;
 };
 
 template <typename T>
 Expected<void, RegisterError> FlowModule::registerType(const std::string& namePath)
 {
-    static_assert(!std::is_base_of<nf::Node, T>::value,
-                  "<T> is not allowed to be of base <nf::Node>");
+    static_assert(!std::is_base_of<nf::Node, T>::value, "<T> must be a free Type");
 
-    auto parseResult = helperParseNamePath(namePath);
-    if (!parseResult)
-        return make_unexpected(parseResult.error());
+    if (namePath.empty())
+        return make_unexpected(RegisterError::EmptyNamePath);
 
-    auto& [baseName, categoryName] = parseResult.value();
+    if (m_flowNodeRegistry.contains(namePath) || m_dataNodeRegistry.contains(namePath))
+        return make_unexpected(RegisterError::NameAlreadyRegistered);
 
-    DataNodeImpl<T>::staticNodeName = baseName;
     auto makerLambda = []() {
         std::unique_ptr<nf::DataNode> uptr = std::make_unique<DataNodeImpl<T>>();
         return uptr;
     };
 
-    m_dataNodeCreators[namePath] = std::move(makerLambda);
+    m_dataNodeRegistry[namePath] = std::move(makerLambda);
+
     return {};
 }
 
@@ -175,7 +171,7 @@ Expected<void, RegisterError> FlowModule::registerCustomNode(const std::string& 
         return uptr;
     };
 
-    m_flowNodeCreators[namePath] = std::move(makerLambda);
+    m_flowNodeRegistry[namePath] = std::move(makerLambda);
     return {};
 }
 
@@ -188,7 +184,7 @@ nf::Expected<void, nf::RegisterError> FlowModule::registerFunction(const std::st
     if (namePath.empty())
         return make_unexpected(RegisterError::EmptyNamePath);
 
-    if (m_flowNodeCreators.contains(namePath) || m_dataNodeCreators.contains(namePath))
+    if (m_flowNodeRegistry.contains(namePath) || m_dataNodeRegistry.contains(namePath))
         return make_unexpected(RegisterError::NameAlreadyRegistered);
 
     FunctorNode<func>::staticNodeName = namePath;
@@ -198,7 +194,7 @@ nf::Expected<void, nf::RegisterError> FlowModule::registerFunction(const std::st
         return uptr;
     };
 
-    m_flowNodeCreators[namePath] = std::move(makerLambda);
+    m_flowNodeRegistry[namePath] = std::move(makerLambda);
 
     return {};
 }
@@ -232,7 +228,7 @@ Expected<void, RegisterError> FlowModule::registerConversion(
         return uptr;
     };
 
-    m_flowNodeCreators[namePath] = std::move(makerLambda);
+    m_flowNodeRegistry[namePath] = std::move(makerLambda);
 
     return {};
 }

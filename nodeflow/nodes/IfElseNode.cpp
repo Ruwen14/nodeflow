@@ -27,7 +27,7 @@ nf::ErrorOr<void> IfElseNode::setup()
 
 void IfElseNode::process()
 {
-    auto cond = getInputData(m_condition);
+    auto cond = getInput(m_condition);
 
     if (cond == nullptr)
         return;

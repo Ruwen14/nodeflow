@@ -2,7 +2,7 @@
 
 namespace nf
 {
-Node* FlowScript::findNode(NodeHandle uuid) const
+Node* FlowScript::findNode(NodeID uuid) const
 {
     // FIXME: A data structure like unordered_map would definitely make more
     // sense here.
@@ -23,7 +23,24 @@ Node* FlowScript::findNode(NodeHandle uuid) const
     return nullptr;
 }
 
-bool FlowScript::hasNode(NodeHandle uuid) const
+std::vector<Node*> FlowScript::findNodeByType(typeid_t type) const
+{
+    std::vector<Node*> results;
+    for (const auto& node : m_callablesNodes)
+    {
+        if (node->nodeType() == type)
+            results.push_back(node.get());
+    }
+
+    for (const auto& node : m_variableNodes)
+    {
+        if (node->nodeType() == type)
+            results.push_back(node.get());
+    }
+    return results;
+}
+
+bool FlowScript::hasNode(NodeID uuid) const
 {
     return findNode(uuid) != nullptr;
 }
@@ -46,9 +63,9 @@ size_t FlowScript::nodeCount() const noexcept
     return m_callablesNodes.size() + m_variableNodes.size();
 }
 
-std::vector<NodeHandle> FlowScript::nodeHandles() const
+std::vector<NodeID> FlowScript::nodeHandles() const
 {
-    std::vector<NodeHandle> nodes;
+    std::vector<NodeID> nodes;
     nodes.reserve(m_variableNodes.size() + m_callablesNodes.size());
 
     for (const auto& node : m_callablesNodes)
@@ -59,26 +76,44 @@ std::vector<NodeHandle> FlowScript::nodeHandles() const
     return nodes;
 }
 
-ErrorOr<NodeHandle> FlowScript::spawnNode(const std::string& namePath)
+nf::ErrorOr<Node*> FlowScript::spawnNode(const std::string& namePath)
 {
-    auto& nodeCreators = m_scriptModule->nodeCreators();
-    auto& dataCreators = m_scriptModule->dataCreators();
+    auto& nodeRegistry = m_scriptModule->nodeRegistry();
+    auto& varRegistry = m_scriptModule->variableRegistry();
 
-    if (nodeCreators.contains(namePath))
+    if (nodeRegistry.contains(namePath))
         return createNode(namePath);
 
-    if (dataCreators.contains(namePath))
+    if (varRegistry.contains(namePath))
         return createVariable(namePath);
 
     return make_unexpected(Error("Unknown namePath during 'FlowScript::spawnNode'"));
 }
 
-ErrorOr<DataNode*> FlowScript::spawnVariable(const std::string_view name)
+ErrorOr<DataNode*> FlowScript::spawnVariable(const std::string& typeName)
 {
-    return nullptr;
+    auto& varRegistry = m_scriptModule->variableRegistry();
+
+    if (!varRegistry.contains(std::string(typeName)))
+        return make_unexpected(Error("Variable of type 'typeName' is not registered."));
+
+    auto instance = varRegistry.at(typeName)();
+
+    while (!isUUIDUnique(instance->uuid()))
+    {
+        NF_ASSERT(false, "UUID collision found!");
+        instance->setUUID(UUID::create());
+    }
+
+    if (auto setupSuccess = instance->setup(); !setupSuccess)
+        return make_unexpected(setupSuccess.error());
+
+    m_variableNodes.push_back(std::move(instance));
+
+    return m_variableNodes[m_variableNodes.size() - 1].get();
 }
 
-bool FlowScript::removeNode(NodeHandle node)
+bool FlowScript::removeNode(NodeID node)
 {
     std::pair<int, size_t> pos;
     auto foundNode = findNode(node, pos);
@@ -123,69 +158,52 @@ bool FlowScript::removeNode(NodeHandle node)
     return true;
 }
 
-/*
-ExpectedRef<FlowNode, Error> FlowScript::spawnNode(const std::string& namePath)
+nf::Expected<void, nf::ConnectionError> FlowScript::connectPorts(Node& fromNode,
+                                                                 PortIndex fromPort,
+                                                                 Node& toNode,
+                                                                 PortIndex toPort)
 {
-    auto& creators = m_scriptModule->nodeCreators();
-
-    if (!creators.contains(namePath))
-        return make_unexpected(Error("Unknown namePath", 100));
-
-    auto creator = creators.at(namePath);
-    auto instance = creator();
-
-    while (!isUUIDUnique(instance->uuid()))
-    {
-        NF_ASSERT(false, "UUID collision found!");
-        instance->setUUID(UUID::create());
-    }
-
-    if (auto setupSuccess = instance->setup(); !setupSuccess)
-        return make_unexpected(setupSuccess.error());
-
-    m_callablesNodes.push_back(std::move(instance));
-
-    auto pos = m_callablesNodes.size() - 1;
-    return std::ref(*m_callablesNodes[pos]);
+    NF_ASSERT(fromNode.uuid() != toNode.uuid(), "Connection with itself not allowed.");
+    if (fromNode.uuid() == toNode.uuid())
+        return make_unexpected(ConnectionError::ConnectionWithItself);
+    return fromNode.makeConnection(fromPort, toNode, toPort);
 }
-*/
 
-Expected<void, ConnectionError> FlowScript::connectPorts(
-    NodeHandle outNodeUUID,
-    PortIndex outPort,
-    NodeHandle inNodeUUID,
-    PortIndex inPort,
-    ConversionPolicy conv /*= ConversionPolicy::DontAddConversion*/)
+nf::Expected<void, nf::ConnectionError> FlowScript::connectPorts(NodeID fromNode,
+                                                                 PortIndex fromPort,
+                                                                 NodeID toNode,
+                                                                 PortIndex toPort)
 {
-    NF_UNUSED(conv);
+    auto outNode = findNode(fromNode);
+    auto inNode = findNode(toNode);
 
-    auto outNode = findNode(outNodeUUID);
-    auto inNode = findNode(inNodeUUID);
-
+    NF_ASSERT(inNode, "outNode doesn't exist.");
+    NF_ASSERT(outNode, "outNode doesn't exist.");
     if (!outNode || !inNode)
         return make_unexpected(ConnectionError::UnknownNode);
 
-    return outNode->makeConnection(outPort, *inNode, inPort);
+    return connectPorts(*outNode, fromPort, *inNode, toPort);
+    //     return outNode->makeConnection(fromPort, *inNode, toPort);
 }
 
-bool FlowScript::disconnectPorts(NodeHandle outNodeUUID,
-                                 PortIndex outPort,
-                                 NodeHandle inNodeUUID,
-                                 PortIndex inPort)
+bool FlowScript::disconnectPorts(NodeID fromNode,
+                                 PortIndex fromPort,
+                                 NodeID toNode,
+                                 PortIndex toPort)
 {
-    auto outNode = findNode(outNodeUUID);
-    auto inNode = findNode(inNodeUUID);
+    auto outNode = findNode(fromNode);
+    auto inNode = findNode(toNode);
 
     if (!outNode || !inNode)
         return false;
 
-    return outNode->breakConnection(outPort, *inNode, inPort);
+    return outNode->breakConnection(fromPort, *inNode, toPort);
 }
 
-bool FlowScript::connectFlow(NodeHandle outNodeUUID, NodeHandle inNodeUUID)
+bool FlowScript::connectFlow(NodeID fromNode, NodeID toNode)
 {
-    auto outNode = findNode(outNodeUUID);
-    auto inNode = findNode(inNodeUUID);
+    auto outNode = findNode(fromNode);
+    auto inNode = findNode(toNode);
 
     if (!outNode || !inNode)
         return false;
@@ -258,10 +276,10 @@ inNode, inPort);
 }
 */
 
-bool FlowScript::disconnectFlow(NodeHandle outNodeUUID, NodeHandle inNodeUUID)
+bool FlowScript::disconnectFlow(NodeID fromNode, NodeID toNode)
 {
-    auto outNode = findNode(outNodeUUID);
-    auto inNode = findNode(inNodeUUID);
+    auto outNode = findNode(fromNode);
+    auto inNode = findNode(toNode);
 
     if (!outNode || !inNode)
         return false;
@@ -289,7 +307,7 @@ bool FlowScript::disconnectFlow(NodeHandle outNodeUUID, NodeHandle inNodeUUID)
     return true;
 }
 
-nf::Node* FlowScript::findNode(NodeHandle uuid, std::pair<int, size_t>& pos) const
+nf::Node* FlowScript::findNode(NodeID uuid, std::pair<int, size_t>& pos) const
 {
     for (size_t i = 0; i < m_callablesNodes.size(); i++)
     {
@@ -346,9 +364,9 @@ bool FlowScript::isUUIDUnique(UUID uuid) const
     return true;
 }
 
-ErrorOr<NodeHandle> FlowScript::createNode(const std::string& namePath)
+nf::ErrorOr<Node*> FlowScript::createNode(const std::string& namePath)
 {
-    auto& creators = m_scriptModule->nodeCreators();
+    auto& creators = m_scriptModule->nodeRegistry();
     auto creator = creators.at(namePath);
     auto instance = creator();
 
@@ -362,13 +380,12 @@ ErrorOr<NodeHandle> FlowScript::createNode(const std::string& namePath)
         return make_unexpected(setupSuccess.error());
 
     m_callablesNodes.push_back(std::move(instance));
-
-    return m_callablesNodes[m_callablesNodes.size() - 1]->uuid();
+    return m_callablesNodes[m_callablesNodes.size() - 1].get();
 }
 
-ErrorOr<NodeHandle> FlowScript::createVariable(const std::string& namePath)
+nf::ErrorOr<Node*> FlowScript::createVariable(const std::string& namePath)
 {
-    auto& creators = m_scriptModule->dataCreators();
+    auto& creators = m_scriptModule->variableRegistry();
     auto creator = creators.at(namePath);
     auto instance = creator();
 
@@ -383,7 +400,7 @@ ErrorOr<NodeHandle> FlowScript::createVariable(const std::string& namePath)
 
     m_variableNodes.push_back(std::move(instance));
 
-    return m_variableNodes[m_variableNodes.size() - 1]->uuid();
+    return m_variableNodes[m_variableNodes.size() - 1].get();
 }
 
 bool FlowScript::debugAllConnectionsRemovedTo(nf::Node* node) const

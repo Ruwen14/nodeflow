@@ -23,14 +23,14 @@ bool Node::streamOutput(PortIndex index, StreamFlag flag, std::stringstream& arc
     return false;
 }
 
-bool Node::setOutputDataFromString(PortIndex index, const std::string& val)
+bool Node::setOutputFromString(PortIndex index, const std::string& val)
 {
     NF_UNUSED(index);
     NF_UNUSED(val);
     return false;
 }
 
-std::optional<std::string> Node::getOutputDataAsString(PortIndex index)
+std::optional<std::string> Node::getOutputAsString(PortIndex index)
 {
     NF_UNUSED(index);
     return std::nullopt;

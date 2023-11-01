@@ -118,7 +118,7 @@ public: // Or better private and friend FlowScript
      * @return 'true' if operation was successfull. 'false' if not (for example
      * when missing istream operator>>).
      */
-    [[nodiscard]] virtual bool setOutputDataFromString(PortIndex index, const std::string& val);
+    [[nodiscard]] virtual bool setOutputFromString(PortIndex index, const std::string& val);
 
     /**
      * @brief Gets output of node specified by index as string for debugging
@@ -126,7 +126,7 @@ public: // Or better private and friend FlowScript
      * @return value as 'std::string' if possible. 'std::nullopt' if not (for
      * example when missing ostream operator<<).
      */
-    virtual std::optional<std::string> getOutputDataAsString(PortIndex index);
+    virtual std::optional<std::string> getOutputAsString(PortIndex index);
 
     /**
      * @brief Users can override to react on their custom events emitted from
@@ -282,7 +282,7 @@ protected:
      * @return nullptr if there is no connection to this input port
      */
     template <typename T>
-    const T* getInputData(const InputPort<T>& p) const
+    const T* getInput(const InputPort<T>& p) const
     {
         const PortLink& link = m_inputPorts[p.m_portIndex].m_link;
         // No input connection
@@ -302,7 +302,7 @@ protected:
      * @return nullptr if there is no connection to this input port
      */
     template <typename T>
-    T* getInputDataMutable(const InputPort<T>& p) const
+    T* getInputMutable(const InputPort<T>& p) const
     {
         const PortLink& link = m_inputPorts[p.m_portIndex].m_link;
         // No input connection
@@ -318,7 +318,7 @@ protected:
      * @brief Set the output data of the node port
      */
     template <typename T, typename Ty>
-    void setOutputData(OutputPort<T>& p, Ty&& val) noexcept
+    void setOutput(OutputPort<T>& p, Ty&& val) noexcept
     {
         // 			pprint(nf::type_name<decltype(val)>());
         p.setValue(std::forward<Ty>(val));

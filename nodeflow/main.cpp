@@ -707,32 +707,6 @@ private:
 
 int main()
 {
-    TestNode n;
-
-    dbgln(n.inPortName(3));
-
-    // InputPin<double, "Input 1"> p0;
-    // InputPin<double, "Input 2"> p1;
-    // InputPin<double, "Input 3"> p2;
-    //
-    // p0.index = 0;
-    // p1.index = 1;
-    // p2.index = 2;
-
-    nf::OutputPort<int> p0{ 30 };
-    nf::OutputPort<double> p1{ 10.4 };
-    nf::OutputPort<bool> p2{ true };
-
-    p0.m_portIndex = 0;
-    p1.m_portIndex = 1;
-    p2.m_portIndex = 2;
-
-    double k = 3.14151512313;
-    std::cout << k;
-
-    dbgln(helperDeserializePorts(1, "3.14151512313", p0, p1, p2));
-    dbgln(helperSerializePorts(1, p0, p1, p2));
-
     //     TestNode n;
     //     dbgln(n.portName(nf::PortDirection::Input, 3));
     //     //     NF_INFO(n.portName(nf::PortDirection::Input, 1));
@@ -768,18 +742,24 @@ int main()
 
     auto module = std::make_shared<nf::FlowModule>("wdadwdwwwwdwdwdadwadwds");
     module->registerFunction<doStuff>("Functions/doStwuff");
+    module->registerType<int>("int");
 
     // #ToDo: set typeID virtual support;
 
     nf::FlowScript script(module);
-    auto maybeNode =
-        script.spawnNode("Functions/doStwuff").or_else([](auto Error) { NF_ASSERT(false, ""); });
+    auto maybeNode = script.spawnNode("Functions/doStwuff").or_else([](auto error) {
+        dbgln(error);
+        NF_ASSERT(false, "");
+    });
 
-    auto doStuffNode = script.findNode(*maybeNode);
+    auto c = *script.spawnVariable("int").or_else([](auto error) {
+        dbgln(error);
+        NF_ASSERT(false, "");
+    });
+    c->setValue(30);
+
+    //     auto doStuffNode = script.findNode(maybeNode);
     //     NF_NODE_LOG(doStuffNode->uuid(), "ewdrrowdwdr");
-
-    script.spawnVariable("Hello", 140);
-
     //     if (doStuffNode)
     //     {
     //         dbgln(doStuffNode->getArchetype());

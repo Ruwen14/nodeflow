@@ -94,7 +94,7 @@ public:
         return "";
     }
 
-    bool setOutputDataFromString(PortIndex index, const std::string& val) override
+    bool setOutputFromString(PortIndex index, const std::string& val) override
     {
         if (index != 0)
             return false;
@@ -102,7 +102,7 @@ public:
         return m_resultPort.setValueFromString(val);
     }
 
-    std::optional<std::string> getOutputDataAsString(PortIndex index) override
+    std::optional<std::string> getOutputAsString(PortIndex index) override
     {
         if (index != 0)
             return std::nullopt;
@@ -146,7 +146,7 @@ public:
                                                        std::index_sequence<seq...>)
     {
         return std::invoke(std::forward<Func>(callable),
-                           *getInputData(std::get<seq>(std::forward<Tuple>(tupl)))...);
+                           *getInput(std::get<seq>(std::forward<Tuple>(tupl)))...);
     }
 
     template <class Func, class Tuple>

@@ -16,26 +16,26 @@ std::string FlowModule::moduleName() const
 std::set<std::string> FlowModule::registered() const
 {
     std::set<std::string> ret;
-    std::transform(m_flowNodeCreators.begin(),
-                   m_flowNodeCreators.end(),
+    std::transform(m_flowNodeRegistry.begin(),
+                   m_flowNodeRegistry.end(),
                    std::inserter(ret, ret.end()),
                    [](auto pair) { return pair.first; });
-    std::transform(m_dataNodeCreators.begin(),
-                   m_dataNodeCreators.end(),
+    std::transform(m_dataNodeRegistry.begin(),
+                   m_dataNodeRegistry.end(),
                    std::inserter(ret, ret.end()),
                    [](auto pair) { return pair.first; });
 
     return ret;
 }
 
-const nf::FlowModule::FlowNodeRegistry& FlowModule::nodeCreators() const
+const FlowModule::FlowNodeRegistry& FlowModule::nodeRegistry() const
 {
-    return m_flowNodeCreators;
+    return m_flowNodeRegistry;
 }
 
-const nf::FlowModule::DataNodeRegistry& FlowModule::dataCreators() const
+const FlowModule::DataNodeRegistry& FlowModule::variableRegistry() const
 {
-    return m_dataNodeCreators;
+    return m_dataNodeRegistry;
 }
 
 nf::Expected<std::pair<std::string, std::string>, nf::RegisterError> FlowModule::
@@ -47,7 +47,7 @@ nf::Expected<std::pair<std::string, std::string>, nf::RegisterError> FlowModule:
     if (namePath.back() == '/')
         return make_unexpected(RegisterError::InvalidNamePath);
 
-    if (m_flowNodeCreators.contains(namePath) || m_dataNodeCreators.contains(namePath))
+    if (m_flowNodeRegistry.contains(namePath) || m_dataNodeRegistry.contains(namePath))
         return make_unexpected(RegisterError::NameAlreadyRegistered);
 
     auto found = namePath.find_last_of("/\\");
