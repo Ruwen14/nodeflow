@@ -393,24 +393,27 @@ public:
 		_ui->tabTwoLayout->addWidget(new nf::CollapsableSection("Secon", new QLabel("hi")));
 		_ui->tabTwoLayout->addStretch();
 
-	connect(innerSection, &nf::CollapsableSection::expanded, this, [this, outerSection] {
-		auto collapsedHeight = outerSection->sizeHint().height() - outerSection->contentArea->height();
-		auto contentHeight = outerSection->contentLayout->sizeHint().height();
-
-		outerSection->collapseButton->toggle();
-		outerSection->collapseButton->toggle();
+		connect(innerSection, &nf::CollapsableSection::expanded, this, [this, outerSection, innerSection] {
 
 
-	});
-	connect(innerSection, &nf::CollapsableSection::collapsed, this, [this, outerSection] {
+			outerSection->collapseButton->toggle();
+			outerSection->recalculate();
+			outerSection->collapseButton->toggle();
+			outerSection->recalculate();
 
-		auto collapsedHeight = outerSection->sizeHint().height() - outerSection->contentArea->height();
-		auto contentHeight = outerSection->contentLayout->sizeHint().height();
+
+		});
+		connect(innerSection, &nf::CollapsableSection::collapsed, this, [this, outerSection, innerSection] {
 
 
-		outerSection->collapseButton->toggle();
-		outerSection->collapseButton->toggle();
-	});
+			outerSection->collapseButton->toggle();
+			outerSection->recalculate();
+			outerSection->collapseButton->toggle();
+			outerSection->recalculate();
+
+
+
+		});
 
 
 

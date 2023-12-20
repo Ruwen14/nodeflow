@@ -233,7 +233,7 @@ namespace nf
 
 	void CollapsableSection::toggle(bool checked)
 	{
-		recalculate();
+// 		recalculate();
 
 
 		// 		collapseButton->setArrowType(checked ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
