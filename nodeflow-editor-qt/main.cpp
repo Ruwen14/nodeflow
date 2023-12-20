@@ -380,7 +380,6 @@ public:
 
 		auto outerWidget = new QWidget();
 		auto outerLay = new QVBoxLayout(outerWidget);
-		outerLay->addWidget(new QLabel("hi"));
 		outerLay->addWidget(innerSection);
 		outerLay->addWidget(new QLabel("hi"));
 
@@ -396,21 +395,19 @@ public:
 		connect(innerSection, &nf::CollapsableSection::expanded, this, [this, outerSection, innerSection] {
 
 
-			outerSection->collapseButton->toggle();
 			outerSection->recalculate();
 			outerSection->collapseButton->toggle();
 			outerSection->recalculate();
+			outerSection->collapseButton->toggle();
 
 
 		});
 		connect(innerSection, &nf::CollapsableSection::collapsed, this, [this, outerSection, innerSection] {
 
-
-			outerSection->collapseButton->toggle();
 			outerSection->recalculate();
 			outerSection->collapseButton->toggle();
 			outerSection->recalculate();
-
+			outerSection->collapseButton->toggle();
 
 
 		});

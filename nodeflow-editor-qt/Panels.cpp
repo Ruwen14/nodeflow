@@ -72,7 +72,6 @@ namespace nf
 		contentLayout = new QVBoxLayout();
 		contentLayout->addWidget(content);
 
-
 		collapseButton = new QToolButton();
 		collapseButton->setText(title);
 		collapseButton->setCheckable(true);
