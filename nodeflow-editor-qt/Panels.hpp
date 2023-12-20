@@ -14,6 +14,7 @@ class QVBoxLayout;
 class QComboBox;
 class QLineEdit;
 class QComboBox;
+class QVBoxLayout;
 
 namespace nf
 {
@@ -22,15 +23,27 @@ namespace nf
 	{
 		Q_OBJECT
 	public:
-		CollapsableSection(const QString& title, QLayout* contentLayout, QWidget* parent = nullptr);
+		CollapsableSection(const QString& title, QWidget* content, QWidget* parent = nullptr);
+
+		CollapsableSection(const QString& title = "", QLayout* contentLayout = nullptr, QWidget* parent = nullptr);
 
 		void expand();
 		void collapse();
 
+
+		void recalculate();
+
+	signals:
+		void expanded();
+		void collapsed();
+
+		void toggled();
+
 	private:
 		void toggle(bool checked);
 
-	private:
+	public:
+		QVBoxLayout* contentLayout;
 		QToolButton* collapseButton;
 		QParallelAnimationGroup* collapseAnimation;
 		QScrollArea* contentArea;
@@ -112,12 +125,38 @@ namespace nf
 		QPushButton* m_addVarButton;
 	};
 
+	class MyPushButton : public QPushButton
+	{
+		Q_OBJECT
+	public:
+		MyPushButton(QWidget* parent = nullptr)
+			: QPushButton(parent)
+		{
+			setObjectName("MyPushButton");
+			setText("MyPushButton");
+		}
+
+
+	protected:
+
+	};
+
 	class ScriptContentPanel : public QWidget
 	{
 		Q_OBJECT
 
 	public:
 		ScriptContentPanel(QWidget* parent = nullptr);
+
+	protected:
+
+		void paintEvent(QPaintEvent*) override
+		{
+			QStyleOption opt;
+			opt.init(this);
+			QPainter p(this);
+			style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+		}
 
 	public:
 		QVBoxLayout* contentLayout = nullptr;

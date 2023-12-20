@@ -1,0 +1,29 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/arrow-down.svg</file>
+        <file>icons/arrow-down-white.svg</file>
+        <file>icons/arrow-up.svg</file>
+        <file>icons/arrow-up-white.svg</file>
+        <file>icons/box-align-bottom-filled.svg</file>
+        <file>icons/box-align-left-filled.svg</file>
+        <file>icons/box-align-right-filled.svg</file>
+        <file>icons/box-align-top-filled.svg</file>
+        <file>icons/check.svg</file>
+        <file>icons/cross.svg</file>
+        <file>icons/cross-white.svg</file>
+        <file>icons/minus.svg</file>
+        <file>icons/missile-svgrepo-com.svg</file>
+        <file>icons/plus.svg</file>
+        <file>icons/progress-pattern.svg</file>
+        <file>icons/radio.svg</file>
+        <file>icons/triangle-down.svg</file>
+        <file>icons/triangle-down-gray.svg</file>
+        <file>icons/triangle-down-white.svg</file>
+        <file>icons/triangle-right.svg</file>
+        <file>icons/triangle-right-cropped.svg</file>
+        <file>icons/triangle-right-gray.svg</file>
+        <file>icons/triangle-right-white.svg</file>
+        <file>icons/uncheck.svg</file>
+        <file>icons/unradio.svg</file>
+    </qresource>
+</RCC>

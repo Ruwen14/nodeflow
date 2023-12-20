@@ -5,6 +5,44 @@
 #include "Panels.hpp"
 #include "nodeflow/utility/dbgln.hpp"
 #include "nodeflow/reflection/type_reflection.hpp"
+#include "ui_Example.h"
+#include "Section.h"
+
+/**
+ * Helper function for forceUpdate(). Not self-sufficient!
+ */
+void invalidateLayout(QLayout* layout) {
+	// Recompute the given layout and all its child layouts.
+	for (int i = 0; i < layout->count(); i++) {
+		QLayoutItem* item = layout->itemAt(i);
+		if (item->layout()) {
+			invalidateLayout(item->layout());
+		}
+		else {
+			item->invalidate();
+		}
+	}
+	layout->invalidate();
+	layout->activate();
+}
+
+
+void forceUpdate(QWidget* widget) {
+	// Update all child widgets.
+	for (int i = 0; i < widget->children().size(); i++) {
+		QObject* child = widget->children()[i];
+		if (child->isWidgetType()) {
+			forceUpdate((QWidget*)child);
+		}
+	}
+
+	// Invalidate the layout of the widget.
+	if (widget->layout()) {
+		invalidateLayout(widget->layout());
+	}
+}
+
+
 
 void setStyleMode(const QString& mode)
 {
@@ -228,7 +266,7 @@ public:
 		caseSensitivityCB->setFont(font);
 		connect(caseSensitivityCB, &QCheckBox::stateChanged, this, [this](int state) {
 			proxyModel->setFilterCaseSensitivity(state == Qt::Checked ? Qt::CaseSensitive : Qt::CaseInsensitive);
-		view->expandAll(); // Current Sort might collapse matches, so update it.
+			view->expandAll(); // Current Sort might collapse matches, so update it.
 		});
 
 		auto headerLay = new QHBoxLayout();
@@ -284,6 +322,104 @@ public:
 	QTimer* searchFinishedTimer;
 };
 
+class Example : public QWidget
+{
+public:
+	Example(QWidget* parent = nullptr) : QWidget(parent), _ui(new Ui::ExampleForm())
+	{
+		_ui->setupUi(this);
+
+
+		// 		auto layout = new QVBoxLayout();
+		// 		inner->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+		// 
+		// 		inner->contentArea->setStyleSheet("border: 1px solid blue;");
+		// 
+		// 		layout->addWidget(inner);
+		// 		layout->addWidget(new QLabel("hi"));
+		// 		layout->addStretch();
+
+
+		auto widget = new QWidget();
+		// 		widget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+		widget->setObjectName("widget");
+		widget->setStyleSheet("#widget{border: 1px solid magenta;}");
+
+
+
+		auto w = new QWidget();
+		auto l = new QVBoxLayout(w);
+		l->addWidget(new QLabel("Hi 1"));
+		l->addWidget(new QLabel("Hi 2"));
+
+		// 		auto inner = new nf::CollapsableSection("Inner", w);
+		// 		inner->contentArea->setStyleSheet("QScrollArea{border: 1px solid blue;}");
+
+
+		auto lel = new QWidget();
+		auto la = new QVBoxLayout(lel);
+
+		// 		la->addWidget(new QLabel("HWW"));
+		// 		la->addWidget(inner);
+		// 		la->addStretch();
+
+
+				// 		widget->setFixedHeight(30);
+
+
+
+		auto innerWidget = new QWidget();
+		innerWidget->setLayout(new QVBoxLayout());
+		innerWidget->layout()->addWidget(new QLabel("Inner 1"));
+		innerWidget->layout()->addWidget(new QLabel("Inner 2"));
+
+		auto innerSection = new nf::CollapsableSection("Inner", innerWidget);
+
+
+
+
+		auto outerWidget = new QWidget();
+		auto outerLay = new QVBoxLayout(outerWidget);
+		outerLay->addWidget(new QLabel("hi"));
+		outerLay->addWidget(innerSection);
+		outerLay->addWidget(new QLabel("hi"));
+
+
+		auto outerSection = new nf::CollapsableSection("Outer", outerWidget);
+
+
+
+		_ui->tabTwoLayout->addWidget(outerSection);
+		_ui->tabTwoLayout->addWidget(new nf::CollapsableSection("Secon", new QLabel("hi")));
+		_ui->tabTwoLayout->addStretch();
+
+	connect(innerSection, &nf::CollapsableSection::expanded, this, [this, outerSection] {
+		auto collapsedHeight = outerSection->sizeHint().height() - outerSection->contentArea->height();
+		auto contentHeight = outerSection->contentLayout->sizeHint().height();
+
+		outerSection->collapseButton->toggle();
+		outerSection->collapseButton->toggle();
+
+
+	});
+	connect(innerSection, &nf::CollapsableSection::collapsed, this, [this, outerSection] {
+
+		auto collapsedHeight = outerSection->sizeHint().height() - outerSection->contentArea->height();
+		auto contentHeight = outerSection->contentLayout->sizeHint().height();
+
+
+		outerSection->collapseButton->toggle();
+		outerSection->collapseButton->toggle();
+	});
+
+
+
+
+	}
+
+	Ui::ExampleForm* _ui;
+};
+
 // TODO move, copy, assign, constructor
 
 int main(int argc, char* argv[])
@@ -296,8 +432,12 @@ int main(int argc, char* argv[])
 	QApplication app(argc, argv);
 	app.setStyle("Fusion");
 	//
-	setStyleMode("darkmode");
+// 	setStyleMode("darkmode");
 	setAppFont("Roboto");
+	QFile file("ue.qss");
+	file.open(QFile::ReadOnly);
+	QString styleSheet = QLatin1String(file.readAll());
+	qApp->setStyleSheet(styleSheet);
 
 	// 	QPixmap c;
 	// 	c.load("C:/Users/ruwen/OneDrive/Desktop/nodeflow/nodeflow-editor/icons/icon_BluePrintEditor_Function_16px_png.png");
@@ -307,7 +447,8 @@ int main(int argc, char* argv[])
 	// 	auto k = w.children();
 // 	w.show();
 
-	nf::FlowEditor w;
+	Example w;
+
 	w.show();
 
 	return app.exec();

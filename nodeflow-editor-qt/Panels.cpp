@@ -65,6 +65,72 @@ namespace nf
 		}
 	};
 
+	CollapsableSection::CollapsableSection(const QString& title, QWidget* content, QWidget* parent)
+		: QWidget(parent)
+
+	{
+		contentLayout = new QVBoxLayout();
+		contentLayout->addWidget(content);
+
+
+		collapseButton = new QToolButton();
+		collapseButton->setText(title);
+		collapseButton->setCheckable(true);
+		collapseButton->setChecked(false);
+		collapseButton->setStyleSheet(R"""(
+			QToolButton
+			{
+				border: none;
+				color: lightGray;
+				background-color: rgb(56, 56, 56);
+				border-radius: 0px;
+				padding: 5px;
+			}
+			)""");
+
+		collapseButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+		collapseButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		collapseButton->setIcon(QIcon(":/icons/triangle-down-gray.svg"));
+		collapseButton->setIconSize(QSize(15, 15));
+
+		// 		collapseButton->setArrowType(Qt::RightArrow);
+		auto font = QApplication::font();
+		font.setPointSize(8);
+		font.setBold(true);
+		collapseButton->setFont(font);
+		connect(collapseButton, &QToolButton::toggled, this, &CollapsableSection::toggle);
+
+		collapseAnimation = new QParallelAnimationGroup(this);
+		contentArea = new QScrollArea(this);
+		contentArea->setMaximumHeight(0);
+		contentArea->setMinimumHeight(0);
+		contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		contentArea->setFrameShape(QFrame::NoFrame);
+
+
+		auto sectionLayout = new QVBoxLayout(this);
+		sectionLayout->setSpacing(0);
+		sectionLayout->setContentsMargins(0, 0, 0, 0);
+		sectionLayout->addWidget(collapseButton);
+
+		sectionLayout->addWidget(contentArea);
+
+		collapseAnimation->addAnimation(new QPropertyAnimation(this, "minimumHeight"));
+		collapseAnimation->addAnimation(new QPropertyAnimation(this, "maximumHeight"));
+		collapseAnimation->addAnimation(new QPropertyAnimation(contentArea, "maximumHeight"));
+
+		contentArea->setLayout(contentLayout);
+
+		recalculate();
+
+		expand();
+
+
+		connect(collapseAnimation, &QParallelAnimationGroup::finished, this, [this]() {
+			emit toggled();
+		});
+
+	}
 	CollapsableSection::CollapsableSection(const QString& title, QLayout* contentLayout, QWidget* parent)
 		: QWidget(parent)
 	{
@@ -85,7 +151,10 @@ namespace nf
 
 		collapseButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 		collapseButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-		collapseButton->setArrowType(Qt::RightArrow);
+		collapseButton->setIcon(QIcon(":/icons/triangle-down-gray.svg"));
+		collapseButton->setIconSize(QSize(15, 15));
+
+		// 		collapseButton->setArrowType(Qt::RightArrow);
 		auto font = QApplication::font();
 		font.setPointSize(8);
 		font.setBold(true);
@@ -110,12 +179,24 @@ namespace nf
 		sectionLayout->addWidget(hline);
 		sectionLayout->addWidget(contentArea);
 
+
+		contentArea->setLayout(contentLayout);
+
 		collapseAnimation->addAnimation(new QPropertyAnimation(this, "minimumHeight"));
 		collapseAnimation->addAnimation(new QPropertyAnimation(this, "maximumHeight"));
 		collapseAnimation->addAnimation(new QPropertyAnimation(contentArea, "maximumHeight"));
 
-		contentArea->setLayout(contentLayout);
-		auto collapsedHeight = sizeHint().height() - contentArea->maximumHeight();
+		recalculate();
+
+		expand();
+	}
+
+
+	void CollapsableSection::recalculate()
+	{
+		auto collapsedHeight = std::abs(sizeHint().height() - contentArea->maximumHeight());
+
+		qDebug() << collapsedHeight;
 		auto contentHeight = contentLayout->sizeHint().height();
 
 		for (int i = 0; i < collapseAnimation->animationCount(); ++i)
@@ -124,6 +205,7 @@ namespace nf
 			animation->setDuration(0);
 			animation->setStartValue(collapsedHeight);
 			animation->setEndValue(collapsedHeight + contentHeight);
+
 		}
 
 		auto contentAnimation = static_cast<QPropertyAnimation*>(
@@ -133,7 +215,6 @@ namespace nf
 		contentAnimation->setDuration(0);
 		contentAnimation->setStartValue(0);
 		contentAnimation->setEndValue(contentHeight);
-		expand();
 	}
 
 	void CollapsableSection::expand()
@@ -148,11 +229,38 @@ namespace nf
 			collapseButton->toggle();
 	}
 
+
+
 	void CollapsableSection::toggle(bool checked)
 	{
-		collapseButton->setArrowType(checked ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
+		recalculate();
+
+
+		// 		collapseButton->setArrowType(checked ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
+		collapseButton->setIcon(checked ? QIcon(":/icons/triangle-down-gray.svg") : QIcon(":/icons/triangle-right-gray.svg"));
+
 		collapseAnimation->setDirection(checked ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
+
+		auto collapsedHeight = sizeHint().height() - contentArea->maximumHeight();
+		auto contentHeight = contentLayout->sizeHint().height();
+
+
+
 		collapseAnimation->start();
+
+
+		if (checked)
+		{
+			emit expanded();
+		}
+		else
+		{
+			emit collapsed();
+		}
+
+
+
+
 	}
 
 	VariableAddConfigurator::VariableAddConfigurator(const QList<QString>& availabelVarTypes, QWidget* parent /*= nullptr*/)
@@ -165,20 +273,20 @@ namespace nf
 		setObjectName("VariableAddConfigurator"),
 
 			setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
-		setStyleSheet(R"""(
-						#VariableAddConfigurator
-						{
-							border: 1px solid red;
-						}
-						QLabel, QLineEdit
-						{
-							font-size: 8pt;
-						}
-		)""");
+		//setStyleSheet(R"""(
+		//				#VariableAddConfigurator
+		//				{
+		//					border: 1px solid red;
+		//				}
+		//				QLabel, QLineEdit
+		//				{
+		//					font-size: 8pt;
+		//				}
+		//)""");
 
 		auto box = new QGroupBox("Create New");
 		box->setFlat(true);
-		box->setStyleSheet("QGroupBox::title {color: darkGray;} QGroupBox{background-color:rgb(61, 61, 60);}");
+		// 		box->setStyleSheet("QGroupBox::title {color: darkGray;} QGroupBox{background-color:rgb(61, 61, 60);}");
 		auto font = QApplication::font();
 		font.setBold(true);
 		font.setPointSize(8);
@@ -217,20 +325,20 @@ namespace nf
 
 			// 		setFrameStyle(QFrame::Panel | QFrame::Raised);
 			setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
-		setStyleSheet(R"""(
-						#AddVariableConfigPopup
-						{
-							border: 1px solid rgb(79, 79, 79);
-						}
-						QLabel, QLineEdit
-						{
-							font-size: 8pt;
-						}
-		)""");
+		//setStyleSheet(R"""(
+		//				#AddVariableConfigPopup
+		//				{
+		//					border: 1px solid red;
+		//				}
+		//				QLabel, QLineEdit
+		//				{
+		//					font-size: 8pt;
+		//				}
+		//)""");
 
 		auto box = new QGroupBox("Configuration");
 		box->setFlat(true);
-		box->setStyleSheet("QGroupBox::title {color: darkGray;}");
+		// 		box->setStyleSheet("QGroupBox::title {color: darkGray;}");
 		auto font = QApplication::font();
 		font.setBold(true);
 		font.setPointSize(8);
@@ -368,16 +476,16 @@ namespace nf
 	void ScriptVariablesSection::setupNewVariableCreator(const QList<QString>& availabelVarTypes, QVBoxLayout* mainLay)
 	{
 		auto box = new QGroupBox("Create New");
-		box->setStyleSheet(R"""(
-						QGroupBox::title {color: darkGray;}
-						QGroupBox {
-							background-color: rgb(26, 26, 26);
-							border: none;
-							margin-top: 10px;
-						}
-						QLabel, QLineEdit { font-size: 8pt; }
-
-		)""");
+		//box->setStyleSheet(R"""(
+		//				QGroupBox::title {color: darkGray;}
+		//				QGroupBox {
+		//					background-color: rgb(26, 26, 26);
+		//					border: none;
+		//					margin-top: 10px;
+		//				}
+		//				QLabel, QLineEdit { font-size: 8pt; }
+		//
+		//)""");
 
 		auto font = QApplication::font();
 		font.setBold(true);
@@ -407,23 +515,23 @@ namespace nf
 
 		m_addVarButton->setIcon(createPlusIcon());
 		// 		m_addVarButton->setFlat(true);
-		m_addVarButton->setStyleSheet(R"""(
-		 QPushButton
-            {
-                background-color: rgb(87, 87, 87);
-				border: none;
-            }
-
-            QPushButton:pressed
-            {
-                background-color: rgb(47, 47, 47);
-            }
-
-            QPushButton:hover:!pressed
-            {
-                background-color: rgb(87, 87, 87);
-            }
-		)""");
+		//m_addVarButton->setStyleSheet(R"""(
+		// QPushButton
+		//    {
+		//        background-color: rgb(87, 87, 87);
+		//		border: none;
+		//    }
+		//
+		//    QPushButton:pressed
+		//    {
+		//        background-color: rgb(47, 47, 47);
+		//    }
+		//
+		//    QPushButton:hover:!pressed
+		//    {
+		//        background-color: rgb(87, 87, 87);
+		//    }
+		//)""");
 
 		m_addVarButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
@@ -455,6 +563,7 @@ namespace nf
 		scriptVariablesTable = new ScriptVariablesTable({ "Boolean", "Byte", "Integer", "Float", "String", "Vector", "Rotator", "Transform" });
 		scriptVarablesSectionLayout->setContentsMargins(9, 0, 0, 9);
 		scriptVarablesSectionLayout->addWidget(scriptVariablesTable);
+
 		auto scriptVariablesSection = new nf::CollapsableSection("VARIABLES", scriptVarablesSectionLayout);
 		scriptVariablesTable->addNewVariable("MyNewVar", "Float", Qt::red);
 
@@ -462,19 +571,37 @@ namespace nf
 		scriptRealVariablesSectionLayout->setContentsMargins(0, 0, 0, 0);
 		scriptRealVariablesSectionLayout->setSpacing(0);
 		auto scriptRealVariableSection = new ScriptVariablesSection({ "Boolean", "Byte", "Integer", "Float", "String", "Vector", "Rotator", "Transform" });
-		scriptRealVariablesSectionLayout->addWidget(scriptRealVariableSection);
+		scriptRealVariablesSectionLayout->addWidget(new QLineEdit());
+		scriptRealVariablesSectionLayout->addWidget(new QLineEdit());
+		scriptRealVariablesSectionLayout->addWidget(new QLineEdit());
+		scriptRealVariablesSectionLayout->addWidget(new QLineEdit());
+		scriptRealVariablesSectionLayout->addWidget(new QLineEdit());
+
+		auto label = new QLabel("Hi");
+		label->setText("Hi");
+		auto labelLayout = new QVBoxLayout();
+		labelLayout->addWidget(label);
+		auto nestedSection = new nf::CollapsableSection("NESTED", labelLayout);
+
+		scriptRealVariablesSectionLayout->addWidget(new MyPushButton());
+
 		auto scriptVariablesSectionBox = new nf::CollapsableSection("REAL VARIABLES", scriptRealVariablesSectionLayout);
+
+		auto lay = new QVBoxLayout(this);
+		lay->addWidget(new MyPushButton());
+		auto lastSection = new nf::CollapsableSection("REAL VARIABLES", lay);
 
 		scriptVariablesSectionBox->setMinimumWidth(300);
 
 		contentLayout->addWidget(scriptVariablesSection);
 		contentLayout->addWidget(scriptVariablesSectionBox);
+		contentLayout->addWidget(lastSection);
 
 		contentLayout->setContentsMargins(2, 2, 2, 2);
 		contentLayout->setSpacing(4);
 		contentLayout->addStretch();
 
-		contentWidget->setStyleSheet("background-color: rgb(26, 26, 26);");
+		// 		contentWidget->setStyleSheet("background-color: rgb(26, 26, 26);");
 	}
 
 	InspectorPanel::InspectorPanel(QWidget* parent /*= nullptr*/)
